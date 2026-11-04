@@ -1,0 +1,65 @@
+{
+  "_comment": [
+    "Address keywords and their abbreviations.",
+    "Each entry: 'short' is used when formatting, 'long' is the full word,",
+    "'aliases' are every spelling we accept as input (one word each).",
+    "Write aliases in correct Turkish; matching ignores case, Turkish letters,",
+    "dots and colons, so 'Sokağı', 'SOKAGI' and 'sokagi.' are the same alias.",
+    "To add a new abbreviation, add it to the 'aliases' list and run the tests."
+  ],
+  "mahalle": {
+    "short": "Mah.",
+    "long": "Mahallesi",
+    "aliases": ["mah", "mh", "mahalle", "mahallesi"]
+  },
+  "cadde": {
+    "short": "Cad.",
+    "long": "Caddesi",
+    "aliases": ["cad", "cd", "cadde", "caddesi", "cadd"]
+  },
+  "sokak": {
+    "short": "Sk.",
+    "long": "Sokağı",
+    "aliases": ["sok", "sk", "sokak", "sokağı"]
+  },
+  "bulvar": {
+    "short": "Blv.",
+    "long": "Bulvarı",
+    "aliases": ["blv", "bulv", "bulvar", "bulvarı"]
+  },
+  "site": {
+    "short": "Sit.",
+    "long": "Sitesi",
+    "aliases": ["sit", "site", "sitesi"]
+  },
+  "apartman": {
+    "short": "Apt.",
+    "long": "Apartmanı",
+    "aliases": ["apt", "ap", "apart", "apartman", "apartmanı"]
+  },
+  "blok": {
+    "short": "Bl.",
+    "long": "Blok",
+    "aliases": ["bl", "blk", "blok", "bloğu", "blokları"]
+  },
+  "bina_no": {
+    "short": "No:",
+    "long": "No",
+    "aliases": ["no", "numara", "num"]
+  },
+  "kat": {
+    "short": "K:",
+    "long": "Kat",
+    "aliases": ["k", "kat", "katı"]
+  },
+  "daire": {
+    "short": "D:",
+    "long": "Daire",
+    "aliases": ["d", "daire", "dairesi"]
+  },
+  "posta_kodu": {
+    "short": "PK:",
+    "long": "Posta Kodu",
+    "aliases": ["pk"]
+  }
+}
