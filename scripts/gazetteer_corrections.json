@@ -1,0 +1,37 @@
+{
+  "_comment": [
+    "Reviewed fixes for known Wikidata problems, applied by build_gazetteer.py.",
+    "Every entry names a Wikidata item (QID) and a reason, so it can be checked",
+    "and ideally fixed upstream on Wikidata too. When Wikidata is fixed, remove",
+    "the entry here and rebuild. 'aliases' are other names people still write",
+    "in addresses; they are matched but never shown as the official name."
+  ],
+  "province_aliases": {
+    "Q45220": {"aliases": ["Afyon"], "reason": "Common short name of Afyonkarahisar."},
+    "Q482834": {"aliases": ["Maraş", "K.Maraş"], "reason": "Common short names of Kahramanmaraş."},
+    "Q388469": {"aliases": ["Urfa"], "reason": "Common short name of Şanlıurfa."},
+    "Q483154": {"aliases": ["Antep"], "reason": "Common short name of Gaziantep."},
+    "Q132637": {"aliases": ["İçel"], "reason": "Former official name of Mersin province (until 2002)."}
+  },
+  "district_names": {
+    "Q2318164": {"name": "Kahramankazan", "aliases": ["Kazan"], "reason": "Renamed in 2016; Wikidata label is the old name 'Kazan (rayon)'."},
+    "Q49103426": {"name": "Eyüpsultan", "aliases": ["Eyüp"], "reason": "Renamed in 2017; item has no Turkish label, other labels say 'Eyüp'."},
+    "Q2641900": {"name": "Aziziye", "aliases": ["Ilıca"], "reason": "Official name is Aziziye; Wikidata label is the old name 'Ilıca'."},
+    "Q10802916": {"name": "19 Mayıs", "aliases": ["Ondokuzmayıs", "Ondokuz Mayıs"], "reason": "Official spelling is '19 Mayıs'."},
+    "Q49109678": {"name": "Tuşba", "aliases": ["Tuşpa"], "reason": "Official spelling is 'Tuşba'."},
+    "Q2025428": {"name": "Marmaraereğlisi", "aliases": ["Marmara Ereğlisi"], "reason": "Official spelling is one word."},
+    "Q1012887": {"name": "Ereğli", "aliases": ["Karadeniz Ereğli", "Karadeniz Ereğlisi"], "reason": "Official name is 'Ereğli' (Zonguldak); 'Karadeniz Ereğli' is the common name."},
+    "Q15961692": {"name": "Ereğli", "aliases": ["Karadeniz Ereğli", "Karadeniz Ereğlisi"], "reason": "Duplicate item of Zonguldak/Ereğli with the common name."},
+    "Q49103932": {"name": "Güney", "reason": "Wikidata label 'Güney Bölgesi' (region) is wrong for this district."},
+    "Q14329111": {"name": "Selçuklu", "reason": "Wikidata label 'Selçuklular' is wrong; the district is Selçuklu."},
+    "Q2205869": {"name": "Yahyalı", "reason": "Typo in Wikidata label ('Yahyal İlçesi')."},
+    "Q2932699": {"name": "Altınordu", "reason": "Label 'Ordu (Altınordu) ilçesi' would clean to the province name."}
+  },
+  "extra_districts": {
+    "Q141623322": {"il": "İstanbul", "reason": "Şile district item has no 'located in' (P131) statement."}
+  },
+  "drop_districts": {
+    "Q49105637": {"reason": "A Wikimedia disambiguation page wrongly typed as a district of Konya."},
+    "Q116788474": {"reason": "Burmageçit is not a district of Tunceli."}
+  }
+}
