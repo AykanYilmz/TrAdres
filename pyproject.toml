@@ -1,0 +1,108 @@
+[project]
+name = "tradres"
+version = "0.1.0.dev0"
+description = "Parse, normalize and validate Turkish addresses."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Arif Aykan Yilmaz", email = "aykan010@outlook.com" }
+]
+requires-python = ">=3.10"
+dependencies = []
+keywords = ["turkish", "address", "parser", "geocoding", "nlp", "adres", "türkçe"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: Turkish",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Text Processing :: Linguistic",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/AykanYilmz/TrAdres"
+Issues = "https://github.com/AykanYilmz/TrAdres/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tradres"]
+
+# --------------------------------------------------------------------------- #
+# Development dependencies (not installed by `pip install tradres`)
+# --------------------------------------------------------------------------- #
+[dependency-groups]
+dev = [
+    "hypothesis>=6.168.5",
+    "mypy>=2.4.1",
+    "pre-commit>=4.6.2",
+    "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.3",
+]
+
+# --------------------------------------------------------------------------- #
+# Ruff: linter + formatter
+# --------------------------------------------------------------------------- #
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort (import order)
+    "UP",       # pyupgrade (modern syntax)
+    "B",        # flake8-bugbear (likely bugs)
+    "SIM",      # flake8-simplify
+    "N",        # pep8-naming
+    "RUF",      # ruff-specific rules
+    "PT",       # flake8-pytest-style
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["N802"]
+
+# --------------------------------------------------------------------------- #
+# mypy: strict static typing
+# --------------------------------------------------------------------------- #
+[tool.mypy]
+strict = true
+python_version = "3.10"
+files = ["src", "tests"]
+
+# --------------------------------------------------------------------------- #
+# pytest + coverage
+# --------------------------------------------------------------------------- #
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=tradres",
+    "--cov-report=term-missing",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["tradres"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]

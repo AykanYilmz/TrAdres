@@ -1,0 +1,188 @@
+# Proje: Türkçe Adres Ayrıştırıcı (açık kaynak Python kütüphanesi + CLI + API)
+
+> Bu dosya projenin ana talimatıdır. Her oturumun başında bunu oku, en alttaki **İlerleme** bölümünden kaldığımız yeri bul ve oradan devam et.
+
+## 0. Rolün ve çalışma şeklimiz
+
+Sen deneyimli bir Python kütüphane geliştiricisi ve açık kaynak bakımcısısın. Ben (Aykan) junior bir yazılım geliştiriciyim; bu proje hem portfolyom hem de gerçekten kullanılacak bir açık kaynak araç olacak. **Amacım sadece çalışan kod değil, her kararı mülakatta anlatabilecek kadar anlamak.**
+
+Kurallar:
+1. **Fazlar halinde ilerle.** Her fazın sonunda dur, ne yaptığını ve neden öyle yaptığını 5–10 maddede özetle, benim onayımı bekle. Bir sonraki faza kendiliğinden geçme.
+2. **Büyük kararlarda önce seçenekleri sun** (kütüphane seçimi, veri kaynağı, API tasarımı, isimlendirme): 2–3 seçenek, artı/eksi, senin önerin. Ben seçeyim.
+3. **Öğret:** Yeni bir kavram kullandığında (ör. trie, fuzzy matching, property-based test, trusted publishing) bir iki cümleyle ne olduğunu ve neden gerektiğini açıkla.
+4. **Bazı kısımları ben yazayım:** Her fazda bana uygun boyutta bir parçayı (bir fonksiyon, birkaç test) "senin görevin" olarak bırak; ben yazınca gözden geçir.
+5. **Ölçmeden özellik ekleme.** Doğruluğu artırdığını iddia ettiğin her değişikliği değerlendirme setinde (Faz 3) ölç, önce/sonra sayılarını göster.
+6. **Bağımlılıkları az tut.** Her yeni bağımlılığı gerekçelendir. Çekirdek kütüphane mümkünse sadece `rapidfuzz` gibi küçük bir bağımlılıkla çalışsın; API, CLI ve demo `extras` olarak gelsin.
+7. Commit'ler küçük ve **Conventional Commits** formatında olsun (`feat:`, `fix:`, `test:`, `docs:`, `chore:`). Her commit'te testler geçsin.
+8. Emin olmadığın bir bilgiyi (veri lisansı, bir kütüphanenin güncel API'si, PyPI'da isim müsaitliği) uydurma; kontrol et ya da bana sor.
+
+## 1. Problem
+
+Türkiye'de adresler serbest metin olarak yazılıyor ve son derece dağınık:
+
+```
+Atatürk Mah. 23 Nisan Cad. No:5/3 Merkez/Bolu
+ataturk mh 23nisan cd no 5 d 3 bolu merkez
+Çankaya Ankara Kızılay Mahallesi Gazi Mustafa Kemal Blv. No: 12 Kat: 4 Daire: 8
+CANKAYA/ANKARA kizilay mah gmk bulvarı 12/8
+Yenimahalle Ankara, Batıkent, 1923. Cadde, Toki Konutları B-3 Blok, No:7, D:14
+```
+
+E-ticaret, kargo, CRM ve lojistik yazan her ekip bu adresleri parçalamak, doğrulamak ve standart biçime getirmek zorunda. Bu kütüphane bunu yapacak:
+
+```python
+from tradres import parse
+
+result = parse("ataturk mh 23nisan cd no 5 d 3 bolu merkez")
+result.il            # "Bolu"
+result.ilce          # "Merkez"
+result.mahalle       # "Atatürk"
+result.cadde         # "23 Nisan"
+result.bina_no       # "5"
+result.daire         # "3"
+result.confidence    # 0.0–1.0 arası genel güven skoru
+result.format()      # "Atatürk Mah. 23 Nisan Cad. No:5 D:3 Merkez/Bolu"
+result.to_dict()     # JSON'a hazır sözlük, her alanın kendi güven skoruyla
+```
+
+## 2. Kapsam
+
+### v0.1 (ilk yayın) — olmazsa olmazlar
+- **Normalizasyon**
+  - Türkçe'ye doğru büyük/küçük harf dönüşümü (Python'un `str.lower()`'ı `I → i` yapar, Türkçe'de `I → ı`, `İ → i` olmalı). Kendi `tr_lower` / `tr_upper` fonksiyonlarımız olsun ve testleri bulunsun.
+  - ASCII'ye çevrilmiş girdiyi tanıma: `cankaya` → `Çankaya`, `sisli` → `Şişli` (eşleştirme Türkçe karakterlerden bağımsız bir anahtar üzerinden yapılsın, çıktı her zaman doğru Türkçe yazımla dönsün).
+  - Kısaltmalar: `Mah./Mh./Mahallesi`, `Cad./Cd./Caddesi`, `Sok./Sk./Sokağı`, `Blv./Bulvarı`, `Apt./Apartmanı`, `Sit./Sitesi`, `Bl./Blok`, `No:/No`, `D:/Daire`, `K:/Kat` vb. Bu liste kodun içine gömülmesin, ayrı bir veri dosyasında dursun ki katkıcılar kolayca eklesin.
+  - Boşluk, noktalama ve birleşik yazım temizliği (`23nisan` → `23 Nisan`, `No:5/3` → bina 5, daire 3).
+- **Bileşen çıkarma:** il, ilçe, mahalle, cadde, sokak, bulvar, site, blok, bina no, kat, daire, posta kodu. Tanınamayan kısım `kalan` (unparsed) alanına konsun, asla sessizce atılmasın.
+- **Gazetteer (resmi yer adları) ile doğrulama:** il → ilçe → mahalle hiyerarşisi. Bir ilçe yanlış ile eşleşirse güven düşsün; il yazılmamışsa ilçeden çıkarılabiliyorsa (tek bir ile aitse) doldurulsun ve bu durum işaretlensin.
+- **Bulanık eşleştirme:** Yazım hatalarını tolere et (`Kızılay` / `Kizilay` / `Kzılay`). Eşik değerleri sabit kodlanmasın, ayarlanabilir olsun.
+- **Sıra bağımsızlığı:** `Merkez/Bolu`, `Bolu Merkez`, `Bolu - Merkez`, adresin başında ya da sonunda il/ilçe.
+- **Güven skoru:** Her alan için ve genel olarak. Nasıl hesaplandığı README'de açıklansın.
+- **Standart biçimlendirme:** `result.format()` tek, tutarlı bir yazım üretsin.
+- **CLI:** `tradres parse "adres"` (JSON çıktı) ve `tradres parse-csv girdi.csv --column adres -o cikti.csv` (toplu işleme, ilerleme çubuğu).
+- **Tip güvenliği:** Tüm public API tip ipuçlu, `py.typed` dosyası olan, `mypy --strict` ile temiz.
+
+### v0.2 ve sonrası (şimdi yapma, yol haritasına yaz)
+- FastAPI servisi + Docker image (tekli ve toplu `/parse` uç noktaları)
+- Hugging Face Spaces'te (Gradio) canlı demo
+- Posta kodu tahmini ve doğrulaması
+- Belirsiz adreslerde birden fazla aday döndürme (`parse_candidates`)
+- "… karşısı", "… yanı" gibi tarif ifadelerini `tarif` alanına ayırma
+- Değerlendirme seti kural tabanlı yaklaşımda tıkanırsa küçük bir NER modeli denemek (önce ölç, sonra karar ver)
+
+### Kapsam dışı
+- Coğrafi koordinat (geocoding) — harici servis gerektirir
+- Gerçek kişilere ait adres verisi toplamak
+
+## 3. Veri
+
+- İl/ilçe/mahalle listesi için **lisansı açık ve güncel** bir kaynak bul. Seçenekleri (resmi kurumların yayınladığı listeler, açık topluluk veri setleri) lisansları, güncellikleri ve kapsamlarıyla birlikte bana sun; ben seçeyim. İzin vermeyen bir siteyi kazıma.
+- Ham veriyi işleyip pakete gömülecek kompakt bir biçime (ör. sıkıştırılmış JSON) dönüştüren bir **build script'i** yaz (`scripts/build_gazetteer.py`). Paketin içindeki veri bu script'le yeniden üretilebilir olsun.
+- Verinin kaynağını, lisansını ve tarihini `DATA_SOURCES.md` dosyasında belgele.
+- Paket kurulumunda internet gerekmesin; veri paketle gelsin. Paket boyutunu ölç ve README'ye yaz.
+- Gazetteer bir kez yüklensin (lazy loading + cache), arama için uygun bir indeks kullanılsın (ör. ASCII anahtarlı sözlük, gerekirse trie). Hangisini neden seçtiğini açıkla.
+
+## 4. Mimari
+
+`src/` düzeni kullan. Önerilen modüller (gerekirse değiştir ama gerekçelendir):
+
+```
+src/tradres/
+├── __init__.py          # public API: parse, normalize, Address
+├── models.py            # Address dataclass'ı / alanlar, güven skorları, to_dict, format
+├── normalize.py         # Türkçe harf dönüşümü, ASCII anahtar, temizlik
+├── abbreviations.py     # kısaltma sözlüğünü yükleyen kod (veri ayrı dosyada)
+├── tokenizer.py         # adresi anlamlı parçalara bölme
+├── extractors/          # her bileşen için ayrı çıkarıcı (numara, sokak, mahalle, il/ilçe...)
+├── gazetteer.py         # yer adı verisi, indeks, hiyerarşi doğrulaması
+├── matching.py          # bulanık eşleştirme, eşikler
+├── scoring.py           # güven skoru hesaplama
+├── parser.py            # her şeyi birleştiren pipeline
+├── cli.py               # komut satırı arayüzü
+├── data/                # gömülü gazetteer ve kısaltma dosyaları
+└── py.typed
+```
+
+Pipeline: `ham metin → normalize → tokenize → sayısal alanlar (no/kat/daire/posta kodu) → yer adları (gazetteer + fuzzy) → sokak/cadde/site/blok → hiyerarşi doğrulama → skorlama → Address`.
+
+Her aşama saf (pure) fonksiyon olsun, ayrı ayrı test edilebilsin.
+
+## 5. Kalite
+
+- **Testler:** `pytest`. Her modülün birim testleri + uçtan uca testler.
+- **Property-based test:** `hypothesis` ile ör. "normalize iki kez uygulanınca sonuç değişmez", "parse asla exception fırlatmaz, en kötü ihtimalle boş alanlar döner", "format edilen adres tekrar parse edilince aynı alanlar çıkar".
+- **Değerlendirme seti (çok önemli):** `eval/` klasöründe, elle etiketlenmiş en az 300 adres (YAML/JSON: girdi → beklenen alanlar). Farklı yazım tarzları, hatalar, eksik bilgiler, farklı iller içersin. **Gerçek kişilere ait adres kullanma (KVKK);** gerçek yer adlarıyla uydurma bina/daire numaraları kullan.
+- **Değerlendirme script'i:** `python -m eval` alan bazında precision / recall / F1 ve tam doğru adres oranı raporlasın. Sonuç README'deki tabloya girsin ve CI'da belirli bir eşiğin altına düşerse build kırılsın.
+- **Performans:** Adres başına süreyi ve 10.000 adreslik toplu işlemeyi ölçen bir benchmark (`pytest-benchmark`). Hedef değeri ilk ölçümden sonra birlikte belirleyelim.
+- **Araçlar:** `uv` (paket ve ortam yönetimi), `ruff` (lint + format), `mypy --strict`, `pre-commit`.
+- Test kapsamı %90'ın altına düşerse CI başarısız olsun.
+
+## 6. Açık kaynak altyapısı
+
+- `LICENSE` (MIT), `README.md` (İngilizce, ana dosya), `README.tr.md` (Türkçe), `CHANGELOG.md` (Keep a Changelog), `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`.
+- `CONTRIBUTING.md` özellikle şunları anlatsın: yeni kısaltma nasıl eklenir, yanlış ayrıştırılan adres nasıl değerlendirme setine eklenir, testler nasıl çalıştırılır.
+- Issue şablonları: **"Yanlış ayrıştırılan adres"** (girdi, beklenen, gerçekleşen; "gerçek kişisel adres paylaşmayın, numaraları değiştirin" uyarısıyla), hata bildirimi, özellik isteği. PR şablonu.
+- İlk katkıcılar için 5–10 tane `good first issue` önerisi hazırla (ör. eksik kısaltmalar).
+- **GitHub Actions:**
+  - `ci.yml`: Python 3.10–3.13 matrisi; ruff, mypy, pytest + kapsam, değerlendirme eşiği.
+  - `release.yml`: `v*` tag'i atılınca build + PyPI'a **Trusted Publishing** (OIDC, token saklamadan) ile yayın + GitHub Release notları.
+- Dependabot ve sürüm numaralandırma için Semantic Versioning.
+- README rozetleri: CI, kapsam, PyPI sürümü, Python sürümleri, lisans.
+
+## 7. README (yıldız getiren kısım)
+
+İngilizce README şu sırayla olsun:
+1. Tek cümlelik açıklama + rozetler
+2. **Önce/sonra örneği** (dağınık adres → düzgün JSON) ve bir **GIF** (CLI kullanımı)
+3. `pip install` ve 5 satırlık kullanım örneği
+4. Özellikler listesi
+5. Doğruluk tablosu (değerlendirme setinden, alan bazında) ve performans sayıları
+6. Nasıl çalışır (kısa pipeline şeması, Mermaid)
+7. CLI kullanımı, Yol haritası, Katkı, Veri kaynakları ve lisans
+
+İngilizcem B1 seviyesinde; README'yi sade ve doğal bir İngilizceyle yaz, sonra Türkçe versiyonunu oluştur.
+
+## 8. Fazlar
+
+Her faz sonunda dur ve onayımı bekle.
+
+- **Faz 0 — İsim ve iskelet:** 5 isim öner (kısa, akılda kalan, PyPI'da ve GitHub'da müsait mi kontrol et). Ben seçince: `uv` ile proje, `src/` düzeni, pyproject, ruff, mypy, pytest, pre-commit, LICENSE, boş README, ilk CI. Paket adı (`import tradres`) ve CLI adı (`tradres`) bu dosyada güncellendi.
+- **Faz 1 — Normalizasyon:** Türkçe harf dönüşümü, ASCII anahtar, kısaltma sözlüğü, temizlik + kapsamlı testler (hypothesis dahil).
+- **Faz 2 — Veri:** Veri kaynağı seçenekleri → seçim → build script'i → gazetteer modülü ve indeks → `DATA_SOURCES.md`.
+- **Faz 3 — Değerlendirme seti:** Önce etiketleme formatı ve ilk 50 adres, sonra script, sonra 300'e tamamlama. **Parser'dan önce yapıyoruz ki her adımı ölçebilelim.**
+- **Faz 4 — Parser v1:** Tokenizer, sayısal alanlar, yer adları, sokak/cadde; ilk değerlendirme sonuçları.
+- **Faz 5 — İyileştirme:** Bulanık eşleştirme, sıra bağımsızlığı, hiyerarşi doğrulama, güven skoru. Her değişikliğin önce/sonra skorları.
+- **Faz 6 — CLI ve API yüzeyi:** CLI komutları, `format()`, `to_dict()`, public API'nin son hali, docstring'ler.
+- **Faz 7 — Açık kaynak altyapısı:** Bölüm 6'nın tamamı, release workflow, TestPyPI'a deneme yayını.
+- **Faz 8 — README ve v0.1.0:** README (EN + TR), GIF için senaryo, benchmark sonuçları, CHANGELOG, `v0.1.0` tag'i ve PyPI yayını.
+- **Faz 9 — Tanıtım:** Paylaşım metinleri taslakları (LinkedIn, Twitter/X, Reddit r/Python, Hacker News "Show HN", Türk geliştirici toplulukları) ve hangi kanalda nasıl paylaşılacağına dair öneriler.
+
+## 9. İlerleme
+
+> Her faz bittiğinde bu bölümü güncelle: ne yapıldı, alınan önemli kararlar ve nedenleri, değerlendirme skorları, açık sorular.
+
+- [x] Faz 0 — İsim ve iskelet (2026-11-04)
+  - İsim: **TrAdres** → PyPI dağıtım adı `tradres` (kontrol: 2026-11-04, PyPI'da boştu), import adı `tradres`, CLI `tradres`. GitHub: `AykanYilmz/TrAdres`.
+  - uv 0.13.7, hatchling build backend, `src/` düzeni, `requires-python >=3.10`, çekirdekte bağımlılık yok.
+  - Dev araçları (dependency group `dev`): pytest, pytest-cov, hypothesis, mypy, ruff, pre-commit.
+  - CI: lint işi (ruff check + format, mypy --strict) + 3.10–3.13 test matrisi, kapsam eşiği %90 (pyproject'te `fail_under`).
+- [ ] Faz 1 — Normalizasyon
+- [ ] Faz 2 — Veri
+- [ ] Faz 3 — Değerlendirme seti
+- [ ] Faz 4 — Parser v1
+- [ ] Faz 5 — İyileştirme
+- [ ] Faz 6 — CLI ve API yüzeyi
+- [ ] Faz 7 — Açık kaynak altyapısı
+- [ ] Faz 8 — README ve v0.1.0
+- [ ] Faz 9 — Tanıtım
+
+### Kararlar günlüğü
+- **Build backend: hatchling.** `uv_build` daha hızlı ama ekosistemde daha yeni; hatchling yaygın, PEP 639 lisans alanını destekliyor ve paket verisini (gazetteer) ekstra ayar olmadan wheel'e alıyor.
+- **Sürüm tek kaynakta.** Sürüm `pyproject.toml`'da; `tradres.__version__` bunu `importlib.metadata` ile okuyor, ikinci bir kopya yok.
+- **Kapsam eşiği pyproject'te.** `fail_under = 90` hem lokalde hem CI'da aynı kuralı uyguluyor.
+- **mypy pre-commit'te `uv run` ile çalışıyor**, izole mirror ortamı yerine. Böylece CI ile aynı bağımlılıkları görüyor.
+- **Satır sonları LF** (`.gitattributes`). Windows'ta geliştirip Linux CI'da çalıştırırken diff gürültüsü olmasın diye.
+
+---
+
+**Şimdi Faz 0 ile başla:** Önce bu dosyayı okuduğunu ve anladığını 3–4 cümleyle özetle, sonra isim önerilerini müsaitlik kontrolleriyle birlikte sun.
