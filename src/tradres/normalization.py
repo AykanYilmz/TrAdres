@@ -115,10 +115,13 @@ def ascii_key(text: str) -> str:
     Never show this key to users; it is only for lookups.
     """
     text = tr_lower(text).translate(_ASCII_FOLD)
-    # Remove remaining accents (é -> e): decompose, then drop combining marks.
-    text = "".join(
-        char for char in unicodedata.normalize("NFKD", text) if not unicodedata.combining(char)
-    )
+    if not text.isascii():
+        # Remove remaining accents (é -> e): decompose, then drop combining marks.
+        # Skipped when possible: it is the slowest step, and after the Turkish
+        # letters are mapped most names are already plain ASCII.
+        text = "".join(
+            char for char in unicodedata.normalize("NFKD", text) if not unicodedata.combining(char)
+        )
     text = _APOSTROPHES.sub("", text)  # "Atatürk'ün" -> "ataturkun", not "ataturk un"
     return _NON_ALNUM.sub(" ", text).strip()
 
