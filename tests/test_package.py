@@ -12,3 +12,8 @@ def test_version_is_a_non_empty_string() -> None:
 
 def test_py_typed_marker_is_shipped() -> None:
     assert files("tradres").joinpath("py.typed").is_file()
+
+
+def test_all_names_exist() -> None:
+    missing = [name for name in tradres.__all__ if not hasattr(tradres, name)]
+    assert missing == []

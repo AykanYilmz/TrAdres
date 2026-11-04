@@ -10,7 +10,7 @@ Kurallar:
 1. **Fazlar halinde ilerle.** Her fazın sonunda dur, ne yaptığını ve neden öyle yaptığını 5–10 maddede özetle, benim onayımı bekle. Bir sonraki faza kendiliğinden geçme.
 2. **Büyük kararlarda önce seçenekleri sun** (kütüphane seçimi, veri kaynağı, API tasarımı, isimlendirme): 2–3 seçenek, artı/eksi, senin önerin. Ben seçeyim.
 3. **Öğret:** Yeni bir kavram kullandığında (ör. trie, fuzzy matching, property-based test, trusted publishing) bir iki cümleyle ne olduğunu ve neden gerektiğini açıkla.
-4. **Bazı kısımları ben yazayım:** Her fazda bana uygun boyutta bir parçayı (bir fonksiyon, birkaç test) "senin görevin" olarak bırak; ben yazınca gözden geçir.
+4. **Bana görev bırakma.** Tüm kodu ve testleri sen yaz; ben açıkça istemedikçe "senin görevin" diye iş bırakma.
 5. **Ölçmeden özellik ekleme.** Doğruluğu artırdığını iddia ettiğin her değişikliği değerlendirme setinde (Faz 3) ölç, önce/sonra sayılarını göster.
 6. **Bağımlılıkları az tut.** Her yeni bağımlılığı gerekçelendir. Çekirdek kütüphane mümkünse sadece `rapidfuzz` gibi küçük bir bağımlılıkla çalışsın; API, CLI ve demo `extras` olarak gelsin.
 7. Commit'ler küçük ve **Conventional Commits** formatında olsun (`feat:`, `fix:`, `test:`, `docs:`, `chore:`). Her commit'te testler geçsin.
