@@ -90,7 +90,7 @@ result.to_dict()     # JSON'a hazır sözlük, her alanın kendi güven skoruyla
 src/tradres/
 ├── __init__.py          # public API: parse, normalize, Address
 ├── models.py            # Address dataclass'ı / alanlar, güven skorları, to_dict, format
-├── normalize.py         # Türkçe harf dönüşümü, ASCII anahtar, temizlik
+├── normalization.py     # Türkçe harf dönüşümü, ASCII anahtar, temizlik
 ├── abbreviations.py     # kısaltma sözlüğünü yükleyen kod (veri ayrı dosyada)
 ├── tokenizer.py         # adresi anlamlı parçalara bölme
 ├── extractors/          # her bileşen için ayrı çıkarıcı (numara, sokak, mahalle, il/ilçe...)
@@ -166,7 +166,11 @@ Her faz sonunda dur ve onayımı bekle.
   - uv 0.13.7, hatchling build backend, `src/` düzeni, `requires-python >=3.10`, çekirdekte bağımlılık yok.
   - Dev araçları (dependency group `dev`): pytest, pytest-cov, hypothesis, mypy, ruff, pre-commit.
   - CI: lint işi (ruff check + format, mypy --strict) + 3.10–3.13 test matrisi, kapsam eşiği %90 (pyproject'te `fail_under`).
-- [ ] Faz 1 — Normalizasyon
+- [x] Faz 1 — Normalizasyon (2026-11-04, onay bekliyor)
+  - `normalization.py`: `tr_lower`, `tr_upper`, `tr_title`, `ascii_key`, `clean`, `normalize` (top-level `tradres.normalize`).
+  - `abbreviations.py` + `data/abbreviations.json`: 11 tür (mahalle … posta_kodu), `lookup()`, veri doğrulaması.
+  - 173 test (örnek + doctest + hypothesis), kapsam %98.6. `HYPOTHESIS_PROFILE=thorough` ile 5000 örnekte de temiz.
+  - Açık soru: `apartman` türü Address'te hangi alana gidecek (`bina_adi`?) — Faz 4'te karar.
 - [ ] Faz 2 — Veri
 - [ ] Faz 3 — Değerlendirme seti
 - [ ] Faz 4 — Parser v1
@@ -182,7 +186,13 @@ Her faz sonunda dur ve onayımı bekle.
 - **Kapsam eşiği pyproject'te.** `fail_under = 90` hem lokalde hem CI'da aynı kuralı uyguluyor.
 - **mypy pre-commit'te `uv run` ile çalışıyor**, izole mirror ortamı yerine. Böylece CI ile aynı bağımlılıkları görüyor.
 - **Satır sonları LF** (`.gitattributes`). Windows'ta geliştirip Linux CI'da çalıştırırken diff gürültüsü olmasın diye.
+- **Modül adı `normalization.py`** (`normalize.py` değil): paket `normalize` fonksiyonunu dışa açıyor; aynı isimde modül olunca `tradres.normalize` bazen modülü bazen fonksiyonu gösterir.
+- **`clean` büyük/küçük harfi korur, `normalize` = `tr_lower(clean(x))`.** Sıra önemli: NFKC bazı sembolleri büyük harfe çevirir (ℌ → H), küçültme en sonda.
+- **Rakam/harf ayırma en az 2 harfte** (`23nisan` → `23 nisan`, `no5` → `no 5`) ama `5A`, `B3` korunur (bina no / blok adı). Rakam arası `/` sıkı kalır (`5/3`), diğerleri boşluklu (`Merkez / Bolu`).
+- **Kısaltmalar JSON'da**: stdlib ile okunur (YAML bağımlılık ister, TOML 3.10'da stdlib'de yok). Tek kelimelik alias'lar, `alias_key` ile nokta/iki nokta/aksan bağımsız eşleşme. Belirsiz alias'lar (`da`, `bul`) bilerek eklenmedi.
+- **ruff `allowed-confusables = ["ı"]`**: ı gerçek bir harf. Diğer benzer görünen karakterler kaynakta `\uXXXX` olarak yazılır.
+- **Doctest'ler test paketinin parçası** (`--doctest-modules`): docstring örnekleri yanlış kalamaz.
 
 ---
 
-**Şimdi Faz 0 ile başla:** Önce bu dosyayı okuduğunu ve anladığını 3–4 cümleyle özetle, sonra isim önerilerini müsaitlik kontrolleriyle birlikte sun.
+**Kaldığımız yer:** İlerleme bölümündeki ilk tamamlanmamış faz.
