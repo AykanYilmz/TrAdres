@@ -166,12 +166,18 @@ Her faz sonunda dur ve onayımı bekle.
   - uv 0.13.7, hatchling build backend, `src/` düzeni, `requires-python >=3.10`, çekirdekte bağımlılık yok.
   - Dev araçları (dependency group `dev`): pytest, pytest-cov, hypothesis, mypy, ruff, pre-commit.
   - CI: lint işi (ruff check + format, mypy --strict) + 3.10–3.13 test matrisi, kapsam eşiği %90 (pyproject'te `fail_under`).
-- [x] Faz 1 — Normalizasyon (2026-11-04, onay bekliyor)
+- [x] Faz 1 — Normalizasyon (2026-11-04, onaylandı)
   - `normalization.py`: `tr_lower`, `tr_upper`, `tr_title`, `ascii_key`, `clean`, `normalize` (top-level `tradres.normalize`).
   - `abbreviations.py` + `data/abbreviations.json`: 11 tür (mahalle … posta_kodu), `lookup()`, veri doğrulaması.
   - 173 test (örnek + doctest + hypothesis), kapsam %98.6. `HYPOTHESIS_PROFILE=thorough` ile 5000 örnekte de temiz.
   - Açık soru: `apartman` türü Address'te hangi alana gidecek (`bina_adi`?) — Faz 4'te karar.
-- [ ] Faz 2 — Veri
+- [x] Faz 2 — Veri (2026-11-04, onay bekliyor)
+  - Kaynak: **Wikidata (CC0)**, seçenekler (Wikidata / turkiye-api / OSM) sunuldu, Aykan seçti.
+  - `scripts/build_gazetteer.py` + `scripts/gazetteer_corrections.json` → `src/tradres/data/gazetteer.json.gz` (194 KiB, deterministik).
+  - Sonuç: 81 il, 973 ilçe (resmi listeyle birebir), 46.112 mahalle/köy (resmi isimlerin ~%88.6'sı aynı ilçede bulunuyor).
+  - `gazetteer.py`: `load_gazetteer()` (lazy + cache), `find_il/find_ilce/find_mahalle/provinces_of_district`, ilk yükleme ~0.3 s.
+  - Wheel 206 KiB. 268 test, kapsam %98.6. `DATA_SOURCES.md` yazıldı.
+  - Açık soru: eksik ~%11 mahallenin doğruluğa etkisi Faz 3'te ölçülecek; gerekirse Wikidata'ya katkı / ek dosya.
 - [ ] Faz 3 — Değerlendirme seti
 - [ ] Faz 4 — Parser v1
 - [ ] Faz 5 — İyileştirme
@@ -192,6 +198,12 @@ Her faz sonunda dur ve onayımı bekle.
 - **Kısaltmalar JSON'da**: stdlib ile okunur (YAML bağımlılık ister, TOML 3.10'da stdlib'de yok). Tek kelimelik alias'lar, `alias_key` ile nokta/iki nokta/aksan bağımsız eşleşme. Belirsiz alias'lar (`da`, `bul`) bilerek eklenmedi.
 - **ruff `allowed-confusables = ["ı"]`**: ı gerçek bir harf. Diğer benzer görünen karakterler kaynakta `\uXXXX` olarak yazılır.
 - **Doctest'ler test paketinin parçası** (`--doctest-modules`): docstring örnekleri yanlış kalamaz.
+- **Gazetteer kaynağı Wikidata (CC0).** turkiye-api daha eksiksiz ama veri TÜİK/PTT kaynaklı ve yeniden dağıtım lisansı belirsiz; OSM'de mahalle kapsamı ~%30 ve ODbL share-alike. PTT toplu dosyası kaldırılmış, NVİ kazınamaz. turkiye-api sadece **yerel karşılaştırma** için kullanıldı, pakete girmedi.
+- **Wikidata hataları kodda değil, `gazetteer_corrections.json`'da** düzeltiliyor; her girdi QID + gerekçe içeriyor, Wikidata düzelince silinir. Eski/halk adları (`Kazan`, `Eyüp`, `Urfa`, `Afyon`) `diger_adlar` olarak tutuluyor, resmi ad olarak gösterilmiyor.
+- **Merkez ilçe kuralı:** büyükşehir olmayan 51 ilde ilin adını taşıyan ilçe `Merkez` olur; 30 büyükşehirde bu tür kayıtlar eskimiş sayılıp atılır (sabit liste: 6360 + Ordu 6447).
+- **Mahalle ve köy ayrılmıyor** (`Mahalle` sınıfı ikisini de tutar): Wikidata sınıfı güvenilir değil.
+- **İndeks: ASCII anahtarlı `dict`**, trie değil. Tam eşleşme O(1); trie sadece önek/bulanık aday aramasında gerekir, şimdilik yok — Faz 5'te ölçülür.
+- **Etiket dili önceliği tr → mul → en → …**: Wikidata ortak adları `mul` diline taşıyor; sadece `tr` sorgusu 12 ilçeyi kaçırıyordu.
 
 ---
 
