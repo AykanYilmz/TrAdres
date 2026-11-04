@@ -73,6 +73,9 @@ select = [
     "PT",       # flake8-pytest-style
 ]
 
+# "ı" (dotless i) is a real Turkish letter, not a look-alike of "i".
+allowed-confusables = ["ı"]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["N802"]
 
@@ -88,11 +91,12 @@ files = ["src", "tests"]
 # pytest + coverage
 # --------------------------------------------------------------------------- #
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "src"]
 addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
+    "--doctest-modules",
     "--cov=tradres",
     "--cov-report=term-missing",
 ]
