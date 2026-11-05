@@ -11,7 +11,7 @@ from tradres.extractors.streets import extract_streets
 from tradres.gazetteer import Gazetteer, load_gazetteer
 from tradres.matching import DEFAULT_CONFIG, MatchConfig
 from tradres.models import Address
-from tradres.normalization import tr_title
+from tradres.normalization import ascii_key, tr_title
 from tradres.scoring import Origin, score_address
 from tradres.tokenizer import Token, street_keyword, tokenize
 
@@ -99,6 +99,24 @@ def loose_mahalle(tokens: Sequence[Token], used: Collection[int]) -> list[int]:
     return []
 
 
+def repeated_places(
+    tokens: Sequence[Token],
+    used: Collection[int],
+    fields: Mapping[str, str],
+    gazetteer: Gazetteer,
+) -> set[int]:
+    """Words that repeat the known il or ilçe: "Bolu Merkez/Bolu" says Bolu twice."""
+    repeated: set[int] = set()
+    il, ilce = fields.get("il"), fields.get("ilce")
+    for window in free_windows(tokens, used):
+        province = gazetteer.find_il(window.text)
+        same_il = province is not None and province.ad == il
+        same_ilce = ilce is not None and ascii_key(window.text) == ascii_key(ilce)
+        if same_il or same_ilce:
+            repeated.update(range(window.start, window.end))
+    return repeated
+
+
 def description(tokens: Sequence[Token], used: Collection[int]) -> list[int]:
     """Free words up to a word that ends a direction: "D 100 karayolu üzeri".
 
@@ -157,6 +175,8 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
     fields.update(streets.fields)
     origins.update(streets.origins)
     used |= streets.used
+
+    used |= repeated_places(tokens, used, fields, gazetteer)
 
     for field in _NAME_FIELDS:
         if field in fields:

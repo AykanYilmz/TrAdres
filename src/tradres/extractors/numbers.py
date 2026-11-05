@@ -117,9 +117,27 @@ class _Scanner:
         if value is None or found.kind in self.fields:
             return
         if found.kind == "daire" and value.is_number and (has_no_word or _flat_after(token, value)):
-            self.take("daire", _digits(value), *range(index, last + 1))
+            self.flat(index, last)
         elif found.kind == "kat" and _floor_after(token, value):
             self.take("kat", _floor_value(value), *range(index, last + 1))
+
+    def flat(self, index: int, last: int) -> None:
+        """Flat number at ``last``, with an optional letter: "D:6", "D:6/B"."""
+        mark, letter = self.at(last + 1), self.at(last + 2)
+        after = self.at(last + 3)
+        lettered = (
+            mark is not None
+            and mark.text == "/"
+            and letter is not None
+            and len(letter.text) == 1
+            and letter.text.isalpha()
+            and not (after is not None and street_keyword(after))  # "D:6/A Blok"
+        )
+        if lettered and letter is not None:
+            value = f"{_digits(self.tokens[last])}/{tr_upper(letter.text)}"
+            self.take("daire", value, *range(index, last + 3))
+        else:
+            self.take("daire", _digits(self.tokens[last]), *range(index, last + 1))
 
     def is_number_word(self, index: int) -> bool:
         token = self.at(index)

@@ -190,3 +190,30 @@ def test_directions(text: str, tarif: str | None, kalan: str | None) -> None:
 def test_street_named_after_a_direction_is_not_a_direction() -> None:
     address = parse("Cami Yanı Sokak No:5 Kadıköy")
     assert (address.sokak, address.tarif) == ("Cami Yanı", None)
+
+
+@pytest.mark.parametrize(
+    ("text", "daire", "blok"),
+    [
+        ("Gül Sk. D:6/B Kadıköy", "6/B", None),
+        ("Gül Sk. Daire:6/b Kadıköy", "6/B", None),
+        ("Gül Sk. D:6/A Blok Kadıköy", "6", "A"),
+        ("Gül Sk. D:6 / Kadıköy", "6", None),
+    ],
+)
+def test_flat_with_a_letter(text: str, daire: str, blok: str | None) -> None:
+    address = parse(text)
+    assert (address.daire, address.blok) == (daire, blok)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Yeni Mah. Sinop Gerze/Sinop",
+        "Yeni Mah. Gerze Gerze Sinop",
+        "Sinop, Yeni Mah. Gerze/Sinop",
+    ],
+)
+def test_repeated_place_is_not_left_over(text: str) -> None:
+    address = parse(text)
+    assert (address.il, address.ilce, address.kalan) == ("Sinop", "Gerze", None)

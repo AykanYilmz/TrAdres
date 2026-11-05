@@ -32,3 +32,7 @@
   girdi: "Selahattin Mah. okul yanında No:4 Silvan Diyarbakır"
   beklenen: {il: Diyarbakır, ilce: Silvan, mahalle: Selahattin, bina_no: "4", tarif: okul yanında}
   etiketler: [tarif]
+- id: "p014"
+  girdi: "Çarşı Mah., Lale Sk. Güneş apt D:4/C, 57200 Sinop Gerze/Sinop"
+  beklenen: {il: Sinop, ilce: Gerze, mahalle: Çarşı, sokak: Lale, bina_adi: Güneş, daire: 4/C, posta_kodu: "57200"}
+  etiketler: [tuzak, no_bolu]
