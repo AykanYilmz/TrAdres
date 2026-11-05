@@ -14,6 +14,8 @@
     "Q132637": {"aliases": ["İçel"], "reason": "Former official name of Mersin province (until 2002)."}
   },
   "district_names": {
+    "Q388703": {"name": "Şehitkamil", "reason": "Official spelling has no circumflex."},
+    "Q264105": {"name": "Bala", "reason": "Official spelling has no circumflex."},
     "Q2318164": {"name": "Kahramankazan", "aliases": ["Kazan"], "reason": "Renamed in 2016; Wikidata label is the old name 'Kazan (rayon)'."},
     "Q49103426": {"name": "Eyüpsultan", "aliases": ["Eyüp"], "reason": "Renamed in 2017; item has no Turkish label, other labels say 'Eyüp'."},
     "Q2641900": {"name": "Aziziye", "aliases": ["Ilıca"], "reason": "Official name is Aziziye; Wikidata label is the old name 'Ilıca'."},
