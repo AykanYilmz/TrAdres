@@ -334,3 +334,25 @@ def test_format_round_trips_on_any_mix_of_parts(
         posta_kodu=posta_kodu,
     )
     assert fields_of(parse(address.format())) == fields_of(address)
+
+
+@pytest.mark.parametrize("country", ["Türkiye", "turkiye", "TÜRKİYE", "Turkey"])
+def test_country_at_the_end_is_not_a_place(country: str) -> None:
+    address = parse(f"Kızılay, Gül Sk. No:5, 06420 Çankaya/Ankara, {country}")
+    assert address.mahalle == "Kızılay"
+    assert address.site is None
+    assert address.kalan is None
+
+
+def test_country_word_inside_a_name_stays() -> None:
+    assert parse("Türkiye Sk. No:3 Çankaya/Ankara").sokak == "Türkiye"
+
+
+def test_only_the_country_gives_an_empty_address() -> None:
+    assert parse("Türkiye") == Address(field_confidence={})
+
+
+def test_plus_code_stays_in_kalan() -> None:
+    address = parse("8Q5V+2H Çankaya, Ankara, Türkiye")
+    assert address.mahalle is None
+    assert address.kalan == "8Q5V+2H"

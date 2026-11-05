@@ -1,0 +1,10 @@
+{
+  "_comment": [
+    "Names of the country. Only the last word of an address is checked,",
+    "so 'Türkiye Sokak' stays a street."
+  ],
+  "names": [
+    "Türkiye",
+    "Turkey"
+  ]
+}

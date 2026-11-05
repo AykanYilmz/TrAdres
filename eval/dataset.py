@@ -46,6 +46,7 @@ TAGS = frozenset(
         "tarif",  # directions ("... karşısı") that stay in kalan
         "posta_kodu",  # has a postal code
         "tuzak",  # looks like one thing but is another (D 100 = a road)
+        "google_maps",  # comma separated pieces, as Google Maps writes them
     }
 )
 

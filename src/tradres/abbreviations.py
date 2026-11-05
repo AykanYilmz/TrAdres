@@ -45,6 +45,7 @@ KINDS: frozenset[str] = frozenset(
 
 _DATA_FILE = "abbreviations.json"
 _NAME_WORDS_FILE = "name_words.json"
+_COUNTRY_NAMES_FILE = "country_names.json"
 _DESCRIPTION_WORDS_FILE = "description_words.json"
 
 
@@ -153,6 +154,13 @@ def load_name_words() -> Mapping[str, str]:
     return MappingProxyType(
         {alias_key(key): value for key, value in raw.items() if not key.startswith("_")}
     )
+
+
+@cache
+def load_country_names() -> frozenset[str]:
+    """Names of the country, as keys. See data/country_names.json."""
+    text = (files("tradres") / "data" / _COUNTRY_NAMES_FILE).read_text(encoding="utf-8")
+    return frozenset(alias_key(name) for name in json.loads(text)["names"])
 
 
 @cache

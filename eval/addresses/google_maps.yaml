@@ -1,0 +1,100 @@
+# The way Google Maps writes an address: pieces separated by commas, a postal
+# code before ilçe/il, and often the country at the end.
+# Places are real; street names, buildings and numbers are invented.
+
+- id: "m001"
+  girdi: "Kızılay, Lale Sk. No:5, 06420 Çankaya/Ankara, Türkiye"
+  beklenen: {il: Ankara, ilce: Çankaya, mahalle: Kızılay, sokak: Lale, bina_no: "5", posta_kodu: "06420"}
+  etiketler: [google_maps, temiz, posta_kodu]
+- id: "m002"
+  girdi: "Bahçelievler, Yasemin Sk. No:14 D:3, 06490 Çankaya/Ankara, Türkiye"
+  beklenen: {il: Ankara, ilce: Çankaya, mahalle: Bahçelievler, sokak: Yasemin, bina_no: "14", daire: "3", posta_kodu: "06490"}
+  etiketler: [google_maps, temiz, posta_kodu]
+- id: "m003"
+  girdi: "Caferağa, Nergis Sk. No:21/A, 34710 Kadıköy/İstanbul, Türkiye"
+  beklenen: {il: İstanbul, ilce: Kadıköy, mahalle: Caferağa, sokak: Nergis, bina_no: 21/A, posta_kodu: "34710"}
+  etiketler: [google_maps, posta_kodu]
+- id: "m004"
+  girdi: "Fenerbahçe, Papatya Cd. No:88, 34726 Kadıköy/İstanbul, Türkiye"
+  beklenen: {il: İstanbul, ilce: Kadıköy, mahalle: Fenerbahçe, cadde: Papatya, bina_no: "88", posta_kodu: "34726"}
+  etiketler: [google_maps, temiz, posta_kodu]
+- id: "m005"
+  girdi: "Alsancak, 1453. Sk. No:9, 35220 Konak/İzmir, Türkiye"
+  beklenen: {il: İzmir, ilce: Konak, mahalle: Alsancak, sokak: "1453", bina_no: "9", posta_kodu: "35220"}
+  etiketler: [google_maps, posta_kodu]
+- id: "m006"
+  girdi: "Alsancak, Mimoza Cd. No:40/2, 35220 Konak/İzmir, Turkey"
+  beklenen: {il: İzmir, ilce: Konak, mahalle: Alsancak, cadde: Mimoza, bina_no: "40", daire: "2", posta_kodu: "35220"}
+  etiketler: [google_maps, no_bolu, posta_kodu]
+- id: "m007"
+  girdi: "Şirinyalı, 1520. Sk. No:6, 07160 Muratpaşa/Antalya, Türkiye"
+  beklenen: {il: Antalya, ilce: Muratpaşa, mahalle: Şirinyalı, sokak: "1520", bina_no: "6", posta_kodu: "07160"}
+  etiketler: [google_maps, posta_kodu]
+- id: "m008"
+  girdi: "Lale Blv. No:44, 07100 Muratpaşa/Antalya, Türkiye"
+  beklenen: {il: Antalya, ilce: Muratpaşa, bulvar: Lale, bina_no: "44", posta_kodu: "07100"}
+  etiketler: [google_maps, mahalle_eksik, posta_kodu]
+- id: "m009"
+  girdi: "Altıparmak, Menekşe Cd. No:17, 16050 Osmangazi/Bursa, Türkiye"
+  beklenen: {il: Bursa, ilce: Osmangazi, mahalle: Altıparmak, cadde: Menekşe, bina_no: "17", posta_kodu: "16050"}
+  etiketler: [google_maps, temiz, posta_kodu]
+- id: "m010"
+  girdi: "Reşatbey, 62008. Sk. No:3 Kat:2, 01120 Seyhan/Adana, Türkiye"
+  beklenen: {il: Adana, ilce: Seyhan, mahalle: Reşatbey, sokak: "62008", bina_no: "3", kat: "2", posta_kodu: "01120"}
+  etiketler: [google_maps, posta_kodu]
+- id: "m011"
+  girdi: "Hoşnudiye, Sümbül Sk. No:11, 26130 Tepebaşı/Eskişehir, Türkiye"
+  beklenen: {il: Eskişehir, ilce: Tepebaşı, mahalle: Hoşnudiye, sokak: Sümbül, bina_no: "11", posta_kodu: "26130"}
+  etiketler: [google_maps, temiz, posta_kodu]
+- id: "m012"
+  girdi: "Feritpaşa, Kardelen Cd. No:7, 42060 Selçuklu/Konya, Türkiye"
+  beklenen: {il: Konya, ilce: Selçuklu, mahalle: Feritpaşa, cadde: Kardelen, bina_no: "7", posta_kodu: "42060"}
+  etiketler: [google_maps, temiz, posta_kodu]
+- id: "m013"
+  girdi: "Tabaklar, Zambak Sk. No:2, 14100 Bolu Merkez/Bolu, Türkiye"
+  beklenen: {il: Bolu, ilce: Merkez, mahalle: Tabaklar, sokak: Zambak, bina_no: "2", posta_kodu: "14100"}
+  etiketler: [google_maps, posta_kodu]
+- id: "m014"
+  girdi: "Hunat, Sedef Sk. No:30, 38030 Melikgazi/Kayseri, Türkiye"
+  beklenen: {il: Kayseri, ilce: Melikgazi, mahalle: Hunat, sokak: Sedef, bina_no: "30", posta_kodu: "38030"}
+  etiketler: [google_maps, temiz, posta_kodu]
+- id: "m015"
+  girdi: "İncilipınar, Ortanca Cd. No:12, 27090 Şehitkamil/Gaziantep, Türkiye"
+  beklenen: {il: Gaziantep, ilce: Şehitkamil, mahalle: İncilipınar, cadde: Ortanca, bina_no: "12", posta_kodu: "27090"}
+  etiketler: [google_maps, posta_kodu]
+- id: "m016"
+  girdi: "Kemerkaya, Akasya Sk. No:4, 61100 Ortahisar/Trabzon, Türkiye"
+  beklenen: {il: Trabzon, ilce: Ortahisar, mahalle: Kemerkaya, sokak: Akasya, bina_no: "4", posta_kodu: "61100"}
+  etiketler: [google_maps, temiz, posta_kodu]
+- id: "m017"
+  girdi: "Kızılay Mah., Lale Sk. No:5, Çankaya/Ankara, Türkiye"
+  beklenen: {il: Ankara, ilce: Çankaya, mahalle: Kızılay, sokak: Lale, bina_no: "5"}
+  etiketler: [google_maps, temiz]
+- id: "m018"
+  girdi: "Çiçek Apt., Caferağa, Lale Sk. No:5, 34710 Kadıköy/İstanbul, Türkiye"
+  beklenen: {il: İstanbul, ilce: Kadıköy, mahalle: Caferağa, sokak: Lale, bina_adi: Çiçek, bina_no: "5", posta_kodu: "34710"}
+  etiketler: [google_maps, bina_adi, posta_kodu]
+- id: "m019"
+  girdi: "No:12, Çankaya/Ankara, Türkiye"
+  beklenen: {il: Ankara, ilce: Çankaya, bina_no: "12"}
+  etiketler: [google_maps, mahalle_eksik]
+- id: "m020"
+  girdi: "Kadıköy/İstanbul, Türkiye"
+  beklenen: {il: İstanbul, ilce: Kadıköy}
+  etiketler: [google_maps, mahalle_eksik]
+- id: "m021"
+  girdi: "Konak, İzmir, Türkiye"
+  beklenen: {il: İzmir, ilce: Konak}
+  etiketler: [google_maps, mahalle_eksik]
+- id: "m022"
+  girdi: "Bahçelievler, Türkiye Sk. No:3, 06490 Çankaya/Ankara, Türkiye"
+  beklenen: {il: Ankara, ilce: Çankaya, mahalle: Bahçelievler, sokak: Türkiye, bina_no: "3", posta_kodu: "06490"}
+  etiketler: [google_maps, tuzak, posta_kodu]
+- id: "m023"
+  girdi: "8Q5V+2H Çankaya, Ankara, Türkiye"
+  beklenen: {il: Ankara, ilce: Çankaya, kalan: 8Q5V+2H}
+  etiketler: [google_maps, tuzak, mahalle_eksik]
+- id: "m024"
+  girdi: "Altıparmak, Menekşe Cd. No:17 Kat:3 D:6, 16050 Osmangazi/Bursa, TÜRKİYE"
+  beklenen: {il: Bursa, ilce: Osmangazi, mahalle: Altıparmak, cadde: Menekşe, bina_no: "17", kat: "3", daire: "6", posta_kodu: "16050"}
+  etiketler: [google_maps, buyuk_harf, posta_kodu]

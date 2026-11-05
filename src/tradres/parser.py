@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Collection, Mapping, Sequence
 
-from tradres.abbreviations import load_description_words, lookup
+from tradres.abbreviations import load_country_names, load_description_words, lookup
 from tradres.extractors.numbers import extract_numbers
 from tradres.extractors.places import extract_places, free_windows
 from tradres.extractors.streets import extract_streets
@@ -21,6 +22,16 @@ _NAME_FIELDS = ("bulvar", "cadde", "sokak", "site", "bina_adi")
 _MAX_LOOSE_MAHALLE_WORDS = 2
 _MAX_LOOSE_SITE_WORDS = 3
 _COMMAS = frozenset(",;")
+#: Letters of a Google Plus Code: "8Q5V+2H".
+_PLUS_CODE = re.compile(r"[23456789CFGHJMPQRVWX]{2,8}\+[23456789CFGHJMPQRVWX]{2,3}", re.IGNORECASE)
+
+
+def country_word(tokens: Sequence[Token]) -> set[int]:
+    """The country at the very end: "..., Çankaya/Ankara, Türkiye"."""
+    words = [index for index, token in enumerate(tokens) if not token.is_separator]
+    if words and tokens[words[-1]].key in load_country_names():
+        return {words[-1]}
+    return set()
 
 
 def official_mahalle(
@@ -108,7 +119,10 @@ def loose_words(
         words = [tokens[i] for i in run]
         fits = 0 < len(run) <= max_words and (not own_piece or _in_own_piece(tokens, run))
         if fits and not any(
-            word.is_number or word.key in load_description_words() or street_keyword(word)
+            word.is_number
+            or word.key in load_description_words()
+            or street_keyword(word)
+            or _PLUS_CODE.fullmatch(word.text)
             for word in words
         ):
             return run
@@ -190,7 +204,7 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
     numbers = extract_numbers(tokens)
     fields.update(numbers.fields)
     origins.update(dict.fromkeys(numbers.fields, Origin.EXACT), **numbers.origins)
-    used |= numbers.used
+    used |= numbers.used | country_word(tokens)
 
     places = extract_places(tokens, used, gazetteer, config)
     fields.update(places.fields)
