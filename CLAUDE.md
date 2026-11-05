@@ -150,7 +150,7 @@ Her faz sonunda dur ve onayımı bekle.
 - **Faz 1 — Normalizasyon:** Türkçe harf dönüşümü, ASCII anahtar, kısaltma sözlüğü, temizlik + kapsamlı testler (hypothesis dahil).
 - **Faz 2 — Veri:** Veri kaynağı seçenekleri → seçim → build script'i → gazetteer modülü ve indeks → `DATA_SOURCES.md`.
 - **Faz 3 — Değerlendirme seti:** Önce etiketleme formatı ve ilk 50 adres, sonra script, sonra 300'e tamamlama. **Parser'dan önce yapıyoruz ki her adımı ölçebilelim.**
-- **Faz 4 — Parser v1:** Tokenizer, sayısal alanlar, yer adları, sokak/cadde; ilk değerlendirme sonuçları.
+- **Faz 4 — Parser v1:** Tokenizer, sayısal alanlar, yer adları, sokak/cadde; ilk değerlendirme sonuçları. Sonunda basit yerel web demosu (`python -m demo`): üstte adres kutusu, altta ayrıştırılmış hali.
 - **Faz 5 — İyileştirme:** Bulanık eşleştirme, sıra bağımsızlığı, hiyerarşi doğrulama, güven skoru. Her değişikliğin önce/sonra skorları.
 - **Faz 6 — CLI ve API yüzeyi:** CLI komutları, `format()`, `to_dict()`, public API'nin son hali, docstring'ler.
 - **Faz 7 — Açık kaynak altyapısı:** Bölüm 6'nın tamamı, release workflow, TestPyPI'a deneme yayını.
@@ -184,7 +184,13 @@ Her faz sonunda dur ve onayımı bekle.
   - Set gazetteer'dan bağımsız örneklendi: 43 adres `gazetteer_disi` (%13.7), 1 adres `gazetteer_yazim_farki`.
   - CI eşiği henüz yok; parser gelince Faz 4'te `--min-f1` / `--min-exact` ile eklenecek.
   - Açık soru: 144 mahallede Wikidata yazımı resmiyle farklı (çoğu biçim farkı); mahalle düzeltmesi Faz 5'te ele alınacak.
-- [ ] Faz 4 — Parser v1
+- [x] Faz 4 — Parser v1 (2026-11-05, onay bekliyor)
+  - `models.py` (`Address`, `FIELDS`), `tokenizer.py`, `extractors/{numbers,places,streets}.py`, `parser.py`; `tradres.parse` public.
+  - İlk ölçüm: **F1 0.977, tam doğru %88.8** (278/313). Güncel baseline: F1 0.890, %53.0. Aşamalar: sayılar %0.6 → yer adları %2.6 → cadde/sokak %80.8 → tam pipeline %88.8. Hız ~174 µs/adres.
+  - **Bu sayı iyimser:** seti ve parser'ı aynı kişi (Claude) yazdı, kurallar setin örüntülerini biliyordu. Faz 5'ten önce ayrı bir test bölümü önerildi.
+  - CI eşiği: `python -m eval --min-f1 0.95 --min-exact 0.85`.
+  - Yerel demo: `python -m demo` → http://127.0.0.1:8000. Sadece stdlib, sadece localhost, adres kaydetmez. Pakete dahil değil.
+  - Faz 5'e kalanlar: yazım hatası (`yazim_hatasi` %27.3), ASCII cadde/sokak adlarının Türkçeleştirilmesi, mahalleden ilçe çıkarımı, `İst.`/`Ş.Urfa`/`G.Antep` kısa adları, tarif sözcüklerinin bina adına karışması, `gmk`.
 - [ ] Faz 5 — İyileştirme
 - [ ] Faz 6 — CLI ve API yüzeyi
 - [ ] Faz 7 — Açık kaynak altyapısı
@@ -213,6 +219,11 @@ Her faz sonunda dur ve onayımı bekle.
 - **Karşılaştırma büyük/küçük harfe duyarsız, Türkçe harfe duyarlı.** `Cankaya` yanlış sayılır; doğru yazımı geri vermek ürünün vaadi. Adlar tür eksiz, numaralar metin.
 - **Set gazetteer'dan örneklenmedi.** Kök nüfus ağırlıklı rastgele örneklem (sabit tohum), yoksa eksik %11 ölçümde görünmezdi. Sokak, bina ve numaralar uydurma; Aykan'ın adresi örneklem dışında.
 - **`kalan` şimdilik puanlanmıyor;** sadece belge. Hatalı değer hem FP hem FN sayılır. Parser hata fırlatırsa boş sonuç + `crashes` sayacı.
+- **Parser token tabanlı, kural tabanlı.** Aşamalar saf fonksiyon ve kullandığı token'ları bildiriyor; hiçbir aşamanın kullanmadığı token `kalan`'a düşüyor.
+- **Sıra: sayılar → il/ilçe → adlar.** Türkçede ad önce, anahtar sonra gelir (`Gazi Mustafa Kemal Bulvarı`); bu yüzden boş kelimeler biriktirilip sonraki anahtara veriliyor. Anahtardan hemen önceki kelime il/ilçe sayılmıyor (`Van Cad.`, `Fatih Mah.`).
+- **Alan ezilmez:** bir alan ilk değerini tutar, sonraki değer `kalan`'a gider. Hypothesis (5000 örnek) `D: 34000 12/3`'te daire ezilmesini yakaladı.
+- **Çıplak `D` + 3 hane daire sayılmaz** (`D 100` karayolu); `D:100` ve `Daire 100` sayılır.
+- **Web demosu Faz 4 sonunda, stdlib ile** (`http.server`): parser olmadan gösterecek şey yoktu; bağımlılık eklememek için FastAPI kullanılmadı. Hugging Face demosu v0.2 planında kalıyor.
 - **Etiket dili önceliği tr → mul → en → …**: Wikidata ortak adları `mul` diline taşıyor; sadece `tr` sorgusu 12 ilçeyi kaçırıyordu.
 
 ---
