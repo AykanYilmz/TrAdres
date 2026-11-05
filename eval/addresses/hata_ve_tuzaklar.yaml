@@ -1,0 +1,366 @@
+# Typing mistakes, traps, estates and blocks, plus the examples from the project brief.
+# Places are real; streets, buildings and numbers are invented. See eval/README.md.
+
+# --- Examples from the project brief ---------------------------------------
+- id: "p001"
+  girdi: "Atatürk Mah. 23 Nisan Cad. No:5/3 Merkez/Bolu"
+  beklenen: {il: Bolu, ilce: Merkez, mahalle: Atatürk, cadde: 23 Nisan, bina_no: "5", daire: "3"}
+  etiketler: [temiz, kisaltma, no_bolu]
+- id: "p002"
+  girdi: "ataturk mh 23nisan cd no 5 d 3 bolu merkez"
+  beklenen: {il: Bolu, ilce: Merkez, mahalle: Atatürk, cadde: 23 Nisan, bina_no: "5", daire: "3"}
+  etiketler: [ascii, kisaltma, birlesik, noktalama]
+- id: "p003"
+  girdi: "Çankaya Ankara Kızılay Mahallesi Gazi Mustafa Kemal Blv. No: 12 Kat: 4 Daire: 8"
+  beklenen: {il: Ankara, ilce: Çankaya, mahalle: Kızılay, bulvar: Gazi Mustafa Kemal, bina_no: "12", kat: "4", daire: "8"}
+  etiketler: [sira, kisaltma]
+- id: "p004"
+  girdi: "CANKAYA/ANKARA kizilay mah gmk bulvarı 12/8"
+  beklenen: {il: Ankara, ilce: Çankaya, mahalle: Kızılay, bulvar: Gazi Mustafa Kemal, bina_no: "12", daire: "8"}
+  etiketler: [ascii, sira, kisaltma, no_bolu, tuzak]
+  not: "gmk, Gazi Mustafa Kemal'in kısaltması."
+- id: "p005"
+  girdi: "Yenimahalle Ankara, Batıkent, 1923. Cadde, Toki Konutları B-3 Blok, No:7, D:14"
+  beklenen: {il: Ankara, ilce: Yenimahalle, mahalle: Batıkent, cadde: "1923", site: Toki Konutları, blok: B-3, bina_no: "7", daire: "14"}
+  etiketler: [sira, site, tuzak]
+  not: "Batıkent resmi mahalle değil, semt adı olarak yazılmış."
+
+# --- Typing mistakes ---------------------------------------------------------
+- id: "d001"
+  girdi: "Kzılay Mah. Atatürk Bulvarı No:9 Çankaya Ankara"
+  beklenen: {il: Ankara, ilce: Çankaya, mahalle: Kızılay, bulvar: Atatürk, bina_no: "9"}
+  etiketler: [yazim_hatasi]
+- id: "d002"
+  girdi: "Kizilay mahalesi Çankya Ankra"
+  beklenen: {il: Ankara, ilce: Çankaya, mahalle: Kızılay}
+  etiketler: [ascii, yazim_hatasi]
+- id: "d003"
+  girdi: "Yıldırım Beyazit Mah. Payaz Hatay"
+  beklenen: {il: Hatay, ilce: Payas, mahalle: Yıldırım Beyazıt}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "d004"
+  girdi: "Akpınar Köyü Yıldızeli Sivass"
+  beklenen: {il: Sivas, ilce: Yıldızeli, mahalle: Akpınar}
+  etiketler: [koy, yazim_hatasi]
+- id: "d005"
+  girdi: "Elmacık Köyü Kofcaz Kırklareli"
+  beklenen: {il: Kırklareli, ilce: Kofçaz, mahalle: Elmacık}
+  etiketler: [koy, yazim_hatasi]
+- id: "d006"
+  girdi: "Atatürk Mah. Fevzipaşa Cad. No:44 Erzincann"
+  beklenen: {il: Erzincan, mahalle: Atatürk, cadde: Fevzipaşa, bina_no: "44"}
+  etiketler: [ilce_eksik, yazim_hatasi, kisaltma]
+- id: "d007"
+  girdi: "Küçüksu Mahalesi Körfez Cad. No:3 Üsküdar İstanbul"
+  beklenen: {il: İstanbul, ilce: Üsküdar, mahalle: Küçüksu, cadde: Körfez, bina_no: "3"}
+  etiketler: [yazim_hatasi, kisaltma]
+  not: "Mahalesi: anahtar sözcükte yazım hatası."
+- id: "d008"
+  girdi: "Umcular Mah. Karpzulu Aydın"
+  beklenen: {il: Aydın, ilce: Karpuzlu, mahalle: Umcular}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "d009"
+  girdi: "Sarıharman Köyü Adıyman Merkez"
+  beklenen: {il: Adıyaman, ilce: Merkez, mahalle: Sarıharman}
+  etiketler: [koy, yazim_hatasi]
+- id: "d010"
+  girdi: "Türkali Mah. Nüzhetiye Cadesi No:20 Beşiktas İstanbul"
+  beklenen: {il: İstanbul, ilce: Beşiktaş, mahalle: Türkali, cadde: Nüzhetiye, bina_no: "20"}
+  etiketler: [yazim_hatasi]
+- id: "d011"
+  girdi: "Ulukent Mah. Tvas Denizli"
+  beklenen: {il: Denizli, ilce: Tavas, mahalle: Ulukent}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "d012"
+  girdi: "Yalangoz Mh. Kırıkan Hatay"
+  beklenen: {il: Hatay, ilce: Kırıkhan, mahalle: Yalangoz}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "d013"
+  girdi: "Dervişli Köyü Osmaniyee"
+  beklenen: {il: Osmaniye, ilce: Merkez, mahalle: Dervişli}
+  etiketler: [koy, ilce_eksik, yazim_hatasi]
+- id: "d014"
+  girdi: "Ekin Mah. Mmak Ankara No 3"
+  beklenen: {il: Ankara, ilce: Mamak, mahalle: Ekin, bina_no: "3"}
+  etiketler: [yazim_hatasi, kisaltma, noktalama]
+- id: "d015"
+  girdi: "İslam Mah. Saimbeyili Adana"
+  beklenen: {il: Adana, ilce: Saimbeyli, mahalle: İslam}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "d016"
+  girdi: "Göztepe Mahllesi Odunpazarı Eskişehir"
+  beklenen: {il: Eskişehir, ilce: Odunpazarı, mahalle: Göztepe}
+  etiketler: [yazim_hatasi]
+- id: "d017"
+  girdi: "Kamçılı Mah. Karesi Balıkesir"
+  beklenen: {il: Balıkesir, ilce: Karesi, mahalle: Kamçıllı}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "d018"
+  girdi: "Yeşilpınr Mah. Eyüpsultan İstanbul"
+  beklenen: {il: İstanbul, ilce: Eyüpsultan, mahalle: Yeşilpınar}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "d019"
+  girdi: "Şeyh Şamil Mah. Dulkadiroglu Kahramanmaras"
+  beklenen: {il: Kahramanmaraş, ilce: Dulkadiroğlu, mahalle: Şeyh Şamil}
+  etiketler: [ascii, kisaltma]
+- id: "d020"
+  girdi: "sarıot mah kale malatay"
+  beklenen: {il: Malatya, ilce: Kale, mahalle: Sarıot}
+  etiketler: [yazim_hatasi, kisaltma, noktalama, tuzak]
+  not: "Kale, yaygın bir sokak ve mahalle adı olmasına rağmen burada ilçe."
+- id: "d021"
+  girdi: "Kırcami Mah. Muratpasa Antlya"
+  beklenen: {il: Antalya, ilce: Muratpaşa, mahalle: Kırcami}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "d022"
+  girdi: "Müslümanbey Mah. Kilis"
+  beklenen: {il: Kilis, mahalle: Müslümanbey}
+  etiketler: [ilce_eksik, kisaltma]
+- id: "d023"
+  girdi: "Cumhuriyet Mh. Felahiye Kaysari"
+  beklenen: {il: Kayseri, ilce: Felahiye, mahalle: Cumhuriyet}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "d024"
+  girdi: "Toluklar Köyü Bayramiç Çanakale"
+  beklenen: {il: Çanakkale, ilce: Bayramiç, mahalle: Toluklar}
+  etiketler: [koy, yazim_hatasi]
+
+# --- Traps -------------------------------------------------------------------
+- id: "d025"
+  girdi: "Yeni Mah. E 96 karayolu üzeri İl Özel İdaresi lojmanları Şehit Üsteğmen Ali Demir Apartmanı daire 6 Merkez/Afyonkarahisar"
+  beklenen: {il: Afyonkarahisar, ilce: Merkez, mahalle: Yeni, bina_adi: Şehit Üsteğmen Ali Demir, daire: "6", kalan: E 96 karayolu üzeri İl Özel İdaresi lojmanları}
+  etiketler: [tuzak, tarif, bina_adi]
+  not: "İl sözcüğü il adı getirmiyor; bina numarası yok, sadece daire var."
+- id: "d026"
+  girdi: "Değirmendere Mah. D 010 Karadeniz sahil yolu üzeri No:88 Ortahisar/Trabzon"
+  beklenen: {il: Trabzon, ilce: Ortahisar, mahalle: Değirmendere, bina_no: "88", kalan: D 010 Karadeniz sahil yolu üzeri}
+  etiketler: [tuzak, tarif]
+  not: "D 010 karayolu; D daire değil."
+- id: "d027"
+  girdi: "Selahattin Mah. D 950 yanı Silvan Diyarbakır"
+  beklenen: {il: Diyarbakır, ilce: Silvan, mahalle: Selahattin, kalan: D 950 yanı}
+  etiketler: [tuzak, tarif]
+- id: "d028"
+  girdi: "Hamidiye Mah. K Blok D:12 Gemlik/Bursa"
+  beklenen: {il: Bursa, ilce: Gemlik, mahalle: Hamidiye, blok: K, daire: "12"}
+  etiketler: [tuzak, kisaltma, site]
+  not: "K burada kat değil, blok adı."
+- id: "d029"
+  girdi: "Kalyoncu Kulluğu Mah. D Blok K:3 Beyoğlu İstanbul"
+  beklenen: {il: İstanbul, ilce: Beyoğlu, mahalle: Kalyoncu Kulluğu, blok: D, kat: "3"}
+  etiketler: [tuzak, kisaltma, site]
+  not: "D burada daire değil, blok adı."
+- id: "d030"
+  girdi: "Barbaros Mah. Hürriyet Cad. No:5 Körfez/Kocaeli"
+  beklenen: {il: Kocaeli, ilce: Körfez, mahalle: Barbaros, cadde: Hürriyet, bina_no: "5"}
+  etiketler: [kisaltma, tuzak]
+  not: "Körfez burada ilçe, İzmir'de mahalle adı."
+- id: "d031"
+  girdi: "Kordonboyu Mah. Ankara Cad. No:40 Kartal İstanbul"
+  beklenen: {il: İstanbul, ilce: Kartal, mahalle: Kordonboyu, cadde: Ankara, bina_no: "40"}
+  etiketler: [kisaltma, tuzak]
+  not: "Ankara burada cadde adı, il İstanbul."
+- id: "d032"
+  girdi: "Fevzi Çakmak Mah. Adana Cad. No:17 Tarsus Mersin"
+  beklenen: {il: Mersin, ilce: Tarsus, mahalle: Fevzi Çakmak, cadde: Adana, bina_no: "17"}
+  etiketler: [kisaltma, tuzak]
+- id: "d033"
+  girdi: "Vali Mithat Bey Mah. İzmir Sk. No:2 İpekyolu/Van"
+  beklenen: {il: Van, ilce: İpekyolu, mahalle: Vali Mithat Bey, sokak: İzmir, bina_no: "2"}
+  etiketler: [kisaltma, tuzak]
+- id: "d034"
+  girdi: "M.Akif Ersoy Mah. Kapadokya Blv. No:30 Nevşehir"
+  beklenen: {il: Nevşehir, mahalle: M.Akif Ersoy, bulvar: Kapadokya, bina_no: "30"}
+  etiketler: [ilce_eksik, kisaltma, tuzak]
+  not: "Mahalle adının içinde nokta var."
+- id: "d035"
+  girdi: "Kurtlusoğuksu Mah. Kırıkhan"
+  beklenen: {il: Hatay, ilce: Kırıkhan, mahalle: Kurtlusoğuksu}
+  etiketler: [il_eksik, kisaltma]
+- id: "d036"
+  girdi: "Sultan Selim Mah. Yavuzeli/Gaziantep"
+  beklenen: {il: Gaziantep, ilce: Yavuzeli, mahalle: Sultan Selim}
+  etiketler: [kisaltma]
+- id: "d037"
+  girdi: "Eskiköy Mah. Gürgentepe Ordu No:7/A"
+  beklenen: {il: Ordu, ilce: Gürgentepe, mahalle: Eskiköy, bina_no: 7/A}
+  etiketler: [kisaltma, tuzak]
+  not: "7/A bina numarası; A daire değil."
+- id: "d038"
+  girdi: "Yeşilyuva Mah. Atatürk Cad. No:12A Acıpayam/Denizli"
+  beklenen: {il: Denizli, ilce: Acıpayam, mahalle: Yeşilyuva, cadde: Atatürk, bina_no: "12A"}
+  etiketler: [kisaltma, tuzak]
+- id: "d039"
+  girdi: "Gürsel Mah. 5 Temmuz Cad. No:14 İskenderun Hatay"
+  beklenen: {il: Hatay, ilce: İskenderun, mahalle: Gürsel, cadde: 5 Temmuz, bina_no: "14"}
+  etiketler: [kisaltma, tuzak]
+  not: "5 Temmuz cadde adı; 5 numara değil."
+- id: "d040"
+  girdi: "Arı Mah. Bulanık Muş"
+  beklenen: {il: Muş, ilce: Bulanık, mahalle: Arı}
+  etiketler: [kisaltma]
+- id: "d041"
+  girdi: "Çal Mah. Kurşunlu/Çankırı"
+  beklenen: {il: Çankırı, ilce: Kurşunlu, mahalle: Çal}
+  etiketler: [kisaltma, tuzak]
+  not: "Çal Denizli'de ilçe adı, burada mahalle."
+- id: "d042"
+  girdi: "Soğukpınar Mah. 30 Ağustos Cad. No:9 Çekmeköy/İstanbul"
+  beklenen: {il: İstanbul, ilce: Çekmeköy, mahalle: Soğukpınar, cadde: 30 Ağustos, bina_no: "9"}
+  etiketler: [kisaltma, tuzak]
+- id: "d043"
+  girdi: "Bezirhane Mah. Karayazı Erzurum"
+  beklenen: {il: Erzurum, ilce: Karayazı, mahalle: Bezirhane}
+  etiketler: [kisaltma]
+- id: "d044"
+  girdi: "Aşağı Karkutlu Mh. Birecik"
+  beklenen: {il: Şanlıurfa, ilce: Birecik, mahalle: Aşağı Karkutlu}
+  etiketler: [il_eksik, kisaltma]
+- id: "d045"
+  girdi: "Elmalı Mah. Kadışehri Yozgat"
+  beklenen: {il: Yozgat, ilce: Kadışehri, mahalle: Elmalı}
+  etiketler: [kisaltma, tuzak]
+  not: "Elmalı Antalya'da ilçe adı, burada mahalle."
+- id: "d046"
+  girdi: "Mimar Sinan Mah. Atışalanı Cad. No:25 Esenler/İST 34220"
+  beklenen: {il: İstanbul, ilce: Esenler, mahalle: Mimar Sinan, cadde: Atışalanı, bina_no: "25", posta_kodu: "34220"}
+  etiketler: [kisaltma, posta_kodu]
+- id: "d047"
+  girdi: "34930 Mecidiye Mah. Sultanbeyli"
+  beklenen: {il: İstanbul, ilce: Sultanbeyli, mahalle: Mecidiye, posta_kodu: "34930"}
+  etiketler: [il_eksik, sira, posta_kodu, kisaltma]
+- id: "d048"
+  girdi: "Kültür Mah. Tatvan Bitlis P.K. 13200"
+  beklenen: {il: Bitlis, ilce: Tatvan, mahalle: Kültür, posta_kodu: "13200"}
+  etiketler: [posta_kodu, kisaltma]
+- id: "d049"
+  girdi: "Cumhuriyet Mah. Beydağ İzmir Posta Kodu: 35790"
+  beklenen: {il: İzmir, ilce: Beydağ, mahalle: Cumhuriyet, posta_kodu: "35790"}
+  etiketler: [posta_kodu, kisaltma]
+- id: "d050"
+  girdi: "Eşrefpaşa Mah. 12345 Sk. No:3 Afyonkarahisar Merkez 03040"
+  beklenen: {il: Afyonkarahisar, ilce: Merkez, mahalle: Eşrefpaşa, sokak: "12345", bina_no: "3", posta_kodu: "03040"}
+  etiketler: [posta_kodu, kisaltma, tuzak]
+  not: "Beş haneli sokak numarası ile posta kodu birlikte."
+
+# --- Estates, blocks, named buildings ---------------------------------------
+- id: "d051"
+  girdi: "İsmet Paşa Mah. Kardelen Sitesi B Blok Kat:4 Daire:15 Yalova Merkez"
+  beklenen: {il: Yalova, ilce: Merkez, mahalle: İsmet Paşa, site: Kardelen, blok: B, kat: "4", daire: "15"}
+  etiketler: [site]
+- id: "d052"
+  girdi: "Yukarıışıklar Mah. Sahil Sit. A-2 Blok No:6 Manavgat Antalya"
+  beklenen: {il: Antalya, ilce: Manavgat, mahalle: Yukarıışıklar, site: Sahil, blok: A-2, bina_no: "6"}
+  etiketler: [site, kisaltma]
+- id: "d053"
+  girdi: "Kocatepe Mah. Deniz Apt. No:21 K:2 D:5 İskenderun/Hatay"
+  beklenen: {il: Hatay, ilce: İskenderun, mahalle: Kocatepe, bina_adi: Deniz, bina_no: "21", kat: "2", daire: "5"}
+  etiketler: [bina_adi, kisaltma]
+- id: "d054"
+  girdi: "İstiklal Mah. Gül Apartmanı Kat 3 Daire 6 Menemen İzmir"
+  beklenen: {il: İzmir, ilce: Menemen, mahalle: İstiklal, bina_adi: Gül, kat: "3", daire: "6"}
+  etiketler: [bina_adi]
+- id: "d055"
+  girdi: "Güldibi Mah. Yeşil Vadi Sitesi Villa 12 Sapanca Sakarya"
+  beklenen: {il: Sakarya, ilce: Sapanca, mahalle: Güldibi, site: Yeşil Vadi, kalan: Villa 12}
+  etiketler: [site, tuzak]
+  not: "Villa 12 için ayrı alan yok."
+- id: "d056"
+  girdi: "Türbe Mah. Akasya Apt. B Blok Daire 2 Hendek/Sakarya"
+  beklenen: {il: Sakarya, ilce: Hendek, mahalle: Türbe, bina_adi: Akasya, blok: B, daire: "2"}
+  etiketler: [bina_adi, site]
+- id: "d057"
+  girdi: "Şekerhane Mah. Keykubat Blv. Marina Residence No:88 D:40 Alanya/Antalya"
+  beklenen: {il: Antalya, ilce: Alanya, mahalle: Şekerhane, bulvar: Keykubat, bina_adi: Marina Residence, bina_no: "88", daire: "40"}
+  etiketler: [bina_adi, kisaltma, tuzak]
+  not: "Residence sözlükte yok; bina adının parçası."
+- id: "d058"
+  girdi: "Hamitli Köyü Uzunköprü/Edirne"
+  beklenen: {il: Edirne, ilce: Uzunköprü, mahalle: Hamitli}
+  etiketler: [koy]
+- id: "d059"
+  girdi: "Çanaklı Mah. Vezirköprü Samsun Okul Apt."
+  beklenen: {il: Samsun, ilce: Vezirköprü, mahalle: Çanaklı, bina_adi: Okul}
+  etiketler: [bina_adi, kisaltma]
+- id: "d060"
+  girdi: "Göztepe Mah. Tütüncü Mehmet Efendi Cad. Selvi Apt. No:61/7 Kadıköy İstanbul"
+  beklenen: {il: İstanbul, ilce: Kadıköy, mahalle: Göztepe, cadde: Tütüncü Mehmet Efendi, bina_adi: Selvi, bina_no: "61", daire: "7"}
+  etiketler: [bina_adi, no_bolu, kisaltma]
+- id: "d061"
+  girdi: "Siteler Mah. Ahşap Sit. 14. Sk. No:3 Yıldırım/Bursa"
+  beklenen: {il: Bursa, ilce: Yıldırım, mahalle: Siteler, site: Ahşap, sokak: "14", bina_no: "3"}
+  etiketler: [site, kisaltma, tuzak]
+  not: "Siteler mahalle adı, site anahtar sözcüğü sanılmamalı."
+- id: "d062"
+  girdi: "Varsak Karşıyaka Mah. Kepez/Antalya"
+  beklenen: {il: Antalya, ilce: Kepez, mahalle: Varsak Karşıyaka}
+  etiketler: [kisaltma, tuzak]
+- id: "d063"
+  girdi: "Esenlik Mah. 8101 Sk. Özlem Apt. No:9 D:1 Karabağlar İzmir"
+  beklenen: {il: İzmir, ilce: Karabağlar, mahalle: Esenlik, sokak: "8101", bina_adi: Özlem, bina_no: "9", daire: "1"}
+  etiketler: [bina_adi, kisaltma]
+- id: "d064"
+  girdi: "Dereçepni Köyü Boğazlıyan Yozgat"
+  beklenen: {il: Yozgat, ilce: Boğazlıyan, mahalle: Dereçepni}
+  etiketler: [koy]
+- id: "d065"
+  girdi: "Sümer Mah. Nevşehir Merkez Sümer Apt. Kat:1"
+  beklenen: {il: Nevşehir, ilce: Merkez, mahalle: Sümer, bina_adi: Sümer, kat: "1"}
+  etiketler: [bina_adi, kisaltma, tuzak]
+  not: "Mahalle ile bina aynı adı taşıyor."
+- id: "d066"
+  girdi: "Şalgam Köyü Seydiler Kastamonu"
+  beklenen: {il: Kastamonu, ilce: Seydiler, mahalle: Şalgam}
+  etiketler: [koy]
+- id: "d067"
+  girdi: "Bekirler Mah. Bigadiç/Balıkesir"
+  beklenen: {il: Balıkesir, ilce: Bigadiç, mahalle: Bekirler}
+  etiketler: [kisaltma]
+- id: "d068"
+  girdi: "Tuna Mah. 1. Cad. Tuna Sitesi C2 Blok D:9 Esenler"
+  beklenen: {il: İstanbul, ilce: Esenler, mahalle: Tuna, cadde: "1", site: Tuna, blok: C2, daire: "9"}
+  etiketler: [il_eksik, site, kisaltma, tuzak]
+- id: "d069"
+  girdi: "Akmescit Mah. Yunusemre Manisa No:5 Kat:Zemin"
+  beklenen: {il: Manisa, ilce: Yunusemre, mahalle: Akmescit, bina_no: "5", kat: Zemin}
+  etiketler: [kisaltma, tuzak]
+  not: "Kat sayı değil: Zemin."
+- id: "d070"
+  girdi: "Simani Mah. Bingöl Merkez Kat:B1"
+  beklenen: {il: Bingöl, ilce: Merkez, mahalle: Simani, kat: B1}
+  etiketler: [kisaltma, tuzak]
+  not: "B1 bodrum kat; blok değil."
+- id: "d071"
+  girdi: "Abdullah Paşa Mah. İliç Erzincan"
+  beklenen: {il: Erzincan, ilce: İliç, mahalle: Abdullah Paşa}
+  etiketler: [kisaltma]
+- id: "d072"
+  girdi: "Nur Mah. 1. Sk. No:1/1 Artuklu Mardin"
+  beklenen: {il: Mardin, ilce: Artuklu, mahalle: Nur, sokak: "1", bina_no: "1", daire: "1"}
+  etiketler: [no_bolu, kisaltma, tuzak]
+- id: "d073"
+  girdi: "Kalayık Mah Hendek Sakarya No:5 Daire:5"
+  beklenen: {il: Sakarya, ilce: Hendek, mahalle: Kalayık, bina_no: "5", daire: "5"}
+  etiketler: [noktalama, kisaltma]
+- id: "d074"
+  girdi: "Osman Temiz Mah. 2710. Sk. No:6/12 Çankaya Ankara"
+  beklenen: {il: Ankara, ilce: Çankaya, mahalle: Osman Temiz, sokak: "2710", bina_no: "6", daire: "12"}
+  etiketler: [no_bolu, kisaltma]
+- id: "d075"
+  girdi: "Sarıçam Mah. 201 Sk. No:3 Yüreğir Adana"
+  beklenen: {il: Adana, ilce: Yüreğir, mahalle: Sarıçam, sokak: "201", bina_no: "3"}
+  etiketler: [kisaltma, tuzak]
+  not: "Sarıçam Adana'da ilçe adı, burada Yüreğir'de mahalle."
+- id: "d076"
+  girdi: "Aksu Mah. Atakum Samsun"
+  beklenen: {il: Samsun, ilce: Atakum, mahalle: Aksu}
+  etiketler: [kisaltma, tuzak]
+  not: "Aksu Antalya ve Isparta'da ilçe adı."
+- id: "d077"
+  girdi: "Mehmet Akif Ersoy Mah. 5021 Sk. Kepez Antalya"
+  beklenen: {il: Antalya, ilce: Kepez, mahalle: Mehmet Akif Ersoy, sokak: "5021"}
+  etiketler: [kisaltma]
+- id: "d078"
+  girdi: "Şehit Kansu Küçükateş Mah. Kadirli Osmaniye"
+  beklenen: {il: Osmaniye, ilce: Kadirli, mahalle: Şehit Kansu Küçükateş}
+  etiketler: [kisaltma]
