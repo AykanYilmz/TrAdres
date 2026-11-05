@@ -348,3 +348,21 @@ def test_second_holdout_set_is_separate() -> None:
 def test_second_holdout_is_selected(capsys: pytest.CaptureFixture[str]) -> None:
     assert main(["--holdout", "2", "--parser", "eval.baseline:parse"]) == 0
     assert "locked test set: 50" in capsys.readouterr().out
+
+
+def test_min_tag_passes_and_fails() -> None:
+    assert main(["--min-tag", "temiz=0.5"], loader=_perfect) == 0
+    assert main(["--parser", "eval.baseline:parse", "--min-tag", "google_maps=0.99"]) == 1
+
+
+def test_min_tag_counts_an_unknown_group_as_zero() -> None:
+    assert main(["--min-tag", "yok=0.5"], loader=_perfect) == 1
+
+
+def test_min_tag_needs_a_rate() -> None:
+    with pytest.raises(SystemExit):
+        main(["--min-tag", "temiz"], loader=_perfect)
+
+
+def test_holdout_refuses_min_tag() -> None:
+    assert main(["--holdout", "--min-tag", "temiz=0.5"], loader=_perfect) == 2

@@ -43,6 +43,26 @@ def as_fields(result: object) -> Mapping[str, object]:
     return {name: getattr(result, name, None) for name in FIELDS}
 
 
+def tag_threshold(value: str) -> tuple[str, float]:
+    """Read ``temiz=0.95`` from the command line."""
+    tag, _, rate = value.partition("=")
+    try:
+        return tag, float(rate)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"expected TAG=RATE, got {value!r}") from None
+
+
+def tags_below_threshold(report: Report, minimums: Sequence[tuple[str, float]]) -> list[str]:
+    """One line for each tag group under its minimum. A missing group counts."""
+    lines = []
+    for tag, minimum in minimums:
+        group = report.groups.get(tag)
+        rate = group.rate if group else 0.0
+        if rate < minimum:
+            lines.append(f"below threshold: {tag} exact={rate:.3f} (min {minimum})")
+    return lines
+
+
 def format_text(report: Report, *, groups: bool = True) -> str:
     lines = [f"{'field':<12}{'precision':>10}{'recall':>9}{'f1':>8}{'support':>9}"]
     rows = [*report.fields.items(), ("TOTAL", report.overall)]
@@ -99,6 +119,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--markdown", action="store_true", help="print the README table")
     parser.add_argument("--min-f1", type=float, default=0.0, help="fail below this overall F1")
     parser.add_argument("--min-exact", type=float, default=0.0, help="fail below this exact rate")
+    parser.add_argument(
+        "--min-tag",
+        type=tag_threshold,
+        action="append",
+        default=[],
+        metavar="TAG=RATE",
+        help="fail if this tag's exact rate is lower; can be repeated",
+    )
     return parser
 
 
@@ -112,9 +140,9 @@ def main(
             stream.reconfigure(encoding="utf-8")
     args = build_parser().parse_args(argv)
 
-    if args.holdout and (args.failures or args.tag):
+    if args.holdout and (args.failures or args.tag or args.min_tag):
         # Reading these failures would turn the test set into training data.
-        print("--holdout shows totals only: no --failures or --tag", file=sys.stderr)
+        print("--holdout shows totals only: no --failures, --tag or --min-tag", file=sys.stderr)
         return EXIT_ERROR
 
     try:
@@ -157,6 +185,10 @@ def main(
             f"exact={report.exact_rate:.3f} (min {args.min_exact})",
             file=sys.stderr,
         )
+        return EXIT_BELOW_THRESHOLD
+    problems = tags_below_threshold(report, args.min_tag)
+    if problems:
+        print("\n".join(problems), file=sys.stderr)
         return EXIT_BELOW_THRESHOLD
     return EXIT_OK
 
