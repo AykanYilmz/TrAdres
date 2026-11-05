@@ -87,7 +87,7 @@
   etiketler: [temiz]
 - id: "a021"
   girdi: "Madenköy Ulukışla Niğde Okul Yanı No:3"
-  beklenen: {il: Niğde, ilce: Ulukışla, mahalle: Madenköy, bina_no: "3", kalan: Okul Yanı}
+  beklenen: {il: Niğde, ilce: Ulukışla, mahalle: Madenköy, bina_no: "3", tarif: Okul Yanı}
   etiketler: [koy, sira, tarif]
 - id: "a022"
   girdi: "Kemalpaşa mah. Atatürk bulvarı no:44 Menderes/İzmir"
@@ -158,7 +158,7 @@
   etiketler: [birlesik, kisaltma, noktalama]
 - id: "a038"
   girdi: "Çarşı Mah. D 100 karayolu üzeri Güneş Apt. Daire 4 Gerze/Sinop"
-  beklenen: {il: Sinop, ilce: Gerze, mahalle: Çarşı, bina_adi: Güneş, daire: "4", kalan: D 100 karayolu üzeri}
+  beklenen: {il: Sinop, ilce: Gerze, mahalle: Çarşı, bina_adi: Güneş, daire: "4", tarif: D 100 karayolu üzeri}
   etiketler: [tuzak, tarif, bina_adi]
   not: "D 100 bir karayolu, daire 100 değil."
 - id: "a039"

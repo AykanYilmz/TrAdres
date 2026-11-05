@@ -1,0 +1,30 @@
+{
+  "_comment": [
+    "Words that end a direction: 'okul yanı', 'D 100 karayolu üzeri'.",
+    "Text that ends with one of them goes to the tarif field.",
+    "Case, Turkish letters and punctuation do not matter."
+  ],
+  "words": [
+    "arkası",
+    "arkasında",
+    "arkasındaki",
+    "bitişiği",
+    "bitişiğinde",
+    "bitişiğindeki",
+    "civarı",
+    "civarında",
+    "civarındaki",
+    "karşısı",
+    "karşısında",
+    "karşısındaki",
+    "önü",
+    "önünde",
+    "önündeki",
+    "üzeri",
+    "üzerinde",
+    "üzerindeki",
+    "yanı",
+    "yanında",
+    "yanındaki"
+  ]
+}

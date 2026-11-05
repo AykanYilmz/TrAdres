@@ -64,7 +64,7 @@
   etiketler: [site, kisaltma]
 - id: "h016"
   girdi: "Diyarbakir Dicle Sergenli mahallesi okul karsisi"
-  beklenen: {il: Diyarbakır, ilce: Dicle, mahalle: Sergenli, kalan: okul karsisi}
+  beklenen: {il: Diyarbakır, ilce: Dicle, mahalle: Sergenli, tarif: okul karsisi}
   etiketler: [ascii, sira, tarif]
 - id: "h017"
   girdi: "Kırkkoyn Mah. Selahaddin Eyyubi Blv No:88/4 Bağlar Diyarbakır"
@@ -80,7 +80,7 @@
   etiketler: [temiz, kisaltma]
 - id: "h020"
   girdi: "cevlikler mah. turhal tokat sanayi sitesi yani"
-  beklenen: {il: Tokat, ilce: Turhal, mahalle: Çevlikler, kalan: sanayi sitesi yani}
+  beklenen: {il: Tokat, ilce: Turhal, mahalle: Çevlikler, tarif: sanayi sitesi yani}
   etiketler: [ascii, tarif, tuzak]
 - id: "h021"
   girdi: "Büyüktaşlıca Mahallesi Harran Şanlıurfa"
@@ -124,7 +124,7 @@
   etiketler: [temiz]
 - id: "h031"
   girdi: "Gökçeli köyü Bozüyük Bilecik muhtarlık yanı"
-  beklenen: {il: Bilecik, ilce: Bozüyük, mahalle: Gökçeli, kalan: muhtarlık yanı}
+  beklenen: {il: Bilecik, ilce: Bozüyük, mahalle: Gökçeli, tarif: muhtarlık yanı}
   etiketler: [koy, tarif]
 - id: "h032"
   girdi: "Eyup Sultan Mah. Sakarya Cd. No:40A Sancaktepe"
@@ -248,7 +248,7 @@
   etiketler: [il_eksik, kisaltma]
 - id: "h062"
   girdi: "Talaytepe Mah. Kayapınar Diyarbakır Mardin Yolu Üzeri No:145"
-  beklenen: {il: Diyarbakır, ilce: Kayapınar, mahalle: Talaytepe, bina_no: "145", kalan: Mardin Yolu Üzeri}
+  beklenen: {il: Diyarbakır, ilce: Kayapınar, mahalle: Talaytepe, bina_no: "145", tarif: Mardin Yolu Üzeri}
   etiketler: [tarif, tuzak]
 - id: "h063"
   girdi: "Yayladere Köyü Güroymak/Bitilis"
@@ -340,7 +340,7 @@
   etiketler: [ascii, kisaltma]
 - id: "h085"
   girdi: "Kaptanpaşa Mah. Piyalepaşa Blv. No:73 Beyoğlu/İstanbul Devlet Hastanesi Arkası"
-  beklenen: {il: İstanbul, ilce: Beyoğlu, mahalle: Kaptanpaşa, bulvar: Piyalepaşa, bina_no: "73", kalan: Devlet Hastanesi Arkası}
+  beklenen: {il: İstanbul, ilce: Beyoğlu, mahalle: Kaptanpaşa, bulvar: Piyalepaşa, bina_no: "73", tarif: Devlet Hastanesi Arkası}
   etiketler: [tarif, kisaltma]
 - id: "h086"
   girdi: "Seyran Mah. Yeşilyurt / Malatya Sümer Sk. No 4 Kat 1"

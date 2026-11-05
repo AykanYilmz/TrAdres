@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Collection, Mapping, Sequence
 
+from tradres.abbreviations import load_description_words
 from tradres.extractors.numbers import extract_numbers
 from tradres.extractors.places import extract_places, free_windows
-from tradres.extractors.streets import DESCRIPTION_ENDS, extract_streets
+from tradres.extractors.streets import extract_streets
 from tradres.gazetteer import Gazetteer, load_gazetteer
 from tradres.matching import DEFAULT_CONFIG, MatchConfig
 from tradres.models import Address
@@ -90,9 +91,29 @@ def loose_mahalle(tokens: Sequence[Token], used: Collection[int]) -> list[int]:
             continue
         words = [tokens[i] for i in run]
         if 0 < len(run) <= _MAX_LOOSE_NAME_WORDS and not any(
-            word.is_number or word.key in DESCRIPTION_ENDS or street_keyword(word) for word in words
+            word.is_number or word.key in load_description_words() or street_keyword(word)
+            for word in words
         ):
             return run
+        run = []
+    return []
+
+
+def description(tokens: Sequence[Token], used: Collection[int]) -> list[int]:
+    """Free words up to a word that ends a direction: "D 100 karayolu üzeri".
+
+    Only the first direction is kept. A field holds one value, and any other
+    free text stays in ``kalan``.
+    """
+    ends = load_description_words()
+    run: list[int] = []
+    for index, token in enumerate([*tokens, None]):
+        if token is not None and index not in used and not token.is_separator:
+            run.append(index)
+            continue
+        last = [position for position, i in enumerate(run) if tokens[i].key in ends]
+        if last:
+            return run[: last[-1] + 1]
         run = []
     return []
 
@@ -173,6 +194,12 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
             fields["bina_no"] = tokens[index].text.rstrip(".")
             origins["bina_no"] = Origin.KEYWORD
             used.add(index)
+
+    directions = description(tokens, used)
+    if directions:
+        fields["tarif"] = " ".join(tokens[index].text for index in directions)
+        origins["tarif"] = Origin.KEYWORD
+        used.update(directions)
 
     rest = [
         token.text

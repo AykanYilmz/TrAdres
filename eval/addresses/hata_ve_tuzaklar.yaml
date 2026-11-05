@@ -128,17 +128,17 @@
 # --- Traps -------------------------------------------------------------------
 - id: "d025"
   girdi: "Yeni Mah. E 96 karayolu üzeri İl Özel İdaresi lojmanları Şehit Üsteğmen Ali Demir Apartmanı daire 6 Merkez/Afyonkarahisar"
-  beklenen: {il: Afyonkarahisar, ilce: Merkez, mahalle: Yeni, site: İl Özel İdaresi Lojmanları, bina_adi: Şehit Üsteğmen Ali Demir, daire: "6", kalan: E 96 karayolu üzeri}
+  beklenen: {il: Afyonkarahisar, ilce: Merkez, mahalle: Yeni, site: İl Özel İdaresi Lojmanları, bina_adi: Şehit Üsteğmen Ali Demir, daire: "6", tarif: E 96 karayolu üzeri}
   etiketler: [tuzak, tarif, bina_adi]
   not: "İl sözcüğü il adı getirmiyor; bina numarası yok, sadece daire var."
 - id: "d026"
   girdi: "Değirmendere Mah. D 010 Karadeniz sahil yolu üzeri No:88 Ortahisar/Trabzon"
-  beklenen: {il: Trabzon, ilce: Ortahisar, mahalle: Değirmendere, bina_no: "88", kalan: D 010 Karadeniz sahil yolu üzeri}
+  beklenen: {il: Trabzon, ilce: Ortahisar, mahalle: Değirmendere, bina_no: "88", tarif: D 010 Karadeniz sahil yolu üzeri}
   etiketler: [tuzak, tarif]
   not: "D 010 karayolu; D daire değil."
 - id: "d027"
   girdi: "Selahattin Mah. D 950 yanı Silvan Diyarbakır"
-  beklenen: {il: Diyarbakır, ilce: Silvan, mahalle: Selahattin, kalan: D 950 yanı}
+  beklenen: {il: Diyarbakır, ilce: Silvan, mahalle: Selahattin, tarif: D 950 yanı}
   etiketler: [tuzak, tarif]
 - id: "d028"
   girdi: "Hamidiye Mah. K Blok D:12 Gemlik/Bursa"

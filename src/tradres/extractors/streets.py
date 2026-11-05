@@ -9,20 +9,16 @@ from __future__ import annotations
 
 from collections.abc import Collection, Sequence
 
-from tradres.abbreviations import load_name_words
+from tradres.abbreviations import load_description_words, load_name_words
 from tradres.extractors import Extraction
 from tradres.normalization import tr_title, tr_upper
 from tradres.scoring import Origin
 from tradres.tokenizer import Token, street_keyword
 
-__all__ = ["DESCRIPTION_ENDS", "extract_streets"]
+__all__ = ["extract_streets"]
 
 _FIELD_OF_KIND = {"apartman": "bina_adi"}  # the other kinds have the field's own name
 _NUMBER_WORDS = frozenset({"nolu", "numarali"})  # "1 Nolu Sokak" -> "1"
-# Words that end a description, so a building name can only start after them:
-# "karayolu üzeri Güneş Apt." -> "Güneş". They are real parts of street names
-# ("Cami Yanı Sokak"), so this rule is for building names only.
-DESCRIPTION_ENDS = frozenset({"arkasi", "bitisigi", "civari", "karsisi", "onu", "uzeri", "yani"})
 # They work like "Sitesi", but they stay in the name: "Öğretmen Lojmanları".
 _SITE_NAME_ENDS = frozenset({"konutlari", "lojman", "lojmani", "lojmanlar", "lojmanlari"})
 
@@ -36,9 +32,14 @@ def _name(tokens: Sequence[Token]) -> str:
 
 
 def _after_description(names: Sequence[int], tokens: Sequence[Token]) -> list[int]:
-    """Keep only the words after the last description word."""
+    """A building name starts after a direction: "karayolu üzeri Güneş Apt." -> "Güneş".
+
+    Such words are real parts of street names ("Cami Yanı Sokak"), so this rule
+    is for buildings and estates only.
+    """
+    ends = load_description_words()
     for position in range(len(names) - 1, -1, -1):
-        if tokens[names[position]].key in DESCRIPTION_ENDS:
+        if tokens[names[position]].key in ends:
             return list(names[position + 1 :])
     return list(names)
 
@@ -68,7 +69,13 @@ def extract_streets(tokens: Sequence[Token], used: Collection[int]) -> Extractio
                 fields["site"] = _name([tokens[i] for i in [*names, index]])
                 taken.update([*names, index])
             continue
-        if keyword is None:
+        names_a_landmark = (
+            keyword is not None
+            and keyword.kind in ("site", "apartman")
+            and after is not None
+            and after.key in load_description_words()
+        )
+        if keyword is None or names_a_landmark:  # "Sanayi Sitesi yanı" is a direction
             pending.append(index)
             continue
 

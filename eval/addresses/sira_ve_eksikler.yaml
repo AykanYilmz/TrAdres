@@ -11,7 +11,7 @@
   etiketler: [sira, tuzak]
 - id: "c003"
   girdi: "Samsun İlkadım Hastane Mah. Sağlık Sk. No:12 Devlet Hastanesi arkası"
-  beklenen: {il: Samsun, ilce: İlkadım, mahalle: Hastane, sokak: Sağlık, bina_no: "12", kalan: Devlet Hastanesi arkası}
+  beklenen: {il: Samsun, ilce: İlkadım, mahalle: Hastane, sokak: Sağlık, bina_no: "12", tarif: Devlet Hastanesi arkası}
   etiketler: [sira, tarif, kisaltma]
 - id: "c004"
   girdi: "Lüleburgaz Kurtuluş Mah. İstasyon Cad. No:7 Kırklareli"
@@ -32,7 +32,7 @@
   not: "Numara başta. Girne burada mahalle adı."
 - id: "c008"
   girdi: "Hakkari merkez Halife Derviş mahallesi eski belediye karşısı"
-  beklenen: {il: Hakkari, ilce: Merkez, mahalle: Halife Derviş, kalan: eski belediye karşısı}
+  beklenen: {il: Hakkari, ilce: Merkez, mahalle: Halife Derviş, tarif: eski belediye karşısı}
   etiketler: [sira, tarif]
 - id: "c009"
   girdi: "Finike Yeşilyurt Mah. Portakal Cad. 5/2"
@@ -77,7 +77,7 @@
   etiketler: [sira, kisaltma]
 - id: "c019"
   girdi: "Alaca Alacahüyük Köyü müze yanı"
-  beklenen: {il: Çorum, ilce: Alaca, mahalle: Alacahüyük, kalan: müze yanı}
+  beklenen: {il: Çorum, ilce: Alaca, mahalle: Alacahüyük, tarif: müze yanı}
   etiketler: [koy, il_eksik, sira, tarif]
 - id: "c020"
   girdi: "Aydın Efeler Kemer Mahallesi"
@@ -116,7 +116,7 @@
   etiketler: [sira]
 - id: "c028"
   girdi: "Gültepe Mah. Akdağmadeni/Yozgat PTT karşısı"
-  beklenen: {il: Yozgat, ilce: Akdağmadeni, mahalle: Gültepe, kalan: PTT karşısı}
+  beklenen: {il: Yozgat, ilce: Akdağmadeni, mahalle: Gültepe, tarif: PTT karşısı}
   etiketler: [tarif, kisaltma]
 - id: "c029"
   girdi: "Sanayi Mah. 1. Sanayi Sitesi 12. Blok No:4 Elazığ Merkez"
@@ -140,7 +140,7 @@
   etiketler: [sira, kisaltma]
 - id: "c034"
   girdi: "Akçakale Akçalı Mahallesi sınır kapısı yolu üzeri"
-  beklenen: {il: Şanlıurfa, ilce: Akçakale, mahalle: Akçalı, kalan: sınır kapısı yolu üzeri}
+  beklenen: {il: Şanlıurfa, ilce: Akçakale, mahalle: Akçalı, tarif: sınır kapısı yolu üzeri}
   etiketler: [il_eksik, sira, tarif]
 - id: "c035"
   girdi: "Ümraniye Altınşehir Mah. Barış Sk. No:7 D:3"
@@ -181,7 +181,7 @@
   etiketler: [ilce_eksik, tuzak]
 - id: "c044"
   girdi: "Silifke Göksu Mahallesi Taşucu yolu üzeri No:18"
-  beklenen: {il: Mersin, ilce: Silifke, mahalle: Göksu, bina_no: "18", kalan: Taşucu yolu üzeri}
+  beklenen: {il: Mersin, ilce: Silifke, mahalle: Göksu, bina_no: "18", tarif: Taşucu yolu üzeri}
   etiketler: [il_eksik, sira, tarif]
 - id: "c045"
   girdi: "Balıkesir Bandırma Sahil Yenice Mah."
@@ -211,7 +211,7 @@
   etiketler: [il_eksik, sira, kisaltma]
 - id: "c051"
   girdi: "Aksaray Sultanhanı Türkistan Mah. kervansaray yanı"
-  beklenen: {il: Aksaray, ilce: Sultanhanı, mahalle: Türkistan, kalan: kervansaray yanı}
+  beklenen: {il: Aksaray, ilce: Sultanhanı, mahalle: Türkistan, tarif: kervansaray yanı}
   etiketler: [sira, tarif, kisaltma]
 - id: "c052"
   girdi: "Üsküdar Barbaros Mah. Nakkaş Sk. No:13 Daire 5"
@@ -244,7 +244,7 @@
   etiketler: [il_eksik, sira, tarif]
 - id: "c059"
   girdi: "Kızılöz Köyü camii karşısı Osmaneli Bilecik"
-  beklenen: {il: Bilecik, ilce: Osmaneli, mahalle: Kızılöz, kalan: camii karşısı}
+  beklenen: {il: Bilecik, ilce: Osmaneli, mahalle: Kızılöz, tarif: camii karşısı}
   etiketler: [koy, tarif]
 - id: "c060"
   girdi: "Isparta Gülistan Mah. Süleyman Demirel Blv. No:37"

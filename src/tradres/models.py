@@ -22,6 +22,7 @@ FIELDS: tuple[str, ...] = (
     "kat",
     "daire",
     "posta_kodu",
+    "tarif",
 )
 
 
@@ -30,7 +31,8 @@ class Address:
     """A parsed address. A part that was not found is ``None``.
 
     Names have no type word: ``cadde`` is ``"23 Nisan"``, not ``"23 Nisan Cad."``.
-    Köy names are stored in ``mahalle``. Numbers are strings because values such
+    Köy names are stored in ``mahalle``. ``tarif`` holds directions as written
+    ("okul yanı"). Numbers are strings because values such
     as ``"5A"`` are common. ``kalan`` keeps the text that could not be understood,
     so nothing from the input is lost.
 
@@ -51,6 +53,7 @@ class Address:
     kat: str | None = None
     daire: str | None = None
     posta_kodu: str | None = None
+    tarif: str | None = None
     kalan: str | None = None
     confidence: float = 0.0
     field_confidence: Mapping[str, float] = field(default_factory=dict, hash=False)

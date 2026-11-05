@@ -45,6 +45,7 @@ KINDS: frozenset[str] = frozenset(
 
 _DATA_FILE = "abbreviations.json"
 _NAME_WORDS_FILE = "name_words.json"
+_DESCRIPTION_WORDS_FILE = "description_words.json"
 
 
 @dataclass(frozen=True)
@@ -152,6 +153,13 @@ def load_name_words() -> Mapping[str, str]:
     return MappingProxyType(
         {alias_key(key): value for key, value in raw.items() if not key.startswith("_")}
     )
+
+
+@cache
+def load_description_words() -> frozenset[str]:
+    """Keys of the words that end a direction. See data/description_words.json."""
+    text = (files("tradres") / "data" / _DESCRIPTION_WORDS_FILE).read_text(encoding="utf-8")
+    return frozenset(alias_key(word) for word in json.loads(text)["words"])
 
 
 def lookup(token: str) -> Abbreviation | None:

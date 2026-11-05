@@ -65,16 +65,16 @@ def test_parse(text: str, expected: dict[str, str]) -> None:
     assert _found(parse(text)) == expected
 
 
-def test_unknown_text_goes_to_kalan() -> None:
+def test_direction_goes_to_tarif() -> None:
     address = parse("Tabaklar Mah. eski okul karşısı Merkez/Bolu")
     assert address.mahalle == "Tabaklar"
-    assert address.kalan == "eski okul karşısı"
+    assert address.tarif == "eski okul karşısı"
 
 
 def test_road_name_is_not_a_flat() -> None:
     address = parse("Tabaklar Mah. D 100 yanı Merkez/Bolu")
     assert address.daire is None
-    assert address.kalan == "D 100 yanı"
+    assert address.tarif == "D 100 yanı"
 
 
 def test_mahalle_unknown_to_the_gazetteer_stays_as_written() -> None:
@@ -161,10 +161,32 @@ def test_no_word_is_lost(text: str) -> None:
     [
         ("Yenimahalle Ankara, Batıkent, 1923. Cadde", "Batıkent", None),
         ("Kuyuköy Merzifon Amasya", "Kuyuköy", None),
-        ("Merzifon Amasya okul yanı", None, "okul yanı"),
+        ("Merzifon Amasya okul yanı", None, None),
         ("Merzifon Amasya bir iki üç", None, "bir iki üç"),
     ],
 )
 def test_loose_words_as_mahalle(text: str, mahalle: str | None, kalan: str | None) -> None:
     address = parse(text)
     assert (address.mahalle, address.kalan) == (mahalle, kalan)
+
+
+@pytest.mark.parametrize(
+    ("text", "tarif", "kalan"),
+    [
+        ("Yeni Mah. D 100 karayolu üzeri Güneş Apt. Kadıköy", "D 100 karayolu üzeri", None),
+        ("Yeni Mah. eski belediye karşısı Kadıköy", "eski belediye karşısı", None),
+        ("Yeni Mah. okul yanında No:4 Kadıköy", "okul yanında", None),
+        ("Yeni Mah. Sanayi Sitesi yanı Kadıköy", "Sanayi Sitesi yanı", None),
+        ("Yeni Mah. okul yanı, cami karşısı Kadıköy", "okul yanı", "cami karşısı"),
+        ("Yeni Mah. okul yanı bir de bahçe Kadıköy", "okul yanı", "bir de bahçe"),
+        ("Yeni Mah. köprüden geçince sağda sonra Kadıköy", None, "köprüden geçince sağda sonra"),
+    ],
+)
+def test_directions(text: str, tarif: str | None, kalan: str | None) -> None:
+    address = parse(text)
+    assert (address.tarif, address.kalan) == (tarif, kalan)
+
+
+def test_street_named_after_a_direction_is_not_a_direction() -> None:
+    address = parse("Cami Yanı Sokak No:5 Kadıköy")
+    assert (address.sokak, address.tarif) == ("Cami Yanı", None)

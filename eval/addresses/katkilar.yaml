@@ -20,3 +20,15 @@
   girdi: "Akdeniz Mah. Polis Lojmanları Daire 7 Gülnar Mersin"
   beklenen: {il: Mersin, ilce: Gülnar, mahalle: Akdeniz, site: Polis Lojmanları, daire: "7"}
   etiketler: [site]
+- id: "p011"
+  girdi: "Çarşı Mah. Sanayi Sitesi yanı Gerze/Sinop"
+  beklenen: {il: Sinop, ilce: Gerze, mahalle: Çarşı, tarif: Sanayi Sitesi yanı}
+  etiketler: [tarif, tuzak]
+- id: "p012"
+  girdi: "Yeni Mah. cami karşısındaki Güneş Apt. Daire 4 Keşan Edirne"
+  beklenen: {il: Edirne, ilce: Keşan, mahalle: Yeni, bina_adi: Güneş, daire: "4", tarif: cami karşısındaki}
+  etiketler: [tarif, bina_adi]
+- id: "p013"
+  girdi: "Selahattin Mah. okul yanında No:4 Silvan Diyarbakır"
+  beklenen: {il: Diyarbakır, ilce: Silvan, mahalle: Selahattin, bina_no: "4", tarif: okul yanında}
+  etiketler: [tarif]

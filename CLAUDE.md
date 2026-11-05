@@ -53,7 +53,7 @@ result.to_dict()     # JSON'a hazır sözlük, her alanın kendi güven skoruyla
   - ASCII'ye çevrilmiş girdiyi tanıma: `cankaya` → `Çankaya`, `sisli` → `Şişli` (eşleştirme Türkçe karakterlerden bağımsız bir anahtar üzerinden yapılsın, çıktı her zaman doğru Türkçe yazımla dönsün).
   - Kısaltmalar: `Mah./Mh./Mahallesi`, `Cad./Cd./Caddesi`, `Sok./Sk./Sokağı`, `Blv./Bulvarı`, `Apt./Apartmanı`, `Sit./Sitesi`, `Bl./Blok`, `No:/No`, `D:/Daire`, `K:/Kat` vb. Bu liste kodun içine gömülmesin, ayrı bir veri dosyasında dursun ki katkıcılar kolayca eklesin.
   - Boşluk, noktalama ve birleşik yazım temizliği (`23nisan` → `23 Nisan`, `No:5/3` → bina 5, daire 3).
-- **Bileşen çıkarma:** il, ilçe, mahalle, cadde, sokak, bulvar, site, bina adı, blok, bina no, kat, daire, posta kodu. Tanınamayan kısım `kalan` (unparsed) alanına konsun, asla sessizce atılmasın.
+- **Bileşen çıkarma:** il, ilçe, mahalle, cadde, sokak, bulvar, site, bina adı, blok, bina no, kat, daire, posta kodu, tarif ("okul yanı" gibi yön tarifleri). Tanınamayan kısım `kalan` (unparsed) alanına konsun, asla sessizce atılmasın.
 - **Gazetteer (resmi yer adları) ile doğrulama:** il → ilçe → mahalle hiyerarşisi. Bir ilçe yanlış ile eşleşirse güven düşsün; il yazılmamışsa ilçeden çıkarılabiliyorsa (tek bir ile aitse) doldurulsun ve bu durum işaretlensin.
 - **Bulanık eşleştirme:** Yazım hatalarını tolere et (`Kızılay` / `Kizilay` / `Kzılay`). Eşik değerleri sabit kodlanmasın, ayarlanabilir olsun.
 - **Sıra bağımsızlığı:** `Merkez/Bolu`, `Bolu Merkez`, `Bolu - Merkez`, adresin başında ya da sonunda il/ilçe.
@@ -67,7 +67,6 @@ result.to_dict()     # JSON'a hazır sözlük, her alanın kendi güven skoruyla
 - Hugging Face Spaces'te (Gradio) canlı demo
 - Posta kodu tahmini ve doğrulaması
 - Belirsiz adreslerde birden fazla aday döndürme (`parse_candidates`)
-- "… karşısı", "… yanı" gibi tarif ifadelerini `tarif` alanına ayırma
 - Değerlendirme seti kural tabanlı yaklaşımda tıkanırsa küçük bir NER modeli denemek (önce ölç, sonra karar ver)
 
 ### Kapsam dışı
