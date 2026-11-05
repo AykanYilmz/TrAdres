@@ -199,8 +199,11 @@ Her faz sonunda dur ve onayımı bekle.
   - Hız ~222 µs/adres (önce ~174), wheel 228 KiB, rapidfuzz ilk çekirdek bağımlılık. CI eşiği `--min-f1 0.98 --min-exact 0.95`.
   - Sızıntı: test setinin ilk ölçümünde etiket grupları ekrana geldi, sonra kapatıldı; `İç Kapı No` kuralı test setindeki bir adresten önce biliniyordu ve geliştirme setine de eklendi. Test seti aynı kişi tarafından yazıldı. v0.1 öncesi yeni adreslerle tazelenmeli.
   - Güven skoru açıklanabilir ama kalibre değil: yanlış adreslerin ortalaması 0.859, doğruların 0.934; geliştirme setinde hata az olduğu için eşik önerilemiyor.
-  - Faz 5 özetinden sonra Aykan'ın demoda bulduğu hatalar: `tarif` alanı v0.2'den öne alındı (`data/description_words.json`), `D:6/B`, iki kez yazılan il/ilçe, virgüller arası anahtarsız site adı (güven düşük). Aykan Faz 5'i henüz onaylamadı; kilitli test bu değişikliklerden sonra ölçülmedi, %89.0 eski sayı.
-  - Bilinen hatalar: `Kordon Boyu No:6` mahalle sayılıyor (c089, gevşek mahalle kuralının bedeli), `Sinir`, `Kusdilli` (kelime listesinde yok), `Firat` (Wikidata yazımı), `Ankara Kızılay Atatürk Blv.`, anahtarsız `Marina Residence`. 144 mahalle yazım farkı açık kaldı.
+  - Faz 5 özetinden sonra Aykan'ın demoda bulduğu hatalar: `tarif` alanı v0.2'den öne alındı (`data/description_words.json`), `D:6/B`, iki kez yazılan il/ilçe, virgüller arası anahtarsız site adı (güven düşük). Aykan Faz 5'i henüz onaylamadı.
+  - Veri (A seçeneği): `scripts/gazetteer_additions.json`, kaynaklı tek tek girdiler (`Fırat`, `Kuşdilli`); gereksiz kalan girdi derlemeyi kırar. Wikidata adlarını otomatik düzeltme ölçülüp reddedildi (14 iyi, 34 kötü).
+  - **Son ölçüm: test seti 1 %90.0 (100 adres, F1 0.976), yeni test seti 2 %94.0 (50 adres, F1 0.989, baseline %44.0), geliştirme 320/323 (%99.1).** Test seti 2 de aynı kişi tarafından, kurallar bilinerek yazıldı ve küçük; gerçek dünya sayısı değil.
+  - Demo kod değişince kendini yeniden başlatıyor (`--no-reload` ile kapanır).
+  - Bilinen hatalar: `Sinir` (kelime listesinde yok), `Ankara Kızılay Atatürk Blv.`, anahtarsız `Marina Residence`. 144 mahalle yazım farkı açık kaldı.
 - [ ] Faz 6 — CLI ve API yüzeyi
 - [ ] Faz 7 — Açık kaynak altyapısı
 - [ ] Faz 8 — README ve v0.1.0
