@@ -184,7 +184,7 @@ Her faz sonunda dur ve onayımı bekle.
   - Set gazetteer'dan bağımsız örneklendi: 43 adres `gazetteer_disi` (%13.7), 1 adres `gazetteer_yazim_farki`.
   - CI eşiği henüz yok; parser gelince Faz 4'te `--min-f1` / `--min-exact` ile eklenecek.
   - Açık soru: 144 mahallede Wikidata yazımı resmiyle farklı (çoğu biçim farkı); mahalle düzeltmesi Faz 5'te ele alınacak.
-- [x] Faz 4 — Parser v1 (2026-11-05, onay bekliyor)
+- [x] Faz 4 — Parser v1 (2026-11-05, onaylandı)
   - `models.py` (`Address`, `FIELDS`), `tokenizer.py`, `extractors/{numbers,places,streets}.py`, `parser.py`; `tradres.parse` public.
   - İlk ölçüm: **F1 0.977, tam doğru %88.8** (278/313). Güncel baseline: F1 0.890, %53.0. Aşamalar: sayılar %0.6 → yer adları %2.6 → cadde/sokak %80.8 → tam pipeline %88.8. Hız ~174 µs/adres.
   - **Bu sayı iyimser:** seti ve parser'ı aynı kişi (Claude) yazdı, kurallar setin örüntülerini biliyordu. Faz 5'ten önce ayrı bir test bölümü önerildi.
