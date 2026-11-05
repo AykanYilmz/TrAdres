@@ -8,23 +8,35 @@ from tradres.extractors.numbers import extract_numbers
 from tradres.extractors.places import extract_places, free_windows
 from tradres.extractors.streets import extract_streets
 from tradres.gazetteer import Gazetteer, load_gazetteer
+from tradres.matching import DEFAULT_CONFIG, MatchConfig
 from tradres.models import Address
 from tradres.tokenizer import Token, street_keyword, tokenize
 
 __all__ = ["parse"]
 
 
-def official_mahalle(name: str, fields: Mapping[str, str], gazetteer: Gazetteer) -> str:
-    """Official spelling of a mahalle: same district first, then anywhere.
+def official_mahalle(
+    name: str,
+    fields: Mapping[str, str],
+    gazetteer: Gazetteer,
+    config: MatchConfig = DEFAULT_CONFIG,
+) -> str:
+    """Official spelling of a mahalle.
 
-    If the gazetteer does not know the name, it stays as written.
+    Search the same district, the same province, a typo inside the district,
+    and then everywhere. If nothing fits, the name stays as written.
     """
     il, ilce = fields.get("il"), fields.get("ilce")
-    for filters in ({"il": il, "ilce": ilce}, {"il": il}, {}):
+    for filters in ({"il": il, "ilce": ilce}, {"il": il}):
         matches = gazetteer.find_mahalle(name, **filters)
         if matches:
             return matches[0].ad
-    return name
+    if il is not None and ilce is not None:
+        corrected = gazetteer.fuzzy_mahalle(name, il=il, ilce=ilce, config=config)
+        if corrected is not None:
+            return corrected.ad
+    matches = gazetteer.find_mahalle(name)
+    return matches[0].ad if matches else name
 
 
 def mahalle_without_keyword(
@@ -57,8 +69,10 @@ def number_after_keyword(tokens: Sequence[Token], used: Collection[int]) -> int 
     return None
 
 
-def parse(text: str) -> Address:
+def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
     """Split a Turkish address into its parts.
+
+    ``config`` sets how far a misspelled place name may be from the real one.
 
     >>> address = parse("Kızılay Mah. Gül Sk. No:5/3 Çankaya/Ankara")
     >>> address.il, address.ilce, address.mahalle, address.sokak
@@ -75,7 +89,7 @@ def parse(text: str) -> Address:
     fields.update(numbers.fields)
     used |= numbers.used
 
-    places = extract_places(tokens, used, gazetteer)
+    places = extract_places(tokens, used, gazetteer, config)
     fields.update(places.fields)
     used |= places.used
 
@@ -84,7 +98,7 @@ def parse(text: str) -> Address:
     used |= streets.used
 
     if "mahalle" in fields:
-        fields["mahalle"] = official_mahalle(fields["mahalle"], fields, gazetteer)
+        fields["mahalle"] = official_mahalle(fields["mahalle"], fields, gazetteer, config)
     else:
         found = mahalle_without_keyword(tokens, used, fields, gazetteer)
         if found is not None:

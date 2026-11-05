@@ -2,6 +2,7 @@
 
 from importlib.metadata import PackageNotFoundError, version
 
+from tradres.matching import MatchConfig
 from tradres.models import Address
 from tradres.normalization import normalize
 from tradres.parser import parse
@@ -11,4 +12,4 @@ try:
 except PackageNotFoundError:  # pragma: no cover - only when running from a raw checkout
     __version__ = "0.0.0"
 
-__all__ = ["Address", "__version__", "normalize", "parse"]
+__all__ = ["Address", "MatchConfig", "__version__", "normalize", "parse"]

@@ -19,10 +19,11 @@ import json
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from functools import cache
+from functools import cache, cached_property
 from importlib.resources import files
 from typing import Any
 
+from tradres.matching import DEFAULT_CONFIG, MatchConfig, closest
 from tradres.normalization import ascii_key
 
 __all__ = [
@@ -200,6 +201,58 @@ class Gazetteer:
         ['İstanbul']
         """
         return [self._iller[ascii_key(i.il)] for i in self.find_ilce(name)]
+
+    # ------------------------------------------------------------------ #
+    # Fuzzy lookups (typos)
+    # ------------------------------------------------------------------ #
+
+    def fuzzy_il(self, name: str, config: MatchConfig = DEFAULT_CONFIG) -> Il | None:
+        """The province a misspelled name most likely means.
+
+        >>> load_gazetteer().fuzzy_il("Malatay").ad
+        'Malatya'
+        """
+        key = ascii_key(name)
+        if len(key) < config.min_length:
+            return None
+        hit = closest(key, self._il_index, config)
+        return self._il_index[hit] if hit is not None else None
+
+    @cached_property
+    def _single_province_districts(self) -> dict[str, Ilce]:
+        return {key: found[0] for key, found in self._ilce_index.items() if len(found) == 1}
+
+    def fuzzy_ilce(
+        self, name: str, *, il: str | None = None, config: MatchConfig = DEFAULT_CONFIG
+    ) -> Ilce | None:
+        """The district a misspelled name most likely means.
+
+        Without ``il``, only district names used by one province are searched.
+
+        >>> load_gazetteer().fuzzy_ilce("Çankya", il="Ankara").ad
+        'Çankaya'
+        """
+        key = ascii_key(name)
+        if len(key) < config.min_length:
+            return None
+        pool = (
+            {ascii_key(n): i for i in self.ilceleri(il) for n in (i.ad, *i.diger_adlar)}
+            if il is not None
+            else self._single_province_districts
+        )
+        hit = closest(key, pool, config)
+        return pool[hit] if hit is not None else None
+
+    def fuzzy_mahalle(
+        self, name: str, *, il: str, ilce: str, config: MatchConfig = DEFAULT_CONFIG
+    ) -> Mahalle | None:
+        """The mahalle of one district that a misspelled name most likely means."""
+        key = ascii_key(name)
+        if len(key) < config.min_mahalle_length:
+            return None
+        pool = {ascii_key(m.ad): m for m in self.mahalleleri(il, ilce)}
+        hit = closest(key, pool, config)
+        return pool[hit] if hit is not None else None
 
     def __repr__(self) -> str:
         counts = (

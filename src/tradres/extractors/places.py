@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Collection, Iterator, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from tradres.extractors import Extraction
 from tradres.gazetteer import Gazetteer, Il, Ilce
+from tradres.matching import DEFAULT_CONFIG, MatchConfig
 from tradres.tokenizer import Token, street_keyword
 
 __all__ = ["extract_places", "free_windows"]
@@ -51,18 +52,10 @@ def _overlap(left: Window, right: Window) -> bool:
     return left.start < right.end and right.start < left.end
 
 
-def _choose(tokens: Sequence[Token], used: Collection[int], gazetteer: Gazetteer) -> _Found:
-    iller: list[tuple[Window, Il]] = []
-    ilceler: list[tuple[Window, list[Ilce]]] = []
-    for window in free_windows(tokens, used):
-        il = gazetteer.find_il(window.text)
-        if il is not None:
-            iller.append((window, il))
-        matches = gazetteer.find_ilce(window.text)
-        if matches:
-            ilceler.append((window, matches))
-
-    # Best: a province and one of its districts, next to each other, late in the text.
+def _best_pair(
+    iller: Sequence[tuple[Window, Il]], ilceler: Sequence[tuple[Window, list[Ilce]]]
+) -> _Found | None:
+    """A province and one of its districts, best next to each other and late in the text."""
     best: tuple[tuple[bool, int, int], _Found] | None = None
     for il_window, il in iller:
         for ilce_window, matches in ilceler:
@@ -75,18 +68,77 @@ def _choose(tokens: Sequence[Token], used: Collection[int], gazetteer: Gazetteer
             score = (adjacent, end, size)
             if best is None or score > best[0]:
                 best = (score, _Found((il_window, il), (ilce_window, ilce)))
-    if best is not None:
-        return best[1]
+    return best[1] if best is not None else None
 
+
+def _with_fuzzy_ilce(
+    found: _Found,
+    windows: Sequence[Window],
+    gazetteer: Gazetteer,
+    config: MatchConfig,
+) -> _Found:
+    """Look for a misspelled district of the known province."""
+    assert found.il is not None
+    il_window, il = found.il
+    for window in reversed(windows):
+        if _overlap(window, il_window) or gazetteer.find_mahalle(window.text, il=il.ad):
+            continue
+        ilce = gazetteer.fuzzy_ilce(window.text, il=il.ad, config=config)
+        if ilce is not None:
+            return replace(found, ilce=(window, ilce))
+    return found
+
+
+def _choose(
+    tokens: Sequence[Token],
+    used: Collection[int],
+    gazetteer: Gazetteer,
+    config: MatchConfig,
+) -> _Found:
+    windows = list(free_windows(tokens, used))
+    iller: list[tuple[Window, Il]] = []
+    ilceler: list[tuple[Window, list[Ilce]]] = []
+    for window in windows:
+        il = gazetteer.find_il(window.text)
+        if il is not None:
+            iller.append((window, il))
+        matches = gazetteer.find_ilce(window.text)
+        if matches:
+            ilceler.append((window, matches))
+
+    pair = _best_pair(iller, ilceler)
+    if pair is not None:
+        return pair
     if iller:
-        return _Found(il=iller[-1])
-    # No province written: a district name used by only one province is enough.
+        return _with_fuzzy_ilce(_Found(il=iller[-1]), windows, gazetteer, config)
+
+    # No province as written: a misspelled one, then a one-province district name.
+    misspelled: list[tuple[Window, Il]] = []
+    for window in windows:
+        il = gazetteer.fuzzy_il(window.text, config) if window.end - window.start == 1 else None
+        if il is not None and not gazetteer.find_ilce(window.text):
+            misspelled.append((window, il))
+    pair = _best_pair(misspelled, ilceler)
+    if pair is not None:
+        return pair
+
     unique = [(window, matches[0]) for window, matches in ilceler if len(matches) == 1]
-    return _Found(ilce=unique[-1]) if unique else _Found()
+    if unique:
+        return _Found(ilce=unique[-1])
+    if misspelled:
+        return _with_fuzzy_ilce(_Found(il=misspelled[-1]), windows, gazetteer, config)
+    for window in reversed(windows):
+        ilce = gazetteer.fuzzy_ilce(window.text, config=config)
+        if ilce is not None:
+            return _Found(ilce=(window, ilce))
+    return _Found()
 
 
 def extract_places(
-    tokens: Sequence[Token], used: Collection[int], gazetteer: Gazetteer
+    tokens: Sequence[Token],
+    used: Collection[int],
+    gazetteer: Gazetteer,
+    config: MatchConfig = DEFAULT_CONFIG,
 ) -> Extraction:
     """Find il and ilçe among the free tokens.
 
@@ -95,7 +147,7 @@ def extract_places(
     >>> extract_places(tokenize("Van Cad. Kadıköy"), (), load_gazetteer()).fields
     {'il': 'İstanbul', 'ilce': 'Kadıköy'}
     """
-    found = _choose(tokens, used, gazetteer)
+    found = _choose(tokens, used, gazetteer, config)
     fields: dict[str, str] = {}
     taken: set[int] = set()
     if found.il is not None:

@@ -5,8 +5,10 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from enum import Enum
+from functools import cache
 
-from tradres.abbreviations import Abbreviation, alias_key, lookup
+from tradres.abbreviations import Abbreviation, alias_key, load_abbreviations, lookup
+from tradres.matching import closest
 from tradres.normalization import clean
 
 __all__ = ["STREET_KINDS", "Token", "TokenKind", "street_keyword", "tokenize"]
@@ -16,6 +18,7 @@ STREET_KINDS = frozenset({"mahalle", "cadde", "sokak", "bulvar", "site", "apartm
 
 _TOKEN = re.compile(r"[,;()/]|[^\s,;()]+")
 _SEPARATORS = frozenset(",;()/-")
+_MIN_KEYWORD_LENGTH = 6  # only full forms such as "Mahallesi" are corrected
 # 5, 12A, 1923. (ordinal) or 5/3 (building/flat, or a street number in İzmir)
 _NUMBER = re.compile(r"\d+[^\W\d_]?\.?|\d+/\d+")
 
@@ -68,9 +71,31 @@ def tokenize(text: str) -> tuple[Token, ...]:
     return tuple(_token(piece) for piece in _TOKEN.findall(clean(text)))
 
 
+@cache
+def _long_forms() -> dict[str, Abbreviation]:
+    keywords = (a for a in load_abbreviations().values() if a.kind in STREET_KINDS)
+    return {alias_key(a.long): a for a in keywords if len(a.long) >= _MIN_KEYWORD_LENGTH}
+
+
+@cache
+def _misspelled_keyword(key: str) -> Abbreviation | None:
+    """A typo in a full keyword: "Mahalesi", "Cadesi". The first letter must be right."""
+    if len(key) < _MIN_KEYWORD_LENGTH:
+        return None
+    forms = _long_forms()
+    hit = closest(key, [form for form in forms if form[0] == key[0]])
+    return forms[hit] if hit is not None else None
+
+
 def street_keyword(token: Token) -> Abbreviation | None:
-    """The keyword this token stands for, if it is one of :data:`STREET_KINDS`."""
+    """The keyword this token stands for, if it is one of :data:`STREET_KINDS`.
+
+    >>> street_keyword(tokenize("Mahalesi")[0]).kind
+    'mahalle'
+    """
     if token.kind is not TokenKind.WORD:
         return None
     found = lookup(token.text)
-    return found if found is not None and found.kind in STREET_KINDS else None
+    if found is None:
+        return _misspelled_keyword(token.key)
+    return found if found.kind in STREET_KINDS else None
