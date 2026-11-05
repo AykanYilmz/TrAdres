@@ -204,7 +204,13 @@ Her faz sonunda dur ve onayımı bekle.
   - **Son ölçüm: test seti 1 %90.0 (100 adres, F1 0.976), yeni test seti 2 %94.0 (50 adres, F1 0.989, baseline %44.0), geliştirme 320/323 (%99.1).** Test seti 2 de aynı kişi tarafından, kurallar bilinerek yazıldı ve küçük; gerçek dünya sayısı değil.
   - Demo kod değişince kendini yeniden başlatıyor (`--no-reload` ile kapanır).
   - Bilinen hatalar: `Sinir` (kelime listesinde yok), `Ankara Kızılay Atatürk Blv.`, anahtarsız `Marina Residence`. 144 mahalle yazım farkı açık kaldı.
-- [ ] Faz 6 — CLI ve API yüzeyi (sonunda: Google Maps adresleriyle gerçek deneme, Faz 7'den önce)
+- [ ] Faz 6 — CLI ve API yüzeyi (2026-11-05, kod bitti; Google Maps denemesi ve onay bekliyor)
+  - `cli.py` (argparse, yeni bağımlılık yok): `tradres parse "adres"` (JSON + `adres` anahtarı), `tradres parse-csv girdi.csv --column adres -o cikti.csv`, `python -m tradres`. Excel uyumu: kodlama (BOM → UTF-8 → cp1254) ve ayraç otomatik, çıktı BOM'lu UTF-8. Sonuç sütunları `tradres_` önekli, `tradres_guven`, `tradres_adres`.
+  - `Address.format()`: sabit sıra, `kalan` hariç. Tur testi: geliştirme 323/323, karışık alanlı 30.000 adreste 6 sapma (hepsi ilsiz adreste tarif kelimesi yer sanılıyor), test seti 1'de 99/100 (kilitli set açılmadı), test seti 2'de 50/50. Hypothesis 5000 örnekte temiz.
+  - Maps biçimi için yeni `google_maps` grubu (24 adres, uydurma numaralar): **önce 0/24, sonra 24/24.** Sondaki ülke adı site/mahalle oluyordu (`data/country_names.json`), Plus Code mahalle oluyordu. Geliştirme 320/347 → 344/347 (%99.1), test setleri değişmedi (%90.0, %94.0).
+  - Hız: 10.000 satır CSV 2.6 s (~261 µs/satır, dosya okuma/yazma dahil). Wheel 229 KiB.
+  - CI eşiği `--min-tag temiz=0.95 --min-tag google_maps=0.95`: dağınık veri çalışması düzenli adresleri bozarsa build kırılır.
+  - Gerçek deneme dosyaları `denemeler/` altında, `.gitignore`'da.
 - [ ] Faz 7 — Açık kaynak altyapısı
 - [ ] Faz 8 — README ve v0.1.0
 - [ ] Faz 9 — Tanıtım
@@ -239,6 +245,12 @@ Her faz sonunda dur ve onayımı bekle.
 - **Tarif sözcüğü kuralı sadece bina adında:** `Cami Yanı Sokak`, `Kale Arkası Cad.` gerçek sokak adları, bu yüzden cadde/sokakta uygulanmıyor. `... Lojmanları` şimdilik `kalan`'a gidiyor.
 - **Hedef daraltıldı (2026-11-05, Aykan):** TrAdres bir form aracı değil, veri temizleme aracı: dağınık adres içeren CSV ve eski kayıtları temizleyen, CLI odaklı kütüphane. Yeni formlarda ayrı kutular daha iyi. Talep ve rakip araştırması şimdilik yapılmadı; README ve tanıtımda büyük talep iddiası yazılmayacak.
 - **Gerçek adres denemesi Faz 6 sonunda:** Aykan internetten bulduğu adresleri `tradres parse-csv` ile toplu dener. Hatalar kalıp olarak geliştirme setine girer; numaralar ve binalar uydurulur, adresler olduğu gibi depoya girmez.
+- **CLI argparse ile (Aykan seçti):** typer/click eklemek `pip install tradres[cli]` adımı getirirdi; ilerleme çubuğu kendi kodumuz, ~30 satır.
+- **CSV sonuç sütunları `tradres_` önekli (Aykan seçti):** girdideki `il` sütunuyla çakışmaz. Kendi çıktısını ikinci kez işlemek hata verir.
+- **Ayraç veri sezilerek değil, `--column` adıyla bulunur:** adreslerde virgül bol olduğu için `csv.Sniffer` güvenilmez; doğru ayraç kullanıcının verdiği sütunu bulan ayraçtır.
+- **Fazla hücre son sütuna birleşir:** tırnaksız virgüllü adres satırı metin kaybetmez, özette uyarı çıkar.
+- **Formül koruması:** `=`, `+`, `-`, `@` ile başlayan yeni hücrelerin başına `'` eklenir (CSV injection: Excel hücreyi formül diye çalıştırabilir). Girdi sütunlarına dokunulmaz.
+- **Ülke adı sadece adresin son kelimesiyse atılır:** `Türkiye Sk.` sokak olarak kalır.
 - **Deneme sırası:** önce düzenli adresler (Google Maps) oturtulacak, karmaşık veri ondan sonra ele alınacak (Aykan, 2026-11-05). v0.1 hedefi dağınık CSV temizliği olduğu için karmaşık veri denemesi unutulmamalı.
 - **Faz 6'dan önce yer verisi güçlendirilecek** (Aykan kabul etti); kaynak seçimi Aykan'da.
 - **Fuzzy: rapidfuzz + OSA.** Takas (`Malatay`) 1 düzeltme sayılır. Eşitlikte tahmin edilmez. Kısa kelime düzeltilmez (`Van`/`Yan`). Mahalle için alt sınır daha yüksek: eksik bir `Çınar` `Pınar` olmamalı.

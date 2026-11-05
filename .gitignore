@@ -29,3 +29,6 @@ Thumbs.db
 
 # Raw downloaded data (processed data lives in src/tradres/data/)
 data/raw/
+
+# Real address trials: these files must never enter the repository
+denemeler/
