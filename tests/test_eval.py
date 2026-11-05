@@ -18,6 +18,7 @@ from eval.__main__ import (
 )
 from eval.baseline import parse as baseline_parse
 from eval.dataset import (
+    HOLDOUT_2_DIR,
     HOLDOUT_DIR,
     MISSING_TAG,
     SPELLING_TAG,
@@ -335,3 +336,15 @@ def test_holdout_prints_totals(capsys: pytest.CaptureFixture[str]) -> None:
     out = capsys.readouterr().out
     assert "locked test set: 100" in out
     assert "tag " not in out
+
+
+def test_second_holdout_set_is_separate() -> None:
+    second = load_cases(HOLDOUT_2_DIR)
+    assert len(second) == 50
+    others = {case.beklenen.get("mahalle") for case in [*load_cases(), *load_cases(HOLDOUT_DIR)]}
+    assert not {case.beklenen.get("mahalle") for case in second} & others
+
+
+def test_second_holdout_is_selected(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["--holdout", "2", "--parser", "eval.baseline:parse"]) == 0
+    assert "locked test set: 50" in capsys.readouterr().out

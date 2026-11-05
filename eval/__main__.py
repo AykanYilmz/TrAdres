@@ -10,6 +10,7 @@ from typing import cast
 
 from eval.dataset import (
     ADDRESSES_DIR,
+    HOLDOUT_2_DIR,
     HOLDOUT_DIR,
     MISSING_TAG,
     SPELLING_TAG,
@@ -86,7 +87,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--parser", default=DEFAULT_PARSER, help="module:function to score")
     parser.add_argument("--check", action="store_true", help="only validate the labels")
     parser.add_argument(
-        "--holdout", action="store_true", help="score the locked test set (totals only)"
+        "--holdout",
+        nargs="?",
+        const=1,
+        type=int,
+        choices=(1, 2),
+        help="score a locked test set (totals only)",
     )
     parser.add_argument("--tag", help="score only the addresses with this tag")
     parser.add_argument("--failures", type=int, default=0, metavar="N", help="show N failures")
@@ -112,7 +118,8 @@ def main(
         return EXIT_ERROR
 
     try:
-        cases = load_cases(HOLDOUT_DIR if args.holdout else ADDRESSES_DIR)
+        directory = {None: ADDRESSES_DIR, 1: HOLDOUT_DIR, 2: HOLDOUT_2_DIR}[args.holdout]
+        cases = load_cases(directory)
     except DatasetError as error:
         print(f"invalid labels: {error}", file=sys.stderr)
         return EXIT_ERROR

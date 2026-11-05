@@ -14,6 +14,7 @@ from tradres.models import FIELDS
 ADDRESSES_DIR = Path(__file__).parent / "addresses"
 #: The locked test set: the parser is never tuned on these addresses.
 HOLDOUT_DIR = Path(__file__).parent / "holdout"
+HOLDOUT_2_DIR = Path(__file__).parent / "holdout2"
 
 #: ``kalan`` documents the text that should stay unparsed. It is not scored.
 LABEL_KEYS = frozenset(FIELDS) | {"kalan"}
