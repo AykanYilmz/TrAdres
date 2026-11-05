@@ -217,3 +217,17 @@ def test_flat_with_a_letter(text: str, daire: str, blok: str | None) -> None:
 def test_repeated_place_is_not_left_over(text: str) -> None:
     address = parse(text)
     assert (address.il, address.ilce, address.kalan) == ("Sinop", "Gerze", None)
+
+
+@pytest.mark.parametrize(
+    ("text", "site", "kalan"),
+    [
+        ("Mavi Rezidans, Çarşı Mah., Lale Sk. No:3 Gerze/Sinop", "Mavi Rezidans", None),
+        ("Çarşı Mah., Yeşil Vadi Evleri, No:3 Gerze/Sinop", "Yeşil Vadi Evleri", None),
+        ("Çarşı Mah. Mavi Rezidans No:3 Gerze/Sinop", None, "Mavi Rezidans"),
+        ("Mavi Rezidans, Lale Sk. No:3", None, "Mavi Rezidans"),
+    ],
+)
+def test_piece_between_commas_is_a_site(text: str, site: str | None, kalan: str | None) -> None:
+    address = parse(text)
+    assert (address.site, address.kalan) == (site, kalan)

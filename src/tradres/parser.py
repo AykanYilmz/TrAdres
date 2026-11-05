@@ -18,7 +18,9 @@ from tradres.tokenizer import Token, street_keyword, tokenize
 __all__ = ["parse"]
 
 _NAME_FIELDS = ("bulvar", "cadde", "sokak", "site", "bina_adi")
-_MAX_LOOSE_NAME_WORDS = 2
+_MAX_LOOSE_MAHALLE_WORDS = 2
+_MAX_LOOSE_SITE_WORDS = 3
+_COMMAS = frozenset(",;")
 
 
 def official_mahalle(
@@ -77,12 +79,26 @@ def mahalle_without_keyword(
     return None
 
 
-def loose_mahalle(tokens: Sequence[Token], used: Collection[int]) -> list[int]:
-    """Words standing alone, which may name an area the gazetteer does not list.
+def _in_own_piece(tokens: Sequence[Token], run: Sequence[int]) -> bool:
+    """True if commas or the ends of the text mark off these tokens."""
+    first, last = run[0], run[-1]
+    before = first == 0 or tokens[first - 1].text in _COMMAS
+    after = last == len(tokens) - 1 or tokens[last + 1].text in _COMMAS
+    return before and after
+
+
+def loose_words(
+    tokens: Sequence[Token],
+    used: Collection[int],
+    *,
+    max_words: int,
+    own_piece: bool = False,
+) -> list[int]:
+    """Words standing alone, which may name a place we have no list for.
 
     "Yenimahalle Ankara, Batıkent, 1923. Cadde": il and ilçe are known and
-    "Batıkent" is a separate piece of one or two words. Numbers, keywords and
-    directions ("okul yanı") do not count.
+    "Batıkent" is a separate piece. Numbers, keywords and directions ("okul
+    yanı") do not count. With ``own_piece``, commas must mark off the words.
     """
     run: list[int] = []
     for index, token in enumerate([*tokens, None]):
@@ -90,7 +106,8 @@ def loose_mahalle(tokens: Sequence[Token], used: Collection[int]) -> list[int]:
             run.append(index)
             continue
         words = [tokens[i] for i in run]
-        if 0 < len(run) <= _MAX_LOOSE_NAME_WORDS and not any(
+        fits = 0 < len(run) <= max_words and (not own_piece or _in_own_piece(tokens, run))
+        if fits and not any(
             word.is_number or word.key in load_description_words() or street_keyword(word)
             for word in words
         ):
@@ -193,7 +210,7 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
             origins["mahalle"] = Origin.EXACT
             used.update(found[1])
         elif "il" in fields and "ilce" in fields:
-            loose = loose_mahalle(tokens, used)
+            loose = loose_words(tokens, used, max_words=_MAX_LOOSE_MAHALLE_WORDS)
             if loose:
                 name = tr_title(" ".join(tokens[index].text for index in loose))
                 fields["mahalle"] = gazetteer.respell(name)
@@ -220,6 +237,14 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
         fields["tarif"] = " ".join(tokens[index].text for index in directions)
         origins["tarif"] = Origin.KEYWORD
         used.update(directions)
+
+    if "mahalle" in fields and "site" not in fields:
+        loose = loose_words(tokens, used, max_words=_MAX_LOOSE_SITE_WORDS, own_piece=True)
+        if loose:
+            name = tr_title(" ".join(tokens[index].text for index in loose))
+            fields["site"] = gazetteer.respell(name)
+            origins["site"] = Origin.UNVERIFIED
+            used.update(loose)
 
     rest = [
         token.text

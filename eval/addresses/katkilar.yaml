@@ -36,3 +36,7 @@
   girdi: "Çarşı Mah., Lale Sk. Güneş apt D:4/C, 57200 Sinop Gerze/Sinop"
   beklenen: {il: Sinop, ilce: Gerze, mahalle: Çarşı, sokak: Lale, bina_adi: Güneş, daire: 4/C, posta_kodu: "57200"}
   etiketler: [tuzak, no_bolu]
+- id: "p015"
+  girdi: "Mavi Rezidans, Çarşı Mah., 12 Sk No:7/A D Blok, 57200 Gerze/Sinop"
+  beklenen: {il: Sinop, ilce: Gerze, mahalle: Çarşı, sokak: "12", site: Mavi Rezidans, blok: D, bina_no: 7/A, posta_kodu: "57200"}
+  etiketler: [site, tuzak]

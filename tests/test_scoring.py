@@ -88,3 +88,8 @@ def test_to_dict_is_json_ready() -> None:
 def test_loose_mahalle_is_not_trusted() -> None:
     address = parse("Yenimahalle Ankara, Batıkent, 1923. Cadde")
     assert address.field_confidence["mahalle"] == Origin.UNVERIFIED.value
+
+
+def test_site_without_a_keyword_is_not_trusted() -> None:
+    address = parse("Mavi Rezidans, Çarşı Mah., Gerze/Sinop")
+    assert address.field_confidence["site"] == Origin.UNVERIFIED.value
