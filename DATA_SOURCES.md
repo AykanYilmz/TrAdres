@@ -39,6 +39,10 @@ district**. We measured this once, locally, against a public list built
 from TÜİK and PTT data; that list is **not** included in TrAdres because
 its license is unclear.
 
+Among the names we do find, 99.7% have the same spelling as the official
+list. Most of the rest are small format differences (`100. Yıl` and
+`100.Yıl`); a few are real spelling errors on Wikidata (`Firat` for `Fırat`).
+
 Mahalle and köy are stored together. Wikidata does not mark reliably which
 one a place is (many villages became mahalles in 2012–2014), so TrAdres
 does not try to tell them apart.
@@ -93,6 +97,15 @@ request when you update the data.
 2. **Quick:** add an entry to `scripts/gazetteer_corrections.json` with
    the item's QID and a short reason, rebuild, and open a pull request.
    When Wikidata is fixed, the entry can be removed.
+
+## Evaluation set (`eval/addresses/`)
+
+The evaluation set is a development tool and is not part of the package.
+It uses about 300 real place names, chosen by random sampling from the
+public mahalle and köy list mentioned above, because a sample taken from our
+own gazetteer could not show what is missing from it. Single place names are
+public facts. All street names, building names and numbers are invented, and
+no address belongs to a real person.
 
 ## Package size
 

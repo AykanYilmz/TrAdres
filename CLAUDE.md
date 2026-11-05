@@ -53,7 +53,7 @@ result.to_dict()     # JSON'a hazır sözlük, her alanın kendi güven skoruyla
   - ASCII'ye çevrilmiş girdiyi tanıma: `cankaya` → `Çankaya`, `sisli` → `Şişli` (eşleştirme Türkçe karakterlerden bağımsız bir anahtar üzerinden yapılsın, çıktı her zaman doğru Türkçe yazımla dönsün).
   - Kısaltmalar: `Mah./Mh./Mahallesi`, `Cad./Cd./Caddesi`, `Sok./Sk./Sokağı`, `Blv./Bulvarı`, `Apt./Apartmanı`, `Sit./Sitesi`, `Bl./Blok`, `No:/No`, `D:/Daire`, `K:/Kat` vb. Bu liste kodun içine gömülmesin, ayrı bir veri dosyasında dursun ki katkıcılar kolayca eklesin.
   - Boşluk, noktalama ve birleşik yazım temizliği (`23nisan` → `23 Nisan`, `No:5/3` → bina 5, daire 3).
-- **Bileşen çıkarma:** il, ilçe, mahalle, cadde, sokak, bulvar, site, blok, bina no, kat, daire, posta kodu. Tanınamayan kısım `kalan` (unparsed) alanına konsun, asla sessizce atılmasın.
+- **Bileşen çıkarma:** il, ilçe, mahalle, cadde, sokak, bulvar, site, bina adı, blok, bina no, kat, daire, posta kodu. Tanınamayan kısım `kalan` (unparsed) alanına konsun, asla sessizce atılmasın.
 - **Gazetteer (resmi yer adları) ile doğrulama:** il → ilçe → mahalle hiyerarşisi. Bir ilçe yanlış ile eşleşirse güven düşsün; il yazılmamışsa ilçeden çıkarılabiliyorsa (tek bir ile aitse) doldurulsun ve bu durum işaretlensin.
 - **Bulanık eşleştirme:** Yazım hatalarını tolere et (`Kızılay` / `Kizilay` / `Kzılay`). Eşik değerleri sabit kodlanmasın, ayarlanabilir olsun.
 - **Sıra bağımsızlığı:** `Merkez/Bolu`, `Bolu Merkez`, `Bolu - Merkez`, adresin başında ya da sonunda il/ilçe.
@@ -170,15 +170,20 @@ Her faz sonunda dur ve onayımı bekle.
   - `normalization.py`: `tr_lower`, `tr_upper`, `tr_title`, `ascii_key`, `clean`, `normalize` (top-level `tradres.normalize`).
   - `abbreviations.py` + `data/abbreviations.json`: 11 tür (mahalle … posta_kodu), `lookup()`, veri doğrulaması.
   - 173 test (örnek + doctest + hypothesis), kapsam %98.6. `HYPOTHESIS_PROFILE=thorough` ile 5000 örnekte de temiz.
-  - Açık soru: `apartman` türü Address'te hangi alana gidecek (`bina_adi`?) — Faz 4'te karar.
-- [x] Faz 2 — Veri (2026-11-04, onay bekliyor)
+  - `apartman` türü Address'te `bina_adi` alanına gidecek (Faz 3'te Aykan seçti).
+- [x] Faz 2 — Veri (2026-11-04, onaylandı)
   - Kaynak: **Wikidata (CC0)**, seçenekler (Wikidata / turkiye-api / OSM) sunuldu, Aykan seçti.
   - `scripts/build_gazetteer.py` + `scripts/gazetteer_corrections.json` → `src/tradres/data/gazetteer.json.gz` (194 KiB, deterministik).
   - Sonuç: 81 il, 973 ilçe (resmi listeyle birebir), 46.112 mahalle/köy (resmi isimlerin ~%88.6'sı aynı ilçede bulunuyor).
   - `gazetteer.py`: `load_gazetteer()` (lazy + cache), `find_il/find_ilce/find_mahalle/provinces_of_district`, ilk yükleme ~0.3 s.
   - Wheel 206 KiB. 268 test, kapsam %98.6. `DATA_SOURCES.md` yazıldı.
   - Açık soru: eksik ~%11 mahallenin doğruluğa etkisi Faz 3'te ölçülecek; gerekirse Wikidata'ya katkı / ek dosya.
-- [ ] Faz 3 — Değerlendirme seti
+- [x] Faz 3 — Değerlendirme seti (2026-11-05, onay bekliyor)
+  - `eval/addresses/*.yaml`: elle etiketlenmiş 313 adres, 20 etiket, 69 il. `python -m eval` (`--parser`, `--failures`, `--tag`, `--markdown`, `--check`, `--min-f1`, `--min-exact`).
+  - Baseline (`eval/baseline.py`): F1 0.881, tam doğru %47.0. Parser v1 bunu geçmeli. Set beklenenden kolay: katkılarla zorlaştırılmalı.
+  - Set gazetteer'dan bağımsız örneklendi: 43 adres `gazetteer_disi` (%13.7), 1 adres `gazetteer_yazim_farki`.
+  - CI eşiği henüz yok; parser gelince Faz 4'te `--min-f1` / `--min-exact` ile eklenecek.
+  - Açık soru: 144 mahallede Wikidata yazımı resmiyle farklı (çoğu biçim farkı); mahalle düzeltmesi Faz 5'te ele alınacak.
 - [ ] Faz 4 — Parser v1
 - [ ] Faz 5 — İyileştirme
 - [ ] Faz 6 — CLI ve API yüzeyi
@@ -203,6 +208,11 @@ Her faz sonunda dur ve onayımı bekle.
 - **Merkez ilçe kuralı:** büyükşehir olmayan 51 ilde ilin adını taşıyan ilçe `Merkez` olur; 30 büyükşehirde bu tür kayıtlar eskimiş sayılıp atılır (sabit liste: 6360 + Ordu 6447).
 - **Mahalle ve köy ayrılmıyor** (`Mahalle` sınıfı ikisini de tutar): Wikidata sınıfı güvenilir değil.
 - **İndeks: ASCII anahtarlı `dict`**, trie değil. Tam eşleşme O(1); trie sadece önek/bulanık aday aramasında gerekir, şimdilik yok — Faz 5'te ölçülür.
+- **Değerlendirme seti YAML** (PyYAML sadece dev): katkıcı için okunabilirlik ve yorum satırı en önemli kriter.
+- **`bina_adi` yeni alan** (`Gül Apartmanı` → `Gül`): `kalan`'da kalsa ölçümü yanıltırdı.
+- **Karşılaştırma büyük/küçük harfe duyarsız, Türkçe harfe duyarlı.** `Cankaya` yanlış sayılır; doğru yazımı geri vermek ürünün vaadi. Adlar tür eksiz, numaralar metin.
+- **Set gazetteer'dan örneklenmedi.** Kök nüfus ağırlıklı rastgele örneklem (sabit tohum), yoksa eksik %11 ölçümde görünmezdi. Sokak, bina ve numaralar uydurma; Aykan'ın adresi örneklem dışında.
+- **`kalan` şimdilik puanlanmıyor;** sadece belge. Hatalı değer hem FP hem FN sayılır. Parser hata fırlatırsa boş sonuç + `crashes` sayacı.
 - **Etiket dili önceliği tr → mul → en → …**: Wikidata ortak adları `mul` diline taşıyor; sadece `tr` sorgusu 12 ilçeyi kaçırıyordu.
 
 ---
