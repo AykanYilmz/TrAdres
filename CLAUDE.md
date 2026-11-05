@@ -190,7 +190,8 @@ Her faz sonunda dur ve onayımı bekle.
   - **Bu sayı iyimser:** seti ve parser'ı aynı kişi (Claude) yazdı, kurallar setin örüntülerini biliyordu. Faz 5'ten önce ayrı bir test bölümü önerildi.
   - CI eşiği: `python -m eval --min-f1 0.95 --min-exact 0.85`.
   - Yerel demo: `python -m demo` → http://127.0.0.1:8000. Sadece stdlib, sadece localhost, adres kaydetmez. Pakete dahil değil.
-  - Faz 5'e kalanlar: yazım hatası (`yazim_hatasi` %27.3), ASCII cadde/sokak adlarının Türkçeleştirilmesi, mahalleden ilçe çıkarımı, `İst.`/`Ş.Urfa`/`G.Antep` kısa adları, tarif sözcüklerinin bina adına karışması, `gmk`.
+  - Faz 5'e kalanlar: yazım hatası (`yazim_hatasi` %27.3), ASCII cadde/sokak adlarının Türkçeleştirilmesi, mahalleden ilçe çıkarımı, `İst.`/`Ş.Urfa`/`G.Antep` kısa adları, `gmk`.
+  - Demoda bulunan hata düzeltildi: tarif sözcükleri (`üzeri`, `yanı`, `lojmanları`...) bina adına karışıyordu. Önce F1 0.977, %88.8 (278/313) → sonra **F1 0.979, %89.5 (280/313)**; `bina_adi` F1 0.815 → 0.963.
 - [ ] Faz 5 — İyileştirme
 - [ ] Faz 6 — CLI ve API yüzeyi
 - [ ] Faz 7 — Açık kaynak altyapısı
@@ -224,6 +225,7 @@ Her faz sonunda dur ve onayımı bekle.
 - **Alan ezilmez:** bir alan ilk değerini tutar, sonraki değer `kalan`'a gider. Hypothesis (5000 örnek) `D: 34000 12/3`'te daire ezilmesini yakaladı.
 - **Çıplak `D` + 3 hane daire sayılmaz** (`D 100` karayolu); `D:100` ve `Daire 100` sayılır.
 - **Web demosu Faz 4 sonunda, stdlib ile** (`http.server`): parser olmadan gösterecek şey yoktu; bağımlılık eklememek için FastAPI kullanılmadı. Hugging Face demosu v0.2 planında kalıyor.
+- **Tarif sözcüğü kuralı sadece bina adında:** `Cami Yanı Sokak`, `Kale Arkası Cad.` gerçek sokak adları, bu yüzden cadde/sokakta uygulanmıyor. `... Lojmanları` şimdilik `kalan`'a gidiyor.
 - **Etiket dili önceliği tr → mul → en → …**: Wikidata ortak adları `mul` diline taşıyor; sadece `tr` sorgusu 12 ilçeyi kaçırıyordu.
 
 ---

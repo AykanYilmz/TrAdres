@@ -186,3 +186,28 @@ def test_keyword_without_a_name_stays_free(text: str) -> None:
 
 def test_used_token_breaks_a_name() -> None:
     assert extract_streets(tokenize("Gül No 5 Çınar Sk."), {1, 2}).fields == {"sokak": "Çınar"}
+
+
+@pytest.mark.parametrize(
+    ("text", "name"),
+    [
+        ("Karayolu üzeri Güneş Apt.", "Güneş"),
+        ("Okul yanı Lale Apartmanı", "Lale"),
+        ("Valilik lojmanları Şehit Ali Demir Apt.", "Şehit Ali Demir"),
+        ("Yol üzeri Devlet lojmanları Çınar Apt.", "Çınar"),
+    ],
+)
+def test_building_name_starts_after_a_description(text: str, name: str) -> None:
+    assert extract_streets(tokenize(text), ()).fields == {"bina_adi": name}
+
+
+def test_description_alone_is_not_a_building_name() -> None:
+    assert extract_streets(tokenize("Okul yanı Apt."), ()).fields == {}
+
+
+@pytest.mark.parametrize(
+    ("text", "field", "name"),
+    [("Cami Yanı Sokak", "sokak", "Cami Yanı"), ("Kale Arkası Cad.", "cadde", "Kale Arkası")],
+)
+def test_description_words_stay_in_street_names(text: str, field: str, name: str) -> None:
+    assert extract_streets(tokenize(text), ()).fields == {field: name}
