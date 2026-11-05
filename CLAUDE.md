@@ -234,6 +234,8 @@ Her faz sonunda dur ve onayımı bekle.
 - **Çıplak `D` + 3 hane daire sayılmaz** (`D 100` karayolu); `D:100` ve `Daire 100` sayılır.
 - **Web demosu Faz 4 sonunda, stdlib ile** (`http.server`): parser olmadan gösterecek şey yoktu; bağımlılık eklememek için FastAPI kullanılmadı. Hugging Face demosu v0.2 planında kalıyor.
 - **Tarif sözcüğü kuralı sadece bina adında:** `Cami Yanı Sokak`, `Kale Arkası Cad.` gerçek sokak adları, bu yüzden cadde/sokakta uygulanmıyor. `... Lojmanları` şimdilik `kalan`'a gidiyor.
+- **Hedef daraltıldı (2026-11-05, Aykan):** TrAdres bir form aracı değil, veri temizleme aracı: dağınık adres içeren CSV ve eski kayıtları temizleyen, CLI odaklı kütüphane. Yeni formlarda ayrı kutular daha iyi. Talep ve rakip araştırması şimdilik yapılmadı; README ve tanıtımda büyük talep iddiası yazılmayacak.
+- **Faz 6'dan önce yer verisi güçlendirilecek** (Aykan kabul etti); kaynak seçimi Aykan'da.
 - **Fuzzy: rapidfuzz + OSA.** Takas (`Malatay`) 1 düzeltme sayılır. Eşitlikte tahmin edilmez. Kısa kelime düzeltilmez (`Van`/`Yan`). Mahalle için alt sınır daha yüksek: eksik bir `Çınar` `Pınar` olmamalı.
 - **Birebir ad, fuzzy'den önce gelir:** Türkiye'nin herhangi bir yerinde birebir geçen mahalle gerçek ad sayılır (`Ulucami` → `Uluçam` hatası böyle çözüldü).
 - **Harf geri getirme sadece tamamen ASCII kelimede:** kelime listesi gazetteer'dan, en sık yazım seçilir. Kullanıcının Türkçe harflerine dokunulmaz.
