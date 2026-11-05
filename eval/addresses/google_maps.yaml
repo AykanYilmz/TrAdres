@@ -98,3 +98,35 @@
   girdi: "Altıparmak, Menekşe Cd. No:17 Kat:3 D:6, 16050 Osmangazi/Bursa, TÜRKİYE"
   beklenen: {il: Bursa, ilce: Osmangazi, mahalle: Altıparmak, cadde: Menekşe, bina_no: "17", kat: "3", daire: "6", posta_kodu: "16050"}
   etiketler: [google_maps, buyuk_harf, posta_kodu]
+- id: "m025"
+  girdi: "Nilüfer Merkez, Lale Blv. No:9 D:4, 16110 Nilüfer/Bursa"
+  beklenen: {il: Bursa, ilce: Nilüfer, bulvar: Lale, bina_no: "9", daire: "4", posta_kodu: "16110"}
+  etiketler: [google_maps, tuzak, mahalle_eksik, posta_kodu]
+- id: "m026"
+  girdi: "Van Merkez, Papatya Cd. 15B D:2, 65100 İpekyolu/Van"
+  beklenen: {il: Van, ilce: İpekyolu, cadde: Papatya, bina_no: 15B, daire: "2", posta_kodu: "65100"}
+  etiketler: [google_maps, tuzak, mahalle_eksik, posta_kodu]
+- id: "m027"
+  girdi: "Bodrum Merkez, Zambak Cd. No:31, 48400 Bodrum/Muğla"
+  beklenen: {il: Muğla, ilce: Bodrum, cadde: Zambak, bina_no: "31", posta_kodu: "48400"}
+  etiketler: [google_maps, tuzak, mahalle_eksik, posta_kodu]
+- id: "m028"
+  girdi: "Manisa Merkez, Sümbül Cd. 7 D:1, 45020 Şehzadeler/Manisa"
+  beklenen: {il: Manisa, ilce: Şehzadeler, cadde: Sümbül, bina_no: "7", daire: "1", posta_kodu: "45020"}
+  etiketler: [google_maps, tuzak, mahalle_eksik, posta_kodu]
+- id: "m029"
+  girdi: "Bağcılar Merkez, Lale Cd. 8A D:2, 34200 Bağcılar/İstanbul"
+  beklenen: {il: İstanbul, ilce: Bağcılar, mahalle: Merkez, cadde: Lale, bina_no: 8A, daire: "2", posta_kodu: "34200"}
+  etiketler: [google_maps, tuzak, posta_kodu]
+- id: "m030"
+  girdi: "Mustafa Kemal Paşa, Lale Cd. No:6 D:2, 20010 Merkezefendi/Denizli"
+  beklenen: {il: Denizli, ilce: Merkezefendi, mahalle: Mustafa Kemal Paşa, cadde: Lale, bina_no: "6", daire: "2", posta_kodu: "20010"}
+  etiketler: [google_maps, posta_kodu]
+- id: "m031"
+  girdi: "Mehmet Akif Ersoy, Gül Sk. No:3, 06200 Yenimahalle/Ankara"
+  beklenen: {il: Ankara, ilce: Yenimahalle, mahalle: Mehmet Akif Ersoy, sokak: Gül, bina_no: "3", posta_kodu: "06200"}
+  etiketler: [google_maps, posta_kodu]
+- id: "m032"
+  girdi: "Konyaaltı, Lale Blv. No:12, 07070 Konyaaltı/Antalya"
+  beklenen: {il: Antalya, ilce: Konyaaltı, bulvar: Lale, bina_no: "12", posta_kodu: "07070"}
+  etiketler: [google_maps, mahalle_eksik, posta_kodu]

@@ -376,3 +376,12 @@ def test_csv_gives_the_same_result_as_parse(tmp_path: Path) -> None:
     address = parse(text)
     for name in FIELDS:
         assert row[f"tradres_{name}"] == (getattr(address, name) or "")
+
+
+def test_csv_of_one_column_with_commas_gives_no_warning(tmp_path: Path) -> None:
+    source = tmp_path / "in.csv"
+    target = tmp_path / "out.csv"
+    source.write_text("adres\nGül Sk. No:5, Merkez/Bolu\n", encoding="utf-8")
+    summary = convert_csv(source, target, column="adres")
+    assert summary.uneven == 0
+    assert read_rows(target)[0]["adres"] == "Gül Sk. No:5, Merkez/Bolu"

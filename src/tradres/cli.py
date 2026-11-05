@@ -197,7 +197,8 @@ def parse_rows(
         cells, uneven = fit_row(row, width, delimiter)
         text = cells[column]
         address = parse(text)
-        summary.add(address, blank=not text.strip(), uneven=uneven)
+        # With a single column, commas in the address are harmless: nothing moved.
+        summary.add(address, blank=not text.strip(), uneven=uneven and width > 1)
         yield [*cells, *result_cells(address)]
 
 

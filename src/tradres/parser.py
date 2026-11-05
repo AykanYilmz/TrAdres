@@ -20,7 +20,9 @@ __all__ = ["parse"]
 
 _NAME_FIELDS = ("bulvar", "cadde", "sokak", "site", "bina_adi")
 _MAX_LOOSE_MAHALLE_WORDS = 2
+_MAX_PIECE_MAHALLE_WORDS = 3
 _MAX_LOOSE_SITE_WORDS = 3
+_CENTRE_WORD = "merkez"
 _COMMAS = frozenset(",;")
 #: Letters of a Google Plus Code: "8Q5V+2H".
 _PLUS_CODE = re.compile(r"[23456789CFGHJMPQRVWX]{2,8}\+[23456789CFGHJMPQRVWX]{2,3}", re.IGNORECASE)
@@ -145,15 +147,29 @@ def repeated_places(
     fields: Mapping[str, str],
     gazetteer: Gazetteer,
 ) -> set[int]:
-    """Words that repeat the known il or ilçe: "Bolu Merkez/Bolu" says Bolu twice."""
+    """Words that repeat the known il or ilçe: "Bolu Merkez/Bolu" says Bolu twice.
+
+    "Van Merkez, ... İpekyolu/Van" means the centre of Van, so "Merkez" goes with
+    the repeated name, unless the district has a mahalle called Merkez.
+    """
     repeated: set[int] = set()
     il, ilce = fields.get("il"), fields.get("ilce")
+    has_centre = bool(gazetteer.find_mahalle(_CENTRE_WORD, il=il, ilce=ilce))
     for window in free_windows(tokens, used):
         province = gazetteer.find_il(window.text)
         same_il = province is not None and province.ad == il
         same_ilce = ilce is not None and ascii_key(window.text) == ascii_key(ilce)
         if same_il or same_ilce:
             repeated.update(range(window.start, window.end))
+    if not has_centre:
+        names = {ascii_key(name) for name in (il, ilce) if name}
+        for index in range(1, len(tokens)):
+            if (
+                index not in used
+                and tokens[index].key == _CENTRE_WORD
+                and ascii_key(tokens[index - 1].text) in names
+            ):
+                repeated.add(index)
     return repeated
 
 
@@ -235,7 +251,9 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
             origins["mahalle"] = Origin.EXACT
             used.update(found[1])
         elif "il" in fields and "ilce" in fields:
-            loose = loose_words(tokens, used, max_words=_MAX_LOOSE_MAHALLE_WORDS)
+            loose = loose_words(tokens, used, max_words=_MAX_LOOSE_MAHALLE_WORDS) or loose_words(
+                tokens, used, max_words=_MAX_PIECE_MAHALLE_WORDS, own_piece=True
+            )
             if loose and not before_number_word(tokens, loose):
                 name = tr_title(" ".join(tokens[index].text for index in loose))
                 fields["mahalle"] = gazetteer.respell(name)

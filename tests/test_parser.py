@@ -356,3 +356,28 @@ def test_plus_code_stays_in_kalan() -> None:
     address = parse("8Q5V+2H Çankaya, Ankara, Türkiye")
     assert address.mahalle is None
     assert address.kalan == "8Q5V+2H"
+
+
+def test_centre_of_a_district_is_not_a_mahalle() -> None:
+    address = parse("Van Merkez, Gül Cd. No:5, İpekyolu/Van")
+    assert address.mahalle is None
+    assert address.kalan is None
+
+
+def test_a_real_mahalle_called_merkez_stays() -> None:
+    assert parse("Bağcılar Merkez, Gül Cd. No:5, Bağcılar/İstanbul").mahalle == "Merkez"
+
+
+def test_mahalle_alone_is_kept_even_if_called_merkez() -> None:
+    assert parse("Merkez, Gül Cd. No:5, Şehzadeler/Manisa").mahalle == "Merkez"
+
+
+def test_three_word_mahalle_needs_its_own_piece() -> None:
+    assert parse("Zeki Ali Bey, Gül Sk. No:3, Konak/İzmir").mahalle == "Zeki Ali Bey"
+    assert parse("Gül Sk. No:3 Zeki Ali Bey Konak/İzmir").mahalle is None
+
+
+def test_centre_after_a_district_name() -> None:
+    address = parse("Bodrum Merkez, Gül Cd. No:5, Bodrum/Muğla")
+    assert address.mahalle is None
+    assert address.kalan is None
