@@ -28,6 +28,9 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+[project.scripts]
+tradres = "tradres.cli:main"
+
 [project.urls]
 Homepage = "https://github.com/AykanYilmz/TrAdres"
 Issues = "https://github.com/AykanYilmz/TrAdres/issues"
