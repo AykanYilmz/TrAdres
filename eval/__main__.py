@@ -8,7 +8,15 @@ import sys
 from collections.abc import Callable, Mapping, Sequence
 from typing import cast
 
-from eval.dataset import MISSING_TAG, SPELLING_TAG, DatasetError, load_cases, tag_counts
+from eval.dataset import (
+    ADDRESSES_DIR,
+    HOLDOUT_DIR,
+    MISSING_TAG,
+    SPELLING_TAG,
+    DatasetError,
+    load_cases,
+    tag_counts,
+)
 from eval.metrics import Predict, Report, evaluate
 from tradres.models import FIELDS
 
@@ -76,6 +84,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m eval", description="Score a parser.")
     parser.add_argument("--parser", default=DEFAULT_PARSER, help="module:function to score")
     parser.add_argument("--check", action="store_true", help="only validate the labels")
+    parser.add_argument(
+        "--holdout", action="store_true", help="score the locked test set (totals only)"
+    )
     parser.add_argument("--tag", help="score only the addresses with this tag")
     parser.add_argument("--failures", type=int, default=0, metavar="N", help="show N failures")
     parser.add_argument("--markdown", action="store_true", help="print the README table")
@@ -94,8 +105,13 @@ def main(
             stream.reconfigure(encoding="utf-8")
     args = build_parser().parse_args(argv)
 
+    if args.holdout and (args.failures or args.tag):
+        # Reading these failures would turn the test set into training data.
+        print("--holdout shows totals only: no --failures or --tag", file=sys.stderr)
+        return EXIT_ERROR
+
     try:
-        cases = load_cases()
+        cases = load_cases(HOLDOUT_DIR if args.holdout else ADDRESSES_DIR)
     except DatasetError as error:
         print(f"invalid labels: {error}", file=sys.stderr)
         return EXIT_ERROR
@@ -119,6 +135,8 @@ def main(
 
     report = evaluate(cases, predict)
     print(format_markdown(report) if args.markdown else format_text(report))
+    if args.holdout:
+        print(f"locked test set: {len(cases)} addresses")
     if args.failures:
         print("\n" + format_failures(report, args.failures))
 

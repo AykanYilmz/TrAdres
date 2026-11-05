@@ -12,6 +12,8 @@ from tradres.gazetteer import Gazetteer, load_gazetteer
 from tradres.models import FIELDS
 
 ADDRESSES_DIR = Path(__file__).parent / "addresses"
+#: The locked test set: the parser is never tuned on these addresses.
+HOLDOUT_DIR = Path(__file__).parent / "holdout"
 
 #: ``kalan`` documents the text that should stay unparsed. It is not scored.
 LABEL_KEYS = frozenset(FIELDS) | {"kalan"}

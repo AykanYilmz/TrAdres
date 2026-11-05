@@ -84,3 +84,20 @@ gazetteer, so its place names are **not** taken from the gazetteer. They are a
 random sample, weighted by the square root of population, from a public list
 of mahalle and köy names (see [DATA_SOURCES.md](../DATA_SOURCES.md)). Street
 names, building names and all numbers are invented.
+
+## The locked test set
+
+`eval/addresses/` is the development set: we read its failures and improve the
+rules with them. That makes its score optimistic, because the rules know it.
+
+`eval/holdout/test.yaml` is the test set. Its 100 addresses use places that are
+not in the development set, and they were written before Phase 5 started. Run
+it with:
+
+```bash
+python -m eval --holdout
+```
+
+This prints totals only and refuses `--failures` and `--tag`. Do not tune the
+parser on these addresses. Measure rarely, because every look leaks a little
+information. When a release is out, new addresses replace it.

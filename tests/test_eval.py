@@ -18,6 +18,7 @@ from eval.__main__ import (
 )
 from eval.baseline import parse as baseline_parse
 from eval.dataset import (
+    HOLDOUT_DIR,
     MISSING_TAG,
     SPELLING_TAG,
     Case,
@@ -316,3 +317,19 @@ def test_report_formats_show_crashes() -> None:
     assert "CRASHES: 1" in format_text(report)
     assert "**All fields**" in format_markdown(report)
     assert "expected 'Bolu'" in format_failures(report, 5)
+
+
+def test_holdout_set_is_valid_and_separate() -> None:
+    holdout = load_cases(HOLDOUT_DIR)
+    assert len(holdout) == 100
+    assert not {case.girdi for case in holdout} & {case.girdi for case in load_cases()}
+
+
+@pytest.mark.parametrize("extra", [["--failures", "1"], ["--tag", "ascii"]])
+def test_holdout_refuses_to_show_details(extra: list[str]) -> None:
+    assert main(["--holdout", *extra]) == 2
+
+
+def test_holdout_prints_totals(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["--holdout", "--parser", "eval.baseline:parse"]) == 0
+    assert "locked test set: 100" in capsys.readouterr().out

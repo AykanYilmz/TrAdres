@@ -1,0 +1,404 @@
+# Locked test set. Do NOT tune the parser on these addresses and do not read
+# their failures: `python -m eval --holdout` shows totals only. See eval/README.md.
+# Places are real (random sample); streets, buildings and numbers are invented.
+
+- id: "h001"
+  girdi: "Çınar Mah. 1453. Sk. Nurtepe Sitesi B Blok No:8 D:12 Esenyurt/İstanbul"
+  beklenen: {il: İstanbul, ilce: Esenyurt, mahalle: Çınar, sokak: "1453", site: Nurtepe, blok: B, bina_no: "8", daire: "12"}
+  etiketler: [site, kisaltma]
+- id: "h002"
+  girdi: "kazım karabekir mah 62007 sk no 14 yüreğir adana"
+  beklenen: {il: Adana, ilce: Yüreğir, mahalle: Kazım Karabekir, sokak: "62007", bina_no: "14"}
+  etiketler: [kisaltma, noktalama]
+- id: "h003"
+  girdi: "RİZE MERKEZ ÇAMLIBEL MAH. ZİHNİ DERİN CAD. NO:27 KAT:3"
+  beklenen: {il: Rize, ilce: Merkez, mahalle: Çamlıbel, cadde: Zihni Derin, bina_no: "27", kat: "3"}
+  etiketler: [buyuk_harf, sira]
+- id: "h004"
+  girdi: "Kedek Köyü Kemah Erzincan"
+  beklenen: {il: Erzincan, ilce: Kemah, mahalle: Kedek}
+  etiketler: [koy]
+- id: "h005"
+  girdi: "rizaiye mahallesi Karacaoglan cadesi no:19 osmaniye merkez"
+  beklenen: {il: Osmaniye, ilce: Merkez, mahalle: Rızaiye, cadde: Karacaoğlan, bina_no: "19"}
+  etiketler: [ascii, yazim_hatasi]
+- id: "h006"
+  girdi: "Sunnetciler Mah. Uzum Sok. No:6/2 Akhisar Manisa"
+  beklenen: {il: Manisa, ilce: Akhisar, mahalle: Sünnetçiler, sokak: Üzüm, bina_no: "6", daire: "2"}
+  etiketler: [ascii, no_bolu]
+- id: "h007"
+  girdi: "Barbaros Hayrettin Paşa Mahallesi 1284. Sokak Dış Kapı No:17 İç Kapı No:5 Gaziosmanpaşa/İstanbul"
+  beklenen: {il: İstanbul, ilce: Gaziosmanpaşa, mahalle: Barbaros Hayrettin Paşa, sokak: "1284", bina_no: "17", daire: "5"}
+  etiketler: [temiz, tuzak]
+- id: "h008"
+  girdi: "Merkez Yeni Mah. Şair Fuzuli Cd. No 44 Tepebaşı Eskişehir"
+  beklenen: {il: Eskişehir, ilce: Tepebaşı, mahalle: Merkez Yeni, cadde: Şair Fuzuli, bina_no: "44"}
+  etiketler: [tuzak, kisaltma]
+- id: "h009"
+  girdi: "Mercin Mh. Cumhuriyet Cd. No:72 Ceyhn/Adana"
+  beklenen: {il: Adana, ilce: Ceyhan, mahalle: Mercin, cadde: Cumhuriyet, bina_no: "72"}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "h010"
+  girdi: "Cigiltepe mh 3 sk no 9 mamak ankara"
+  beklenen: {il: Ankara, ilce: Mamak, mahalle: Çiğiltepe, sokak: "3", bina_no: "9"}
+  etiketler: [ascii, kisaltma, noktalama]
+- id: "h011"
+  girdi: "Çatalçeşme Mah. Gazi Cad. No:31 D:2 Elazığ"
+  beklenen: {il: Elazığ, ilce: Merkez, mahalle: Çatal Çeşme, cadde: Gazi, bina_no: "31", daire: "2"}
+  etiketler: [ilce_eksik, birlesik]
+- id: "h012"
+  girdi: "Kuyualan Mahallesi Yunusemre/Manisa"
+  beklenen: {il: Manisa, ilce: Yunusemre, mahalle: Kuyualan}
+  etiketler: [temiz]
+- id: "h013"
+  girdi: "Epçiler Köyü No:23 Merkez/Bartın"
+  beklenen: {il: Bartın, ilce: Merkez, mahalle: Epçiler, bina_no: "23"}
+  etiketler: [koy]
+- id: "h014"
+  girdi: "Cakallar mah. Deniz Cd. Sun Palace Apt. kat 2 no 6 Alanya"
+  beklenen: {il: Antalya, ilce: Alanya, mahalle: Çakallar, cadde: Deniz, bina_adi: Sun Palace, kat: "2", bina_no: "6"}
+  etiketler: [ascii, il_eksik, bina_adi]
+- id: "h015"
+  girdi: "Mavişehir Mah. Caher Dudayev Blv. No:120 Albatros Sitesi C2 Blok D:33 Karşıyaka İzmir"
+  beklenen: {il: İzmir, ilce: Karşıyaka, mahalle: Mavişehir, bulvar: Caher Dudayev, site: Albatros, blok: C2, bina_no: "120", daire: "33"}
+  etiketler: [site, kisaltma]
+- id: "h016"
+  girdi: "Diyarbakir Dicle Sergenli mahallesi okul karsisi"
+  beklenen: {il: Diyarbakır, ilce: Dicle, mahalle: Sergenli, kalan: okul karsisi}
+  etiketler: [ascii, sira, tarif]
+- id: "h017"
+  girdi: "Kırkkoyn Mah. Selahaddin Eyyubi Blv No:88/4 Bağlar Diyarbakır"
+  beklenen: {il: Diyarbakır, ilce: Bağlar, mahalle: Kırkkoyun, bulvar: Selahaddin Eyyubi, bina_no: "88", daire: "4"}
+  etiketler: [yazim_hatasi, no_bolu]
+- id: "h018"
+  girdi: "Kuşcu köyü karakocan elazig"
+  beklenen: {il: Elazığ, ilce: Karakoçan, mahalle: Kuşçu}
+  etiketler: [koy, ascii]
+- id: "h019"
+  girdi: "Öğlebeli Mah. Kışla Sk. No:5 K:1 D:3 Merkez / Karabük"
+  beklenen: {il: Karabük, ilce: Merkez, mahalle: Öğlebeli, sokak: Kışla, bina_no: "5", kat: "1", daire: "3"}
+  etiketler: [temiz, kisaltma]
+- id: "h020"
+  girdi: "cevlikler mah. turhal tokat sanayi sitesi yani"
+  beklenen: {il: Tokat, ilce: Turhal, mahalle: Çevlikler, kalan: sanayi sitesi yani}
+  etiketler: [ascii, tarif, tuzak]
+- id: "h021"
+  girdi: "Büyüktaşlıca Mahallesi Harran Şanlıurfa"
+  beklenen: {il: Şanlıurfa, ilce: Harran, mahalle: Büyüktaşlıca}
+  etiketler: [temiz]
+- id: "h022"
+  girdi: "Huzur Mah. Maslak Ayazağa Cad. No:4 Sarıyer / İST."
+  beklenen: {il: İstanbul, ilce: Sarıyer, mahalle: Huzur, cadde: Maslak Ayazağa, bina_no: "4"}
+  etiketler: [kisaltma, tuzak]
+- id: "h023"
+  girdi: "guzelevler mah 63014 sok no:5 kat:4 yuregir"
+  beklenen: {il: Adana, ilce: Yüreğir, mahalle: Güzelevler, sokak: "63014", bina_no: "5", kat: "4"}
+  etiketler: [ascii, il_eksik, kisaltma]
+- id: "h024"
+  girdi: "Bağlarüstü Mh Atatürk Cd No:102 Bolvadin Afyon"
+  beklenen: {il: Afyonkarahisar, ilce: Bolvadin, mahalle: Bağlarüstü, cadde: Atatürk, bina_no: "102"}
+  etiketler: [kisaltma, noktalama]
+- id: "h025"
+  girdi: "Yukarı Pazarcı Mah. Tarla Sk. No:3 Manavgat/Antalya"
+  beklenen: {il: Antalya, ilce: Manavgat, mahalle: Yukarı Pazarcı, sokak: Tarla, bina_no: "3"}
+  etiketler: [temiz, kisaltma]
+- id: "h026"
+  girdi: "Beypazari Kirbasi mahallesi"
+  beklenen: {il: Ankara, ilce: Beypazarı, mahalle: Kırbaşı}
+  etiketler: [ascii, il_eksik, sira]
+- id: "h027"
+  girdi: "Peyas Mah. 423. Cad. Dicle Kent Sitesi A Blok Kat:6 Daire:12 Kayapınar/Diyarbakır"
+  beklenen: {il: Diyarbakır, ilce: Kayapınar, mahalle: Peyas, cadde: "423", site: Dicle Kent, blok: A, kat: "6", daire: "12"}
+  etiketler: [site, tuzak]
+- id: "h028"
+  girdi: "zaviye mah malatya yesilyurt no 7"
+  beklenen: {il: Malatya, ilce: Yeşilyurt, mahalle: Zaviye, bina_no: "7"}
+  etiketler: [ascii, kisaltma, sira]
+- id: "h029"
+  girdi: "Necat Hepkon Mh. 1023 Sk. No:12 D:1 Seferihisar İzmir 35460"
+  beklenen: {il: İzmir, ilce: Seferihisar, mahalle: Necat Hepkon, sokak: "1023", bina_no: "12", daire: "1", posta_kodu: "35460"}
+  etiketler: [posta_kodu, kisaltma]
+- id: "h030"
+  girdi: "Pazarsuyu Emecen Mahallesi Sahil Cad. Bulancak Giresun"
+  beklenen: {il: Giresun, ilce: Bulancak, mahalle: Pazarsuyu Emecen, cadde: Sahil}
+  etiketler: [temiz]
+- id: "h031"
+  girdi: "Gökçeli köyü Bozüyük Bilecik muhtarlık yanı"
+  beklenen: {il: Bilecik, ilce: Bozüyük, mahalle: Gökçeli, kalan: muhtarlık yanı}
+  etiketler: [koy, tarif]
+- id: "h032"
+  girdi: "Eyup Sultan Mah. Sakarya Cd. No:40A Sancaktepe"
+  beklenen: {il: İstanbul, ilce: Sancaktepe, mahalle: Eyüp Sultan, cadde: Sakarya, bina_no: "40A"}
+  etiketler: [ascii, il_eksik, tuzak]
+- id: "h033"
+  girdi: "Kurtköy Mah. Ankara Cad. No:210 Pendik/İstanbul"
+  beklenen: {il: İstanbul, ilce: Pendik, mahalle: Kurtköy, cadde: Ankara, bina_no: "210"}
+  etiketler: [tuzak, kisaltma]
+- id: "h034"
+  girdi: "Yesilkoy Koyu Ermenek Karaman"
+  beklenen: {il: Karaman, ilce: Ermenek, mahalle: Yeşilköy}
+  etiketler: [koy, ascii]
+- id: "h035"
+  girdi: "ÇUKURBAĞ KÖYÜ ÇAMARDI NİĞDE"
+  beklenen: {il: Niğde, ilce: Çamardı, mahalle: Çukurbağ}
+  etiketler: [koy, buyuk_harf]
+- id: "h036"
+  girdi: "Nenehatun Mah. Nene Hatun Cad. No:15 Darica Kocaeli"
+  beklenen: {il: Kocaeli, ilce: Darıca, mahalle: Nenehatun, cadde: Nene Hatun, bina_no: "15"}
+  etiketler: [ascii, kisaltma]
+- id: "h037"
+  girdi: "Gazipaşa Mah. Yüreğir Adana 14 Sok No:3"
+  beklenen: {il: Adana, ilce: Yüreğir, mahalle: Gazipaşa, sokak: "14", bina_no: "3"}
+  etiketler: [sira, tuzak]
+- id: "h038"
+  girdi: "Atikali Mah. Fevzipaşa Cad. No:77 Fatih/İstanbul Türkiye"
+  beklenen: {il: İstanbul, ilce: Fatih, mahalle: Atikali, cadde: Fevzipaşa, bina_no: "77", kalan: Türkiye}
+  etiketler: [tuzak, kisaltma]
+- id: "h039"
+  girdi: "Yakup Sevki Pasa Mah. Bolvadin/Afyonkarahisar"
+  beklenen: {il: Afyonkarahisar, ilce: Bolvadin, mahalle: Yakup Şevki Paşa}
+  etiketler: [ascii]
+- id: "h040"
+  girdi: "Aydınlıkevler Mah. Devlet Sahil Yolu Cad. No:50 Ortahisar Trabzon"
+  beklenen: {il: Trabzon, ilce: Ortahisar, mahalle: Aydınlıkevler, cadde: Devlet Sahil Yolu, bina_no: "50"}
+  etiketler: [temiz, kisaltma]
+- id: "h041"
+  girdi: "Hacibektasli Mh. Salihli"
+  beklenen: {il: Manisa, ilce: Salihli, mahalle: Hacıbektaşlı}
+  etiketler: [ascii, il_eksik]
+- id: "h042"
+  girdi: "Serinsu Mah. Narman Erzrum"
+  beklenen: {il: Erzurum, ilce: Narman, mahalle: Serinsu}
+  etiketler: [yazim_hatasi]
+- id: "h043"
+  girdi: "Tekkaynak Mah. Çınar / Diyarbakır"
+  beklenen: {il: Diyarbakır, ilce: Çınar, mahalle: Tekkaynak}
+  etiketler: [temiz, tuzak]
+- id: "h044"
+  girdi: "Yaka Mah. Yeni Meram Cad. Güneş Apt. No:91 K:2 Meram Konya"
+  beklenen: {il: Konya, ilce: Meram, mahalle: Yaka, cadde: Yeni Meram, bina_adi: Güneş, bina_no: "91", kat: "2"}
+  etiketler: [bina_adi, tuzak]
+- id: "h045"
+  girdi: "Bağlarbaşı Mah. 1. Sk. No:8 Midyat Mardin"
+  beklenen: {il: Mardin, ilce: Midyat, mahalle: Bağlarbaşı, sokak: "1", bina_no: "8"}
+  etiketler: [temiz, kisaltma]
+- id: "h046"
+  girdi: "Osmangazi Mah. 12 Nolu Cad. No:33 Sehitkamil G.Antep"
+  beklenen: {il: Gaziantep, ilce: Şehitkamil, mahalle: Osmangazi, cadde: "12", bina_no: "33"}
+  etiketler: [ascii, kisaltma, tuzak]
+- id: "h047"
+  girdi: "Güllübahçe Mh. Milas Cd. Mavi Sit. No:4 D:9 Söke Aydın"
+  beklenen: {il: Aydın, ilce: Söke, mahalle: Güllübahçe, cadde: Milas, site: Mavi, bina_no: "4", daire: "9"}
+  etiketler: [site, kisaltma, tuzak]
+- id: "h048"
+  girdi: "Akçaburç Mah. Sehitkamil Gaziantep 78 sk no 1"
+  beklenen: {il: Gaziantep, ilce: Şehitkamil, mahalle: Akçaburç, sokak: "78", bina_no: "1"}
+  etiketler: [sira, ascii, kisaltma]
+- id: "h049"
+  girdi: "Dedeballar mah sivasli usak"
+  beklenen: {il: Uşak, ilce: Sivaslı, mahalle: Dedeballar}
+  etiketler: [ascii, noktalama]
+- id: "h050"
+  girdi: "Değirmenkaşı Mahalesi Reyhanlı/Hatay Cumhuriyet Cad. No:22"
+  beklenen: {il: Hatay, ilce: Reyhanlı, mahalle: Değirmenkaşı, cadde: Cumhuriyet, bina_no: "22"}
+  etiketler: [yazim_hatasi, sira]
+- id: "h051"
+  girdi: "Karaveliler Mah. Bayındr İzmir"
+  beklenen: {il: İzmir, ilce: Bayındır, mahalle: Karaveliler}
+  etiketler: [yazim_hatasi]
+- id: "h052"
+  girdi: "kayacik mh kaynarca sakarya no:11"
+  beklenen: {il: Sakarya, ilce: Kaynarca, mahalle: Kayacık, bina_no: "11"}
+  etiketler: [ascii, kisaltma]
+- id: "h053"
+  girdi: "Tuzluca Mh. Eyyübiye Ş.Urfa"
+  beklenen: {il: Şanlıurfa, ilce: Eyyübiye, mahalle: Tuzluca}
+  etiketler: [kisaltma]
+- id: "h054"
+  girdi: "Özerler Mah. Istanbul Cad. No:5 D:2 Lüleburgaz / Kırklareli"
+  beklenen: {il: Kırklareli, ilce: Lüleburgaz, mahalle: Özerler, cadde: İstanbul, bina_no: "5", daire: "2"}
+  etiketler: [tuzak, ascii, kisaltma]
+- id: "h055"
+  girdi: "Rahmanlar Mah. Selendi Manisa PK 45970"
+  beklenen: {il: Manisa, ilce: Selendi, mahalle: Rahmanlar, posta_kodu: "45970"}
+  etiketler: [posta_kodu]
+- id: "h056"
+  girdi: "yaglica koyu digor kars"
+  beklenen: {il: Kars, ilce: Digor, mahalle: Yağlıca}
+  etiketler: [koy, ascii]
+- id: "h057"
+  girdi: "Gülveren Mah. Köyiçi Sk. Mamak/Ankara No 3"
+  beklenen: {il: Ankara, ilce: Mamak, mahalle: Gülveren, sokak: Köyiçi, bina_no: "3"}
+  etiketler: [sira, kisaltma]
+- id: "h058"
+  girdi: "Kızıldam Köyü Lapseki Çanakale"
+  beklenen: {il: Çanakkale, ilce: Lapseki, mahalle: Kızıldam}
+  etiketler: [koy, yazim_hatasi]
+- id: "h059"
+  girdi: "Tuzcuzade Mah. Bayburt"
+  beklenen: {il: Bayburt, ilce: Merkez, mahalle: Tuzcuzade}
+  etiketler: [ilce_eksik]
+- id: "h060"
+  girdi: "Zekeriyaköy Mh. Mesire Cd. Sarıyer Evleri Sitesi E Blok No:2 İstanbul"
+  beklenen: {il: İstanbul, ilce: Sarıyer, mahalle: Zekeriyaköy, cadde: Mesire, site: Sarıyer Evleri, blok: E, bina_no: "2"}
+  etiketler: [ilce_eksik, site, tuzak]
+- id: "h061"
+  girdi: "Yalı Mah. 3252 Sok. No:2 Çeşme"
+  beklenen: {il: İzmir, ilce: Çeşme, mahalle: Yalı, sokak: "3252", bina_no: "2"}
+  etiketler: [il_eksik, kisaltma]
+- id: "h062"
+  girdi: "Talaytepe Mah. Kayapınar Diyarbakır Mardin Yolu Üzeri No:145"
+  beklenen: {il: Diyarbakır, ilce: Kayapınar, mahalle: Talaytepe, bina_no: "145", kalan: Mardin Yolu Üzeri}
+  etiketler: [tarif, tuzak]
+- id: "h063"
+  girdi: "Yayladere Köyü Güroymak/Bitilis"
+  beklenen: {il: Bitlis, ilce: Güroymak, mahalle: Yayladere}
+  etiketler: [koy, yazim_hatasi]
+- id: "h064"
+  girdi: "Zafertepe Mah. Cengiz Topel Cad. Kütahya No:54/7"
+  beklenen: {il: Kütahya, ilce: Merkez, mahalle: Zafertepe, cadde: Cengiz Topel, bina_no: "54", daire: "7"}
+  etiketler: [ilce_eksik, no_bolu, sira]
+- id: "h065"
+  girdi: "Çamlik Mah. Kilimli Zonguldak"
+  beklenen: {il: Zonguldak, ilce: Kilimli, mahalle: Çamlık}
+  etiketler: [yazim_hatasi]
+- id: "h066"
+  girdi: "karabaş mahallesi ömer türkçakal bulvarı no:101 daire:7 izmit kocaeli"
+  beklenen: {il: Kocaeli, ilce: İzmit, mahalle: Karabaş, bulvar: Ömer Türkçakal, bina_no: "101", daire: "7"}
+  etiketler: [noktalama]
+- id: "h067"
+  girdi: "Huzur Mah. 1120/3 Sk. No:4 Konak İzmir"
+  beklenen: {il: İzmir, ilce: Konak, mahalle: Huzur, sokak: 1120/3, bina_no: "4"}
+  etiketler: [tuzak, kisaltma]
+- id: "h068"
+  girdi: "Hürriyet Mahlesi Omurtak Cd. No 26 Daire 3 Çorlu Tekirdağ"
+  beklenen: {il: Tekirdağ, ilce: Çorlu, mahalle: Hürriyet, cadde: Omurtak, bina_no: "26", daire: "3"}
+  etiketler: [yazim_hatasi, kisaltma]
+- id: "h069"
+  girdi: "Kavaklık Mah. Şehit Kamil Cad. Şahinbey/Gaziantep"
+  beklenen: {il: Gaziantep, ilce: Şahinbey, mahalle: Kavaklık, cadde: Şehit Kamil}
+  etiketler: [tuzak]
+- id: "h070"
+  girdi: "Yedi Eylül Mah. Atatürk Blv. No:12 Turgutlu Manisa"
+  beklenen: {il: Manisa, ilce: Turgutlu, mahalle: Yedi Eylül, bulvar: Atatürk, bina_no: "12"}
+  etiketler: [temiz, kisaltma]
+- id: "h071"
+  girdi: "Ağras Mah. Güneysınır Konya"
+  beklenen: {il: Konya, ilce: Güneysınır, mahalle: Ağras}
+  etiketler: [temiz]
+- id: "h072"
+  girdi: "Kirazliyayla mah basyayla karaman"
+  beklenen: {il: Karaman, ilce: Başyayla, mahalle: Kirazlıyayla}
+  etiketler: [ascii]
+- id: "h073"
+  girdi: "Karlıtepe Mh. Gaziosmanpasa İstanbul Kazım Karabekir Cd No:89"
+  beklenen: {il: İstanbul, ilce: Gaziosmanpaşa, mahalle: Karlıtepe, cadde: Kazım Karabekir, bina_no: "89"}
+  etiketler: [sira, ascii, kisaltma]
+- id: "h074"
+  girdi: "Tarım Mah. Aspendos Bulvari No:33 Muratpaşa/Antalya"
+  beklenen: {il: Antalya, ilce: Muratpaşa, mahalle: Tarım, bulvar: Aspendos, bina_no: "33"}
+  etiketler: [ascii]
+- id: "h075"
+  girdi: "Uzumdali Mah. Antakya Hatay Kurtuluş Cd. 15/3"
+  beklenen: {il: Hatay, ilce: Antakya, mahalle: Üzümdalı, cadde: Kurtuluş, bina_no: "15", daire: "3"}
+  etiketler: [ascii, sira, no_bolu]
+- id: "h076"
+  girdi: "Karakese Mah. Dörtyol/Hatay İstiklal Sk. Çınar Apt. D:5"
+  beklenen: {il: Hatay, ilce: Dörtyol, mahalle: Karakese, sokak: İstiklal, bina_adi: Çınar, daire: "5"}
+  etiketler: [sira, bina_adi, kisaltma]
+- id: "h077"
+  girdi: "Kargalı Mah. Gebze"
+  beklenen: {il: Kocaeli, ilce: Gebze, mahalle: Kargalı}
+  etiketler: [il_eksik]
+- id: "h078"
+  girdi: "Eyyüp Nebi Mah. Eyyübiye/Urfa"
+  beklenen: {il: Şanlıurfa, ilce: Eyyübiye, mahalle: Eyyüp Nebi}
+  etiketler: [kisaltma]
+- id: "h079"
+  girdi: "Yundalan Köyü Merkez Kırklareli"
+  beklenen: {il: Kırklareli, ilce: Merkez, mahalle: Yundalan}
+  etiketler: [koy]
+- id: "h080"
+  girdi: "Mustafa Kemal Mah. Dumlupınar Blv. Tepe Prime Sitesi No:266 B Blok Daire:41 Çankaya/Ankara"
+  beklenen: {il: Ankara, ilce: Çankaya, mahalle: Mustafa Kemal, bulvar: Dumlupınar, site: Tepe Prime, blok: B, bina_no: "266", daire: "41"}
+  etiketler: [site]
+- id: "h081"
+  girdi: "Varsaklar Mah. Öğretmen Lojmanları Daire 4 Kozan/Adana"
+  beklenen: {il: Adana, ilce: Kozan, mahalle: Varsaklar, site: Öğretmen Lojmanları, daire: "4"}
+  etiketler: [site]
+- id: "h082"
+  girdi: "Cami Mah. Çarşı Cad. No:8 Çelikhan/Adıyaman"
+  beklenen: {il: Adıyaman, ilce: Çelikhan, mahalle: Cami, cadde: Çarşı, bina_no: "8"}
+  etiketler: [temiz, kisaltma]
+- id: "h083"
+  girdi: "Küçükkum Mah. Demre Antlya"
+  beklenen: {il: Antalya, ilce: Demre, mahalle: Küçükkum}
+  etiketler: [yazim_hatasi]
+- id: "h084"
+  girdi: "Mollafenari Mh. Inönü Cd. No:60 Osmangazi Bursa"
+  beklenen: {il: Bursa, ilce: Osmangazi, mahalle: Mollafenari, cadde: İnönü, bina_no: "60"}
+  etiketler: [ascii, kisaltma]
+- id: "h085"
+  girdi: "Kaptanpaşa Mah. Piyalepaşa Blv. No:73 Beyoğlu/İstanbul Devlet Hastanesi Arkası"
+  beklenen: {il: İstanbul, ilce: Beyoğlu, mahalle: Kaptanpaşa, bulvar: Piyalepaşa, bina_no: "73", kalan: Devlet Hastanesi Arkası}
+  etiketler: [tarif, kisaltma]
+- id: "h086"
+  girdi: "Seyran Mah. Yeşilyurt / Malatya Sümer Sk. No 4 Kat 1"
+  beklenen: {il: Malatya, ilce: Yeşilyurt, mahalle: Seyran, sokak: Sümer, bina_no: "4", kat: "1"}
+  etiketler: [sira, kisaltma]
+- id: "h087"
+  girdi: "altaylilar mahallesi tarsus mersn"
+  beklenen: {il: Mersin, ilce: Tarsus, mahalle: Altaylılar}
+  etiketler: [ascii, yazim_hatasi]
+- id: "h088"
+  girdi: "Keli Mah. Salihli"
+  beklenen: {il: Manisa, ilce: Salihli, mahalle: Keli}
+  etiketler: [il_eksik]
+- id: "h089"
+  girdi: "Toros Mah. Turhan Cemal Beriker Blv. Seyhan Apt. No:417 Çukurova/Adana"
+  beklenen: {il: Adana, ilce: Çukurova, mahalle: Toros, bulvar: Turhan Cemal Beriker, bina_adi: Seyhan, bina_no: "417"}
+  etiketler: [bina_adi, tuzak]
+- id: "h090"
+  girdi: "Tepebaşı Mah. Zonguldak Merkez Gazipaşa Cad. No:9"
+  beklenen: {il: Zonguldak, ilce: Merkez, mahalle: Tepebaşı, cadde: Gazipaşa, bina_no: "9"}
+  etiketler: [sira, tuzak]
+- id: "h091"
+  girdi: "Kadidondurma Koyu Meric Edirne"
+  beklenen: {il: Edirne, ilce: Meriç, mahalle: Kadıdondurma}
+  etiketler: [koy, ascii]
+- id: "h092"
+  girdi: "Gezköy Mh. Aziziye Erzurm"
+  beklenen: {il: Erzurum, ilce: Aziziye, mahalle: Gezköy}
+  etiketler: [yazim_hatasi]
+- id: "h093"
+  girdi: "ILICAK MAH. BAŞKALE / VAN"
+  beklenen: {il: Van, ilce: Başkale, mahalle: Ilıcak}
+  etiketler: [buyuk_harf]
+- id: "h094"
+  girdi: "Salıbaba Mah. Hürriyet Cad. No:4 Merkez Elazığ"
+  beklenen: {il: Elazığ, ilce: Merkez, mahalle: Salı Baba, cadde: Hürriyet, bina_no: "4"}
+  etiketler: [birlesik, kisaltma]
+- id: "h095"
+  girdi: "Ömerağa Mah. İki Eylül Cad. No:28/3 Tepebaşı/Eskişehir"
+  beklenen: {il: Eskişehir, ilce: Tepebaşı, mahalle: Ömerağa, cadde: İki Eylül, bina_no: "28", daire: "3"}
+  etiketler: [temiz, no_bolu]
+- id: "h096"
+  girdi: "Bekçiler Mah. Seydikemer Muğl"
+  beklenen: {il: Muğla, ilce: Seydikemer, mahalle: Bekçiler}
+  etiketler: [yazim_hatasi]
+- id: "h097"
+  girdi: "Karakaya Mah. Fatih Cad. Keçören Ankara"
+  beklenen: {il: Ankara, ilce: Keçiören, mahalle: Karakaya, cadde: Fatih}
+  etiketler: [yazim_hatasi, tuzak]
+- id: "h098"
+  girdi: "Ayazağa Mh. Kemerburgaz Cd. Sarıyer / Istanbul"
+  beklenen: {il: İstanbul, ilce: Sarıyer, mahalle: Ayazağa, cadde: Kemerburgaz}
+  etiketler: [ascii, kisaltma]
+- id: "h099"
+  girdi: "100. Yıl Mah. Hal Sk. No:6 Gönen Balıkesir"
+  beklenen: {il: Balıkesir, ilce: Gönen, mahalle: 100. Yıl, sokak: Hal, bina_no: "6"}
+  etiketler: [tuzak, kisaltma]
+- id: "h100"
+  girdi: "Ünaldı Köyü Varto/Muş"
+  beklenen: {il: Muş, ilce: Varto, mahalle: Ünaldı}
+  etiketler: [koy]
