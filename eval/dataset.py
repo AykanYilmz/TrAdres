@@ -9,25 +9,9 @@ from pathlib import Path
 import yaml
 
 from tradres.gazetteer import Gazetteer, load_gazetteer
+from tradres.models import FIELDS
 
 ADDRESSES_DIR = Path(__file__).parent / "addresses"
-
-#: Scored address fields, in report order.
-FIELDS: tuple[str, ...] = (
-    "il",
-    "ilce",
-    "mahalle",
-    "bulvar",
-    "cadde",
-    "sokak",
-    "site",
-    "bina_adi",
-    "blok",
-    "bina_no",
-    "kat",
-    "daire",
-    "posta_kodu",
-)
 
 #: ``kalan`` documents the text that should stay unparsed. It is not scored.
 LABEL_KEYS = frozenset(FIELDS) | {"kalan"}

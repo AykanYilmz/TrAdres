@@ -10,7 +10,7 @@
   "mahalle": {
     "short": "Mah.",
     "long": "Mahallesi",
-    "aliases": ["mah", "mh", "mahalle", "mahallesi"]
+    "aliases": ["mah", "mh", "mahalle", "mahallesi", "köyü"]
   },
   "cadde": {
     "short": "Cad.",

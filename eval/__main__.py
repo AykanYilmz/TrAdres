@@ -8,8 +8,9 @@ import sys
 from collections.abc import Callable, Mapping, Sequence
 from typing import cast
 
-from eval.dataset import FIELDS, MISSING_TAG, SPELLING_TAG, DatasetError, load_cases, tag_counts
+from eval.dataset import MISSING_TAG, SPELLING_TAG, DatasetError, load_cases, tag_counts
 from eval.metrics import Predict, Report, evaluate
+from tradres.models import FIELDS
 
 DEFAULT_PARSER = "tradres:parse"
 EXIT_OK, EXIT_BELOW_THRESHOLD, EXIT_ERROR = 0, 1, 2

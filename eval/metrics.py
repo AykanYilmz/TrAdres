@@ -18,7 +18,8 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 
-from eval.dataset import FIELDS, Case
+from eval.dataset import Case
+from tradres.models import FIELDS
 from tradres.normalization import tr_lower
 
 #: A parser for scoring: address text in, field name -> value out.
