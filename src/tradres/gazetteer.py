@@ -23,6 +23,7 @@ from functools import cache, cached_property
 from importlib.resources import files
 from typing import Any
 
+from tradres.abbreviations import load_ascii_names
 from tradres.matching import DEFAULT_CONFIG, MatchConfig, closest
 from tradres.normalization import ascii_key
 
@@ -271,7 +272,8 @@ class Gazetteer:
             for word in name.split():
                 if word.isalpha():
                     counts[ascii_key(word)][word] += 1
-        return {key: found.most_common(1)[0][0] for key, found in counts.items()}
+        keep = load_ascii_names()
+        return {key: found.most_common(1)[0][0] for key, found in counts.items() if key not in keep}
 
     def respell(self, name: str) -> str:
         """Bring back the Turkish letters of words typed in plain ASCII.

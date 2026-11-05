@@ -70,6 +70,18 @@ def district_of_mahalle(fields: Mapping[str, str], gazetteer: Gazetteer) -> tupl
     return places.pop() if len(places) == 1 else None
 
 
+def mahalle_in_street(fields: Mapping[str, str], gazetteer: Gazetteer) -> tuple[str, str] | None:
+    """The mahalle hidden in a numbered street: "Etlik 512. Sokak" gives (sokak, Etlik)."""
+    il, ilce = fields.get("il"), fields.get("ilce")
+    if il is None or ilce is None or "mahalle" in fields:
+        return None
+    for field in ("cadde", "sokak"):
+        head, _, tail = fields.get(field, "").rpartition(" ")
+        if head and tail.isdigit() and gazetteer.find_mahalle(head, il=il, ilce=ilce):
+            return field, head
+    return None
+
+
 def mahalle_without_keyword(
     tokens: Sequence[Token],
     used: Collection[int],
@@ -249,6 +261,13 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
     for field in _NAME_FIELDS:
         if field in fields:
             fields[field] = gazetteer.respell(fields[field])
+
+    hidden = mahalle_in_street(fields, gazetteer)
+    if hidden is not None:
+        street, name = hidden
+        fields["mahalle"] = name
+        fields[street] = fields[street].rpartition(" ")[2]
+        origins["mahalle"] = Origin.KEYWORD
 
     if "mahalle" in fields:
         fields["mahalle"], origins["mahalle"] = official_mahalle(

@@ -19,8 +19,9 @@ STREET_KINDS = frozenset({"mahalle", "cadde", "sokak", "bulvar", "site", "apartm
 _TOKEN = re.compile(r"[,;()/]|[^\s,;()]+")
 _SEPARATORS = frozenset(",;()/-")
 _MIN_KEYWORD_LENGTH = 6  # only full forms such as "Mahallesi" are corrected
-# 5, 12A, 1923. (ordinal) or 5/3 (building/flat, or a street number in İzmir)
-_NUMBER = re.compile(r"\d+[^\W\d_]?\.?|\d+/\d+")
+# 5, 12A, 1923. (ordinal), 39-C, or 5/3 and 72A/5 (building/flat, or a street
+# number in İzmir)
+_NUMBER = re.compile(r"\d+[^\W\d_]?\.?|\d+[^\W\d_]?/\d+|\d+-[^\W\d_]")
 
 
 class TokenKind(Enum):

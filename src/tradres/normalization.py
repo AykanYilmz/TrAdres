@@ -151,6 +151,7 @@ _RULES: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\s*/\s*"), " / "),
     # "5 / 3" -> "5/3": between two digits a slash is "building/flat"
     (re.compile(r"(?<=\d) / (?=\d)"), "/"),
+    (re.compile(rf"(?<=\d{_LETTER}) / (?=\d)"), "/"),  # 72A/5: building 72A, flat 5
     # "Cad.No" / "Sk.5" -> "Cad. No" / "Sk. 5": after a word of 2+ letters.
     # Initials like "P.K." stay together.
     (re.compile(rf"(?<={_LETTER}{{2}})\.(?=\w)"), ". "),

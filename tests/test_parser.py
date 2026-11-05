@@ -381,3 +381,66 @@ def test_centre_after_a_district_name() -> None:
     address = parse("Bodrum Merkez, Gül Cd. No:5, Bodrum/Muğla")
     assert address.mahalle is None
     assert address.kalan == "Merkez"
+
+
+@pytest.mark.parametrize(
+    ("text", "bina_no", "daire"),
+    [
+        ("Konak İzmir Lale Cad. 14/A", "14/A", None),
+        ("Konak İzmir Lale Cad. 14/a", "14/A", None),
+        ("Konak İzmir Lale Cad. 72A/5", "72A", "5"),
+        ("Konak İzmir Lale Cad. No:39-C", "39-C", None),
+        ("Konak İzmir Lale Cad. No:9/b", "9/B", None),
+        ("Konak İzmir Lale Cad. No:9 İç Kapı: 4", "9", "4"),
+        ("Konak İzmir Lale Cad. Dış Kapı: 9 İç Kapı: 4", "9", "4"),
+    ],
+)
+def test_building_number_forms(text: str, bina_no: str, daire: str | None) -> None:
+    address = parse(text)
+    assert (address.bina_no, address.daire) == (bina_no, daire)
+    assert address.mahalle is None
+    assert address.kalan is None
+
+
+def test_slash_letter_before_a_keyword_is_not_a_building() -> None:
+    assert parse("Konak İzmir Lale Cad. 14 / A Blok").blok == "A"
+
+
+def test_lone_word_kapi_with_colon_is_kept() -> None:
+    assert parse("Kapı: 4 Bolu").kalan == "Kapı: 4"
+
+
+def test_district_beside_the_province_beats_merkez() -> None:
+    assert parse("Dereköy Köyü Merkez Mevkii No:2 Seben/Bolu").ilce == "Seben"
+
+
+def test_mahalle_hidden_in_a_numbered_street() -> None:
+    address = parse("Keçiören Ankara Etlik 512. Sokak 7/2")
+    assert (address.mahalle, address.sokak) == ("Etlik", "512")
+
+
+def test_number_in_a_street_name_loses_its_dot() -> None:
+    assert parse("Bağlar Diyarbakır Lale Bey 4. Sok.").sokak == "Lale Bey 4"
+
+
+def test_name_of_an_area_stays_in_the_site() -> None:
+    address = parse("Organize Sanayi Bölgesi 5. Cadde Kepez Antalya")
+    assert (address.site, address.cadde) == ("Organize Sanayi Bölgesi", "5")
+
+
+def test_business_centre_is_a_building_name() -> None:
+    assert parse("Lale Cad. No:2 MAVİ İŞ MERKEZİ Konak").bina_adi == "Mavi İş Merkezi"
+
+
+def test_word_block_is_title_case_and_code_block_is_upper_case() -> None:
+    assert parse("DOĞU BLOK Bolu").blok == "Doğu"
+    assert parse("c3 blok Bolu").blok == "C3"
+
+
+def test_a_rare_place_word_does_not_respell_a_name() -> None:
+    assert parse("Dr. Ali Can Sokağı No:1 Konak İzmir").sokak == "Dr. Ali Can"
+    assert parse("kurtulus sk no 1 konak izmir").sokak == "Kurtuluş"
+
+
+def test_titles_in_street_names_get_their_dot() -> None:
+    assert parse("Prof Dr Ali Demir Cd. Konak İzmir").cadde == "Prof. Dr. Ali Demir"

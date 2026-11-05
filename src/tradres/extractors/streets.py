@@ -20,7 +20,12 @@ __all__ = ["extract_streets"]
 _FIELD_OF_KIND = {"apartman": "bina_adi"}  # the other kinds have the field's own name
 _NUMBER_WORDS = frozenset({"nolu", "numarali"})  # "1 Nolu Sokak" -> "1"
 # They work like "Sitesi", but they stay in the name: "Öğretmen Lojmanları".
-_SITE_NAME_ENDS = frozenset({"konutlari", "lojman", "lojmani", "lojmanlar", "lojmanlari"})
+_SITE_NAME_ENDS = frozenset(
+    {"bolgesi", "konutlari", "lojman", "lojmani", "lojmanlar", "lojmanlari"}
+)
+# The same for one building: "Mavi İş Merkezi".
+_BUILDING_NAME_ENDS = frozenset({"merkezi"})
+_MIN_BLOCK_WORD_LENGTH = 3  # "A", "C3" are codes; "Batı" is a word
 
 
 def _name(tokens: Sequence[Token]) -> str:
@@ -28,7 +33,17 @@ def _name(tokens: Sequence[Token]) -> str:
     if len(words) == 1 and words[0].is_number:
         return words[0].text.rstrip(".")  # "1923. Cadde" -> "1923"
     name_words = load_name_words()
-    return tr_title(" ".join(name_words.get(token.key, token.text) for token in words))
+    texts = [name_words.get(token.key, token.text) for token in words]
+    if words and words[-1].is_number:
+        texts[-1] = texts[-1].rstrip(".")  # "Lale Bey 4. Sok." -> "Lale Bey 4"
+    return tr_title(" ".join(texts))
+
+
+def _block_name(text: str) -> str:
+    name = text.rstrip(".")
+    return (
+        tr_title(name) if name.isalpha() and len(name) >= _MIN_BLOCK_WORD_LENGTH else tr_upper(name)
+    )
 
 
 def _after_description(names: Sequence[int], tokens: Sequence[Token]) -> list[int]:
@@ -61,12 +76,19 @@ def extract_streets(tokens: Sequence[Token], used: Collection[int]) -> Extractio
             continue
         keyword = street_keyword(token)
         after = tokens[index + 1] if index + 1 < len(tokens) else None
-        closes_site = token.key in _SITE_NAME_ENDS and "site" not in fields
-        if keyword is None and closes_site and not (after and street_keyword(after)):
+        closing = (
+            "site"
+            if token.key in _SITE_NAME_ENDS
+            else "bina_adi"
+            if token.key in _BUILDING_NAME_ENDS
+            else None
+        )
+        closes_name = closing is not None and closing not in fields
+        if keyword is None and closing and closes_name and not (after and street_keyword(after)):
             names = _after_description(pending, tokens)
             pending = []
             if names:
-                fields["site"] = _name([tokens[i] for i in [*names, index]])
+                fields[closing] = _name([tokens[i] for i in [*names, index]])
                 taken.update([*names, index])
             continue
         names_a_landmark = (
@@ -93,7 +115,7 @@ def extract_streets(tokens: Sequence[Token], used: Collection[int]) -> Extractio
             if not names and has_next and not tokens[following].is_separator:
                 names = [following]  # "Blok A2"
             if names:
-                fields[field] = tr_upper(tokens[names[0]].text.rstrip("."))
+                fields[field] = _block_name(tokens[names[0]].text)
         elif names:
             fields[field] = _name([tokens[i] for i in names])
         if field in fields:

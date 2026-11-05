@@ -89,12 +89,25 @@ class _Scanner:
             return
         mark, letter = self.at(index + 2), self.at(index + 3)
         if mark and mark.text == "/" and letter and len(letter.text) == 1:
-            self.take("bina_no", f"{number}/{letter.text}", index, index + 1, index + 2, index + 3)
+            value_text = f"{number}/{tr_upper(letter.text)}"
+            self.take("bina_no", value_text, index, index + 1, index + 2, index + 3)
         else:
             self.take("bina_no", number, index, index + 1)
 
+    def door(self, index: int) -> None:
+        """``Kapı:`` at ``index``: "İç Kapı: 4" is the flat, "Dış Kapı: 5" the building."""
+        value, before = self.at(index + 1), self.at(index - 1)
+        if value is None or not value.is_number or before is None:
+            return
+        field = {"ic": "daire", "dis": "bina_no"}.get(before.key)
+        if field is not None and field not in self.fields:
+            self.take(field, _digits(value), index - 1, index, index + 1)
+
     def labelled(self, index: int) -> None:
         token = self.tokens[index]
+        if token.key == "kapi" and token.text.endswith(":"):
+            self.door(index)
+            return
         glued = _GLUED.fullmatch(token.key)
         if glued:
             field = "daire" if glued[1] == "d" else "kat"
@@ -158,11 +171,26 @@ class _Scanner:
         if steps and value and _POSTAL_CODE.fullmatch(value.text):
             self.take("posta_kodu", value.text, *range(index, index + steps + 1))
 
+    def letter_after_street(self, index: int) -> bool:
+        """ "Lale Cad. 14/A": a number and its letter right after a street keyword."""
+        before, mark, letter = self.at(index - 1), self.at(index + 1), self.at(index + 2)
+        if before is None or mark is None or letter is None or "bina_no" in self.fields:
+            return False
+        if not street_keyword(before) or mark.text != "/" or len(letter.text) != 1:
+            return False
+        after = self.at(index + 3)
+        if not letter.text.isalpha() or (after is not None and street_keyword(after)):
+            return False
+        value = f"{_digits(self.tokens[index])}/{tr_upper(letter.text)}"
+        self.take("bina_no", value, index, index + 1, index + 2)
+        self.origins["bina_no"] = Origin.KEYWORD
+        return True
+
     def bare_values(self) -> None:
         """Unlabelled ``12/8`` and postal codes, after the labelled values."""
         for index, token in enumerate(self.tokens):
             following = self.at(index + 1)
-            if index in self.used or not token.is_number:
+            if index in self.used or not token.is_number or self.letter_after_street(index):
                 continue
             if following and (street_keyword(following) or following.key == "nolu"):
                 continue  # "1752/3 Sk.", "64023 Sokak": a street number

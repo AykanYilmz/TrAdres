@@ -278,7 +278,7 @@
   etiketler: [sira, kisaltma]
 - id: "c067"
   girdi: "Esenevler Mah. Ümraniye/İstanbul market üstü"
-  beklenen: {il: İstanbul, ilce: Ümraniye, mahalle: Esenevler, kalan: market üstü}
+  beklenen: {il: İstanbul, ilce: Ümraniye, mahalle: Esenevler, tarif: market üstü}
   etiketler: [tarif, kisaltma]
 - id: "c068"
   girdi: "Barış Mah. 4807 Sk. No:6 Akdeniz/Mersin"

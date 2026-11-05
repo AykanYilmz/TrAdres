@@ -1,0 +1,10 @@
+{
+  "_comment": [
+    "Names that are correct in plain ASCII letters, although a place name",
+    "spelled with Turkish letters has the same ASCII form: Can is not Çan.",
+    "These words are never respelled."
+  ],
+  "names": [
+    "Can"
+  ]
+}

@@ -58,17 +58,21 @@ def _overlap(left: Window, right: Window) -> bool:
 def _best_pair(
     iller: Sequence[tuple[Window, Il]], ilceler: Sequence[tuple[Window, list[Ilce]]]
 ) -> _Found | None:
-    """A province and one of its districts, best next to each other and late in the text."""
-    best: tuple[tuple[bool, int, int], _Found] | None = None
+    """A province and one of its districts, best close together and late in the text.
+
+    Closeness comes first: in "Merkez Küme Evleri No:8 Mengen/Bolu" the district
+    is Mengen, right beside Bolu, although "Merkez" is a district name too.
+    """
+    best: tuple[tuple[int, int, int], _Found] | None = None
     for il_window, il in iller:
         for ilce_window, matches in ilceler:
             ilce = next((item for item in matches if item.il == il.ad), None)
             if ilce is None or _overlap(il_window, ilce_window):
                 continue
-            adjacent = il_window.end == ilce_window.start or ilce_window.end == il_window.start
+            gap = max(il_window.start, ilce_window.start) - min(il_window.end, ilce_window.end)
             end = max(il_window.end, ilce_window.end)
             size = (il_window.end - il_window.start) + (ilce_window.end - ilce_window.start)
-            score = (adjacent, end, size)
+            score = (-gap, end, size)
             if best is None or score > best[0]:
                 best = (score, _Found((il_window, il), (ilce_window, ilce)))
     return best[1] if best is not None else None

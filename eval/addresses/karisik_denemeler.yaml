@@ -1,0 +1,87 @@
+# Patterns that failed in hand trials of mixed addresses.
+# Places are real; street names, buildings and numbers are invented.
+
+- id: "k001"
+  girdi: "Konak İzmir Lale Cad. 14/A Daire:3"
+  beklenen: {il: İzmir, ilce: Konak, cadde: Lale, bina_no: 14/A, daire: "3"}
+  etiketler: [no_bolu, sira, mahalle_eksik]
+- id: "k002"
+  girdi: "Seyhan Adana Papatya Cd. 7/C"
+  beklenen: {il: Adana, ilce: Seyhan, cadde: Papatya, bina_no: 7/C}
+  etiketler: [no_bolu, sira, mahalle_eksik]
+- id: "k003"
+  girdi: "konya meram yeni mh lale cd 18/b d 5"
+  beklenen: {il: Konya, ilce: Meram, mahalle: Yeni, cadde: Lale, bina_no: 18/B, daire: "5"}
+  etiketler: [ascii, kisaltma, no_bolu, sira]
+- id: "k004"
+  girdi: "Efeler Aydın Zambak Cad. 52A/6"
+  beklenen: {il: Aydın, ilce: Efeler, cadde: Zambak, bina_no: 52A, daire: "6"}
+  etiketler: [no_bolu, sira, mahalle_eksik]
+- id: "k005"
+  girdi: "Bostanlı Mh. Lale Cd. 210B/4 Karşıyaka 35590"
+  beklenen: {il: İzmir, ilce: Karşıyaka, mahalle: Bostanlı, cadde: Lale, bina_no: 210B, daire: "4", posta_kodu: "35590"}
+  etiketler: [no_bolu, il_eksik, posta_kodu]
+- id: "k006"
+  girdi: "Tepebaşı/Eskişehir Lale Cad. No:12-B Daire 3"
+  beklenen: {il: Eskişehir, ilce: Tepebaşı, cadde: Lale, bina_no: 12-B, daire: "3"}
+  etiketler: [sira, mahalle_eksik]
+- id: "k007"
+  girdi: "Melikgazi/KAYSERİ Sümbül Cd. No:40-A"
+  beklenen: {il: Kayseri, ilce: Melikgazi, cadde: Sümbül, bina_no: 40-A}
+  etiketler: [sira, mahalle_eksik, buyuk_harf]
+- id: "k008"
+  girdi: "Merkez Mah. Lale Sk. İç Kapı: 7 No:3 Ortahisar/Trabzon"
+  beklenen: {il: Trabzon, ilce: Ortahisar, mahalle: Merkez, sokak: Lale, bina_no: "3", daire: "7"}
+  etiketler: [tuzak]
+- id: "k009"
+  girdi: "Kemerkaya Mahallesi Dr. Ali Can Sokağı No: 9/A İç Kapı: 2 Ortahisar/Trabzon"
+  beklenen: {il: Trabzon, ilce: Ortahisar, mahalle: Kemerkaya, sokak: Dr. Ali Can, bina_no: 9/A, daire: "2"}
+  etiketler: [temiz]
+- id: "k010"
+  girdi: "Çaykışla Köyü Merkez Küme Evleri No:5 Yığılca/Düzce"
+  beklenen: {il: Düzce, ilce: Yığılca, mahalle: Çaykışla, bina_no: "5", kalan: Merkez Küme Evleri}
+  etiketler: [koy, tuzak]
+- id: "k011"
+  girdi: "Dereköy Köyü Merkez Mevkii No:2 Seben/Bolu"
+  beklenen: {il: Bolu, ilce: Seben, mahalle: Dereköy, bina_no: "2", kalan: Merkez Mevkii}
+  etiketler: [koy, tuzak]
+- id: "k012"
+  girdi: "Organize Sanayi Bölgesi 5. Cadde No:20 Kepez Antalya 07190"
+  beklenen: {il: Antalya, ilce: Kepez, site: Organize Sanayi Bölgesi, cadde: "5", bina_no: "20", posta_kodu: "07190"}
+  etiketler: [site, tuzak]
+- id: "k013"
+  girdi: "Konya Selçuklu Sanayi Bölgesi 2045 Sokak No:6"
+  beklenen: {il: Konya, ilce: Selçuklu, site: Sanayi Bölgesi, sokak: "2045", bina_no: "6"}
+  etiketler: [site, tuzak]
+- id: "k014"
+  girdi: "Kartal İstanbul Yakacık Organize Sanayi Bölgesi 12. Sokak No:3"
+  beklenen: {il: İstanbul, ilce: Kartal, site: Yakacık Organize Sanayi Bölgesi, sokak: "12", bina_no: "3"}
+  etiketler: [site, tuzak]
+- id: "k015"
+  girdi: "Keçiören Ankara Etlik 512. Sokak 7/2"
+  beklenen: {il: Ankara, ilce: Keçiören, mahalle: Etlik, sokak: "512", bina_no: "7", daire: "2"}
+  etiketler: [sira, tuzak]
+- id: "k016"
+  girdi: "Bağlar Diyarbakır Lale Bey 4. Sok. No:6"
+  beklenen: {il: Diyarbakır, ilce: Bağlar, sokak: Lale Bey 4, bina_no: "6"}
+  etiketler: [sira, mahalle_eksik]
+- id: "k017"
+  girdi: "Barbaros Mah. Lale Sk. Mavi Kule Doğu Blok No:8 Ataşehir/İstanbul"
+  beklenen: {il: İstanbul, ilce: Ataşehir, mahalle: Barbaros, sokak: Lale, blok: Doğu, bina_no: "8", kalan: Mavi Kule}
+  etiketler: [site, tuzak]
+- id: "k018"
+  girdi: "Yeni Mah. Fatih Cad. No:10 Bakkal üstü Torbalı/İzmir"
+  beklenen: {il: İzmir, ilce: Torbalı, mahalle: Yeni, cadde: Fatih, bina_no: "10", tarif: Bakkal üstü}
+  etiketler: [tarif]
+- id: "k019"
+  girdi: "ÜMRANİYE İSTANBUL ÇAKMAK MAH. LALE CAD. NO:2 MAVİ İŞ MERKEZİ KAT:3"
+  beklenen: {il: İstanbul, ilce: Ümraniye, mahalle: Çakmak, cadde: Lale, bina_adi: Mavi İş Merkezi, bina_no: "2", kat: "3"}
+  etiketler: [buyuk_harf, bina_adi]
+- id: "k020"
+  girdi: "Kemerkaya Mahallesi Prof Dr Ali Demir Caddesi No 7 Daire 1 Ortahisar Trabzon"
+  beklenen: {il: Trabzon, ilce: Ortahisar, mahalle: Kemerkaya, cadde: Prof. Dr. Ali Demir, bina_no: "7", daire: "1"}
+  etiketler: [noktalama]
+- id: "k021"
+  girdi: "Altıparmak Mh Org Ali Demir Cd No 3 Osmangazi Bursa"
+  beklenen: {il: Bursa, ilce: Osmangazi, mahalle: Altıparmak, cadde: Org. Ali Demir, bina_no: "3"}
+  etiketler: [noktalama, kisaltma]
