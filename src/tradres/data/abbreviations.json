@@ -45,7 +45,7 @@
   "bina_no": {
     "short": "No:",
     "long": "No",
-    "aliases": ["no", "numara", "num"]
+    "aliases": ["no", "numara", "numarası", "num"]
   },
   "kat": {
     "short": "K:",

@@ -42,7 +42,7 @@ def as_fields(result: object) -> Mapping[str, object]:
     return {name: getattr(result, name, None) for name in FIELDS}
 
 
-def format_text(report: Report) -> str:
+def format_text(report: Report, *, groups: bool = True) -> str:
     lines = [f"{'field':<12}{'precision':>10}{'recall':>9}{'f1':>8}{'support':>9}"]
     rows = [*report.fields.items(), ("TOTAL", report.overall)]
     for name, score in rows:
@@ -53,9 +53,10 @@ def format_text(report: Report) -> str:
     lines += ["", f"exact addresses: {report.exact}/{report.total} = {report.exact_rate:.1%}"]
     if report.crashes:
         lines.append(f"CRASHES: {report.crashes}")
-    lines += ["", f"{'tag':<16}{'exact':>7}{'total':>7}{'rate':>8}"]
-    for tag, group in sorted(report.groups.items()):
-        lines.append(f"{tag:<16}{group.exact:>7}{group.total:>7}{group.rate:>8.1%}")
+    if groups:
+        lines += ["", f"{'tag':<16}{'exact':>7}{'total':>7}{'rate':>8}"]
+        for tag, group in sorted(report.groups.items()):
+            lines.append(f"{tag:<16}{group.exact:>7}{group.total:>7}{group.rate:>8.1%}")
     return "\n".join(lines)
 
 
@@ -134,7 +135,10 @@ def main(
         return EXIT_ERROR
 
     report = evaluate(cases, predict)
-    print(format_markdown(report) if args.markdown else format_text(report))
+    text = (
+        format_markdown(report) if args.markdown else format_text(report, groups=not args.holdout)
+    )
+    print(text)
     if args.holdout:
         print(f"locked test set: {len(cases)} addresses")
     if args.failures:

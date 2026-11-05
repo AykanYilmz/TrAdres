@@ -332,4 +332,6 @@ def test_holdout_refuses_to_show_details(extra: list[str]) -> None:
 
 def test_holdout_prints_totals(capsys: pytest.CaptureFixture[str]) -> None:
     assert main(["--holdout", "--parser", "eval.baseline:parse"]) == 0
-    assert "locked test set: 100" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "locked test set: 100" in out
+    assert "tag " not in out

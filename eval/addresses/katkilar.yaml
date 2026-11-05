@@ -1,3 +1,14 @@
 # New cases from contributors go here. Rules are in eval/README.md.
 # Never add a real person's address: change everything except the failing pattern.
-[]
+- id: "p006"
+  girdi: "Babataşı Mah. Çınar Cad. No:18 Daire No:2 Fethiye/Muğla"
+  beklenen: {il: Muğla, ilce: Fethiye, mahalle: Babataşı, cadde: Çınar, bina_no: "18", daire: "2"}
+  etiketler: [kisaltma]
+- id: "p007"
+  girdi: "lokmanli mah okul sok bina no 12 kat no 3 daire no 7 kandira kocaeli"
+  beklenen: {il: Kocaeli, ilce: Kandıra, mahalle: Lokmanlı, sokak: Okul, bina_no: "12", kat: "3", daire: "7"}
+  etiketler: [ascii, noktalama]
+- id: "p008"
+  girdi: "Maltepe Mahallesi 216 Sokak Daire Numarası 4 Güzelbahçe İzmir"
+  beklenen: {il: İzmir, ilce: Güzelbahçe, mahalle: Maltepe, sokak: "216", daire: "4"}
+  etiketler: [tuzak]

@@ -67,6 +67,9 @@ class _Scanner:
         value = self.at(index + 1)
         if value is None or not value.is_number or "bina_no" in self.fields:
             return
+        before = self.at(index - 1)
+        if before is not None and before.key == "bina":  # "Bina No: 5"
+            self.used.add(index - 1)
         number, slash, flat = _digits(value).partition("/")
         if slash and "daire" not in self.fields:
             self.take("bina_no", number, index, index + 1)
@@ -90,17 +93,29 @@ class _Scanner:
                 self.take(field, glued[2], index)
             return
         found = lookup(token.text) if token.kind is TokenKind.WORD else None
-        value = self.at(index + 1)
         if found is None:
             return
         if found.kind == "bina_no":
             self.building(index)
-        elif value is None or found.kind in self.fields:
             return
-        elif found.kind == "daire" and value.is_number and _flat_after(token, value):
-            self.take("daire", _digits(value), index, index + 1)
+        if found.kind not in ("daire", "kat"):
+            return
+        # "Daire No: 3": skip the "No". A bare "D" or "K" keeps its own rule,
+        # because in "Blok D No:5" the 5 is the building number.
+        has_no_word = _is_labelled(token) and self.is_number_word(index + 1)
+        last = index + 2 if has_no_word else index + 1
+        value = self.at(last)
+        if value is None or found.kind in self.fields:
+            return
+        if found.kind == "daire" and value.is_number and (has_no_word or _flat_after(token, value)):
+            self.take("daire", _digits(value), *range(index, last + 1))
         elif found.kind == "kat" and _floor_after(token, value):
-            self.take("kat", _floor_value(value), index, index + 1)
+            self.take("kat", _floor_value(value), *range(index, last + 1))
+
+    def is_number_word(self, index: int) -> bool:
+        token = self.at(index)
+        found = lookup(token.text) if token is not None and token.kind is TokenKind.WORD else None
+        return found is not None and found.kind == "bina_no"
 
     def postal_label(self, index: int) -> None:
         """``PK 14100``, ``P.K. 14100`` or ``Posta Kodu: 14100``."""

@@ -211,3 +211,25 @@ def test_description_alone_is_not_a_building_name() -> None:
 )
 def test_description_words_stay_in_street_names(text: str, field: str, name: str) -> None:
     assert extract_streets(tokenize(text), ()).fields == {field: name}
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("No:5 Daire No:3", {"bina_no": "5", "daire": "3"}),
+        ("No 5 Daire No 3", {"bina_no": "5", "daire": "3"}),
+        ("No:5 daire no: 300", {"bina_no": "5", "daire": "300"}),
+        ("Daire Numara 3", {"daire": "3"}),
+        ("No:5 Kat No:2 Daire No:3", {"bina_no": "5", "kat": "2", "daire": "3"}),
+        ("Bina No:5 Daire No:3", {"bina_no": "5", "daire": "3"}),
+    ],
+)
+def test_no_word_after_a_flat_or_floor_label(text: str, expected: dict[str, str]) -> None:
+    found = extract_numbers(tokenize(text))
+    assert found.fields == expected
+    assert len(found.used) == len(tokenize(text))
+
+
+@pytest.mark.parametrize("text", ["Blok D No:5", "Blok K No:5"])
+def test_bare_letter_before_no_is_not_a_label(text: str) -> None:
+    assert extract_numbers(tokenize(text)).fields == {"bina_no": "5"}
