@@ -14,7 +14,8 @@ from tradres.tokenizer import tokenize
 
 
 def _found(address: Address) -> dict[str, str]:
-    return {key: value for key, value in address.to_dict().items() if value is not None}
+    data = address.to_dict()
+    return {key: str(data[key]) for key in [*FIELDS, "kalan"] if data[key] is not None}
 
 
 @pytest.mark.parametrize(
@@ -49,7 +50,7 @@ def _found(address: Address) -> dict[str, str]:
                 "il": "Ankara",
                 "ilce": "Çankaya",
                 "mahalle": "Kızılay",  # spelling comes from the gazetteer
-                "sokak": "Gul",  # street spelling is a Faz 5 job
+                "sokak": "Gül",  # street spelling is a Faz 5 job
                 "bina_no": "5",
             },
         ),
@@ -92,7 +93,7 @@ def test_empty_input() -> None:
 
 
 def test_to_dict_has_every_field() -> None:
-    assert list(Address().to_dict()) == [*FIELDS, "kalan"]
+    assert list(Address().to_dict()) == [*FIELDS, "kalan", "confidence", "field_confidence"]
 
 
 def test_address_is_immutable() -> None:
@@ -148,8 +149,22 @@ address_words = st.lists(
 @given(address_words)
 def test_no_word_is_lost(text: str) -> None:
     """Every word of the input is in some field or in kalan."""
-    output = alias_key(" ".join(value or "" for value in parse(text).to_dict().values()))
+    output = alias_key(" ".join(_found(parse(text)).values()))
     for token in tokenize(text):
         if not token.is_separator and lookup(token.text) is None:
             for piece in token.text.split("/"):  # 12/3 is split into building and flat
                 assert alias_key(piece) in output, token
+
+
+@pytest.mark.parametrize(
+    ("text", "mahalle", "kalan"),
+    [
+        ("Yenimahalle Ankara, Batıkent, 1923. Cadde", "Batıkent", None),
+        ("Kuyuköy Merzifon Amasya", "Kuyuköy", None),
+        ("Merzifon Amasya okul yanı", None, "okul yanı"),
+        ("Merzifon Amasya bir iki üç", None, "bir iki üç"),
+    ],
+)
+def test_loose_words_as_mahalle(text: str, mahalle: str | None, kalan: str | None) -> None:
+    address = parse(text)
+    assert (address.mahalle, address.kalan) == (mahalle, kalan)

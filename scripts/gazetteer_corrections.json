@@ -9,8 +9,9 @@
   "province_aliases": {
     "Q45220": {"aliases": ["Afyon"], "reason": "Common short name of Afyonkarahisar."},
     "Q482834": {"aliases": ["Maraş", "K.Maraş"], "reason": "Common short names of Kahramanmaraş."},
-    "Q388469": {"aliases": ["Urfa"], "reason": "Common short name of Şanlıurfa."},
-    "Q483154": {"aliases": ["Antep"], "reason": "Common short name of Gaziantep."},
+    "Q388469": {"aliases": ["Urfa", "Ş.Urfa"], "reason": "Common short names of Şanlıurfa."},
+    "Q483154": {"aliases": ["Antep", "G.Antep"], "reason": "Common short names of Gaziantep."},
+    "Q534799": {"aliases": ["İst", "İst."], "reason": "Common short form of İstanbul."},
     "Q132637": {"aliases": ["İçel"], "reason": "Former official name of Mersin province (until 2002)."}
   },
   "district_names": {

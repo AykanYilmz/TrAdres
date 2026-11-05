@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, fields
+from collections.abc import Mapping
+from dataclasses import dataclass, field, fields
 
 __all__ = ["FIELDS", "Address"]
 
@@ -32,6 +33,9 @@ class Address:
     Köy names are stored in ``mahalle``. Numbers are strings because values such
     as ``"5A"`` are common. ``kalan`` keeps the text that could not be understood,
     so nothing from the input is lost.
+
+    ``confidence`` (0.0-1.0) scores the whole address and ``field_confidence``
+    each field that was found. See :mod:`tradres.scoring`.
     """
 
     il: str | None = None
@@ -48,7 +52,11 @@ class Address:
     daire: str | None = None
     posta_kodu: str | None = None
     kalan: str | None = None
+    confidence: float = 0.0
+    field_confidence: Mapping[str, float] = field(default_factory=dict, hash=False)
 
-    def to_dict(self) -> dict[str, str | None]:
-        """All parts as a plain dictionary, ready for JSON."""
-        return {field.name: getattr(self, field.name) for field in fields(self)}
+    def to_dict(self) -> dict[str, object]:
+        """All parts and scores as a plain dictionary, ready for JSON."""
+        data: dict[str, object] = {item.name: getattr(self, item.name) for item in fields(self)}
+        data["field_confidence"] = dict(self.field_confidence)
+        return data

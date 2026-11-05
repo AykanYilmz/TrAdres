@@ -94,6 +94,7 @@
   th { width: 34%; color: var(--muted); font-weight: 500; }
   td { overflow-wrap: anywhere; }
   .empty-field { color: var(--muted); }
+  .score { width: 64px; color: var(--muted); text-align: right; }
   .kalan {
     margin-top: 12px;
     padding: 10px 12px;
@@ -153,12 +154,17 @@
   }
 
   function show(address) {
-    result.replaceChildren(element("h2", "Sonuç"));
+    const percent = (value) => "%" + Math.round(value * 100);
+    result.replaceChildren(element("h2", "Sonuç · güven " + percent(address.confidence)));
     const table = element("table");
     const found = FIELDS.filter(([key]) => address[key]);
     for (const [key, label] of found) {
       const row = element("tr");
-      row.append(element("th", label), element("td", address[key]));
+      row.append(
+        element("th", label),
+        element("td", address[key]),
+        element("td", percent(address.field_confidence[key]), "score"),
+      );
       table.append(row);
     }
     if (found.length) result.append(table);

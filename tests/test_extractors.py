@@ -193,8 +193,6 @@ def test_used_token_breaks_a_name() -> None:
     [
         ("Karayolu üzeri Güneş Apt.", "Güneş"),
         ("Okul yanı Lale Apartmanı", "Lale"),
-        ("Valilik lojmanları Şehit Ali Demir Apt.", "Şehit Ali Demir"),
-        ("Yol üzeri Devlet lojmanları Çınar Apt.", "Çınar"),
     ],
 )
 def test_building_name_starts_after_a_description(text: str, name: str) -> None:
@@ -233,3 +231,37 @@ def test_no_word_after_a_flat_or_floor_label(text: str, expected: dict[str, str]
 @pytest.mark.parametrize("text", ["Blok D No:5", "Blok K No:5"])
 def test_bare_letter_before_no_is_not_a_label(text: str) -> None:
     assert extract_numbers(tokenize(text)).fields == {"bina_no": "5"}
+
+
+@pytest.mark.parametrize(
+    ("text", "site", "building"),
+    [
+        ("Öğretmen Lojmanları", "Öğretmen Lojmanları", None),
+        ("Toki Konutları", "Toki Konutları", None),
+        ("Yol üzeri Devlet Lojmanları Çınar Apt.", "Devlet Lojmanları", "Çınar"),
+    ],
+)
+def test_lojman_is_a_site(text: str, site: str, building: str | None) -> None:
+    fields = extract_streets(tokenize(text), ()).fields
+    assert fields["site"] == site
+    assert fields.get("bina_adi") == building
+
+
+def test_site_keyword_after_lojman_wins() -> None:
+    assert extract_streets(tokenize("Polis Lojmanları Sitesi"), ()).fields == {
+        "site": "Polis Lojmanları"
+    }
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("Dış Kapı No:17 İç Kapı No:5", {"bina_no": "17", "daire": "5"}),
+        ("İç Kapı No:5 Dış Kapı No:17", {"bina_no": "17", "daire": "5"}),
+        ("Kapı No:9", {"bina_no": "9"}),
+    ],
+)
+def test_door_numbers(text: str, expected: dict[str, str]) -> None:
+    found = extract_numbers(tokenize(text))
+    assert found.fields == expected
+    assert len(found.used) == len(tokenize(text))

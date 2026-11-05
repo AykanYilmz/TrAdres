@@ -29,8 +29,8 @@ def test_allowed_edits_grow_with_length() -> None:
 
 def test_config_can_turn_fuzzy_matching_off() -> None:
     off = MatchConfig(short_edits=0, long_edits=0)
-    assert parse("Ekin Mah. Malatay", config=off).il is None
-    assert parse("Ekin Mah. Malatay").il == "Malatya"
+    assert parse("Gül Sk. No:5 Malatay", config=off).il is None
+    assert parse("Gül Sk. No:5 Malatay").il == "Malatya"
 
 
 @pytest.mark.parametrize(
@@ -102,3 +102,34 @@ def test_other_words_are_not_keywords(word: str) -> None:
 def test_typos_end_to_end(text: str, expected: tuple[str, str, str]) -> None:
     address = parse(text)
     assert (address.il, address.ilce, address.mahalle) == expected
+
+
+@pytest.mark.parametrize(
+    ("written", "expected"),
+    [
+        ("Ataturk", "Atatürk"),
+        ("19 Mayis", "19 Mayıs"),
+        ("Sehit Kurtulus", "Şehit Kurtuluş"),
+        ("Xqzw", "Xqzw"),  # unknown words stay
+        ("Çinar", "Çinar"),  # words with Turkish letters stay
+    ],
+)
+def test_respell(written: str, expected: str) -> None:
+    assert load_gazetteer().respell(written) == expected
+
+
+def test_ascii_street_names_get_their_letters_back() -> None:
+    address = parse("yeni mah ataturk cad kurtulus sk no 5 bolu merkez")
+    assert (address.cadde, address.sokak) == ("Atatürk", "Kurtuluş")
+
+
+def test_name_word_is_expanded() -> None:
+    assert parse("Kızılay Mah. gmk bulvarı No:12 Çankaya").bulvar == "Gazi Mustafa Kemal"
+
+
+@pytest.mark.parametrize(
+    ("written", "il"),
+    [("İst.", "İstanbul"), ("Ist", "İstanbul"), ("Ş.Urfa", "Şanlıurfa"), ("G.Antep", "Gaziantep")],
+)
+def test_short_province_names(written: str, il: str) -> None:
+    assert parse(f"Yeni Mah. {written}").il == il

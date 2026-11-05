@@ -8,12 +8,14 @@ from dataclasses import dataclass, replace
 from tradres.extractors import Extraction
 from tradres.gazetteer import Gazetteer, Il, Ilce
 from tradres.matching import DEFAULT_CONFIG, MatchConfig
+from tradres.scoring import Origin
 from tradres.tokenizer import Token, street_keyword
 
 __all__ = ["extract_places", "free_windows"]
 
 _MAX_NAME_WORDS = 3  # "Karadeniz Ereğli", "Kahramanmaraş" ... no name is longer
 _DISTRICT_WORDS = frozenset({"ilce", "ilcesi"})  # "Pınarbaşı ilçesi"
+_CENTRE = "merkez"  # people write it for every province, so it never proves a mismatch
 
 
 @dataclass(frozen=True)
@@ -46,6 +48,7 @@ def free_windows(tokens: Sequence[Token], used: Collection[int]) -> Iterator[Win
 class _Found:
     il: tuple[Window, Il] | None = None
     ilce: tuple[Window, Ilce] | None = None
+    mismatch: bool = False  # the district belongs to another province
 
 
 def _overlap(left: Window, right: Window) -> bool:
@@ -69,6 +72,25 @@ def _best_pair(
             if best is None or score > best[0]:
                 best = (score, _Found((il_window, il), (ilce_window, ilce)))
     return best[1] if best is not None else None
+
+
+def _wrong_province_district(
+    il_window: Window, ilceler: Sequence[tuple[Window, list[Ilce]]]
+) -> tuple[Window, Ilce] | None:
+    """A district written next to a province it does not belong to: "Kadıköy/Ankara"."""
+    for window, matches in ilceler:
+        beside = window.end in (il_window.start, il_window.start - 1) or (
+            il_window.end in (window.start, window.start - 1)
+        )
+        if beside and not _overlap(window, il_window) and window.text.casefold() != _CENTRE:
+            return window, matches[0]
+    return None
+
+
+def _before_a_longer_name(window: Window, tokens: Sequence[Token]) -> bool:
+    """True for "Söğütlü" in "Söğütlü Çeşme Mah.": it is the start of another name."""
+    closing = window.end + 1
+    return closing < len(tokens) and street_keyword(tokens[closing]) is not None
 
 
 def _with_fuzzy_ilce(
@@ -110,6 +132,9 @@ def _choose(
     if pair is not None:
         return pair
     if iller:
+        wrong = _wrong_province_district(iller[-1][0], ilceler)
+        if wrong is not None:
+            return _Found(il=iller[-1], ilce=wrong, mismatch=True)
         return _with_fuzzy_ilce(_Found(il=iller[-1]), windows, gazetteer, config)
 
     # No province as written: a misspelled one, then a one-province district name.
@@ -124,7 +149,10 @@ def _choose(
 
     unique = [(window, matches[0]) for window, matches in ilceler if len(matches) == 1]
     if unique:
-        return _Found(ilce=unique[-1])
+        best = max(
+            unique, key=lambda item: (not _before_a_longer_name(item[0], tokens), item[0].end)
+        )
+        return _Found(ilce=best)
     if misspelled:
         return _with_fuzzy_ilce(_Found(il=misspelled[-1]), windows, gazetteer, config)
     for window in reversed(windows):
@@ -149,16 +177,23 @@ def extract_places(
     """
     found = _choose(tokens, used, gazetteer, config)
     fields: dict[str, str] = {}
+    origins: dict[str, Origin] = {}
     taken: set[int] = set()
     if found.il is not None:
         window, il = found.il
         fields["il"] = il.ad
+        origins["il"] = Origin.EXACT if gazetteer.find_il(window.text) else Origin.FUZZY
         taken.update(range(window.start, window.end))
     if found.ilce is not None:
         window, ilce = found.ilce
-        fields["il"] = ilce.il
+        if found.il is None:
+            fields["il"] = ilce.il
+            origins["il"] = Origin.INFERRED
         fields["ilce"] = ilce.ad
+        origins["ilce"] = Origin.EXACT if gazetteer.find_ilce(window.text) else Origin.FUZZY
+        if found.mismatch:
+            origins["il"] = origins["ilce"] = Origin.MISMATCH
         taken.update(range(window.start, window.end))
         if window.end < len(tokens) and tokens[window.end].key in _DISTRICT_WORDS:
             taken.add(window.end)
-    return Extraction(fields=fields, used=frozenset(taken))
+    return Extraction(fields=fields, used=frozenset(taken), origins=origins)

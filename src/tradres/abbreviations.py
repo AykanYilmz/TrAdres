@@ -44,6 +44,7 @@ KINDS: frozenset[str] = frozenset(
 )
 
 _DATA_FILE = "abbreviations.json"
+_NAME_WORDS_FILE = "name_words.json"
 
 
 @dataclass(frozen=True)
@@ -141,6 +142,16 @@ def load_abbreviations() -> Mapping[str, Abbreviation]:
     if not isinstance(raw, dict):
         raise AbbreviationDataError(f"{_DATA_FILE}: top level must be an object")
     return MappingProxyType(build_index(raw))
+
+
+@cache
+def load_name_words() -> Mapping[str, str]:
+    """Short forms of words inside names, such as "gmk". See data/name_words.json."""
+    text = (files("tradres") / "data" / _NAME_WORDS_FILE).read_text(encoding="utf-8")
+    raw = json.loads(text)
+    return MappingProxyType(
+        {alias_key(key): value for key, value in raw.items() if not key.startswith("_")}
+    )
 
 
 def lookup(token: str) -> Abbreviation | None:

@@ -9,33 +9,36 @@ from __future__ import annotations
 
 from collections.abc import Collection, Sequence
 
+from tradres.abbreviations import load_name_words
 from tradres.extractors import Extraction
 from tradres.normalization import tr_title, tr_upper
+from tradres.scoring import Origin
 from tradres.tokenizer import Token, street_keyword
 
-__all__ = ["extract_streets"]
+__all__ = ["DESCRIPTION_ENDS", "extract_streets"]
 
 _FIELD_OF_KIND = {"apartman": "bina_adi"}  # the other kinds have the field's own name
 _NUMBER_WORDS = frozenset({"nolu", "numarali"})  # "1 Nolu Sokak" -> "1"
 # Words that end a description, so a building name can only start after them:
 # "karayolu üzeri Güneş Apt." -> "Güneş". They are real parts of street names
 # ("Cami Yanı Sokak"), so this rule is for building names only.
-_DESCRIPTION_ENDS = frozenset(
-    {"arkasi", "bitisigi", "civari", "karsisi", "lojmani", "lojmanlari", "onu", "uzeri", "yani"}
-)
+DESCRIPTION_ENDS = frozenset({"arkasi", "bitisigi", "civari", "karsisi", "onu", "uzeri", "yani"})
+# They work like "Sitesi", but they stay in the name: "Öğretmen Lojmanları".
+_SITE_NAME_ENDS = frozenset({"konutlari", "lojman", "lojmani", "lojmanlar", "lojmanlari"})
 
 
 def _name(tokens: Sequence[Token]) -> str:
     words = [token for token in tokens if token.key not in _NUMBER_WORDS]
     if len(words) == 1 and words[0].is_number:
         return words[0].text.rstrip(".")  # "1923. Cadde" -> "1923"
-    return tr_title(" ".join(token.text for token in words))
+    name_words = load_name_words()
+    return tr_title(" ".join(name_words.get(token.key, token.text) for token in words))
 
 
 def _after_description(names: Sequence[int], tokens: Sequence[Token]) -> list[int]:
     """Keep only the words after the last description word."""
     for position in range(len(names) - 1, -1, -1):
-        if tokens[names[position]].key in _DESCRIPTION_ENDS:
+        if tokens[names[position]].key in DESCRIPTION_ENDS:
             return list(names[position + 1 :])
     return list(names)
 
@@ -56,6 +59,15 @@ def extract_streets(tokens: Sequence[Token], used: Collection[int]) -> Extractio
             pending = []
             continue
         keyword = street_keyword(token)
+        after = tokens[index + 1] if index + 1 < len(tokens) else None
+        closes_site = token.key in _SITE_NAME_ENDS and "site" not in fields
+        if keyword is None and closes_site and not (after and street_keyword(after)):
+            names = _after_description(pending, tokens)
+            pending = []
+            if names:
+                fields["site"] = _name([tokens[i] for i in [*names, index]])
+                taken.update([*names, index])
+            continue
         if keyword is None:
             pending.append(index)
             continue
@@ -65,7 +77,7 @@ def extract_streets(tokens: Sequence[Token], used: Collection[int]) -> Extractio
         pending = []
         if field in fields:
             continue
-        if field == "bina_adi":
+        if field in ("bina_adi", "site"):
             names = _after_description(names, tokens)
         if field == "blok":
             names = names[-1:]  # a block is one piece: "Kardelen C Blok"
@@ -81,4 +93,6 @@ def extract_streets(tokens: Sequence[Token], used: Collection[int]) -> Extractio
             taken.update(names)
             taken.add(index)
 
-    return Extraction(fields=fields, used=frozenset(taken))
+    return Extraction(
+        fields=fields, used=frozenset(taken), origins=dict.fromkeys(fields, Origin.KEYWORD)
+    )

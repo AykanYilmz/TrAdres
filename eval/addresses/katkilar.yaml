@@ -12,3 +12,11 @@
   girdi: "Maltepe Mahallesi 216 Sokak Daire Numarası 4 Güzelbahçe İzmir"
   beklenen: {il: İzmir, ilce: Güzelbahçe, mahalle: Maltepe, sokak: "216", daire: "4"}
   etiketler: [tuzak]
+- id: "p009"
+  girdi: "Fıstıklık Mahallesi 24020 Sokak Dış Kapı No:9 İç Kapı No:2 Şehitkamil/Gaziantep"
+  beklenen: {il: Gaziantep, ilce: Şehitkamil, mahalle: Fıstıklık, sokak: "24020", bina_no: "9", daire: "2"}
+  etiketler: [temiz]
+- id: "p010"
+  girdi: "Akdeniz Mah. Polis Lojmanları Daire 7 Gülnar Mersin"
+  beklenen: {il: Mersin, ilce: Gülnar, mahalle: Akdeniz, site: Polis Lojmanları, daire: "7"}
+  etiketler: [site]

@@ -20,7 +20,7 @@ MAX_BODY_BYTES = 4096
 PAGE = Path(__file__).parent / "index.html"
 
 
-def parse_request(body: bytes) -> dict[str, str | None]:
+def parse_request(body: bytes) -> dict[str, object]:
     """``{"adres": "..."}`` -> the parsed fields. Raises ValueError on bad input."""
     data = json.loads(body.decode("utf-8"))
     address = data.get("adres") if isinstance(data, dict) else None

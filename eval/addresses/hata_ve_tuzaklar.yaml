@@ -128,7 +128,7 @@
 # --- Traps -------------------------------------------------------------------
 - id: "d025"
   girdi: "Yeni Mah. E 96 karayolu üzeri İl Özel İdaresi lojmanları Şehit Üsteğmen Ali Demir Apartmanı daire 6 Merkez/Afyonkarahisar"
-  beklenen: {il: Afyonkarahisar, ilce: Merkez, mahalle: Yeni, bina_adi: Şehit Üsteğmen Ali Demir, daire: "6", kalan: E 96 karayolu üzeri İl Özel İdaresi lojmanları}
+  beklenen: {il: Afyonkarahisar, ilce: Merkez, mahalle: Yeni, site: İl Özel İdaresi Lojmanları, bina_adi: Şehit Üsteğmen Ali Demir, daire: "6", kalan: E 96 karayolu üzeri}
   etiketler: [tuzak, tarif, bina_adi]
   not: "İl sözcüğü il adı getirmiyor; bina numarası yok, sadece daire var."
 - id: "d026"

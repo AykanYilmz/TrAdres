@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from tradres.abbreviations import lookup
 from tradres.extractors import Extraction
 from tradres.normalization import tr_title, tr_upper
+from tradres.scoring import Origin
 from tradres.tokenizer import Token, TokenKind, street_keyword
 
 __all__ = ["extract_numbers"]
@@ -54,6 +55,7 @@ class _Scanner:
         self.tokens = tokens
         self.fields: dict[str, str] = {}
         self.used: set[int] = set()
+        self.origins: dict[str, Origin] = {}
 
     def at(self, index: int) -> Token | None:
         return self.tokens[index] if 0 <= index < len(self.tokens) else None
@@ -65,11 +67,18 @@ class _Scanner:
     def building(self, index: int) -> None:
         """``No:`` at ``index``, then 5, 5/3 or 7/A."""
         value = self.at(index + 1)
+        before, earlier = self.at(index - 1), self.at(index - 2)
+        door = before is not None and before.key == "kapi"
+        if door and earlier is not None and earlier.key == "ic":  # "İç Kapı No: 5": the flat
+            if value is not None and value.is_number and "daire" not in self.fields:
+                self.take("daire", _digits(value), index - 2, index - 1, index, index + 1)
+            return
         if value is None or not value.is_number or "bina_no" in self.fields:
             return
-        before = self.at(index - 1)
-        if before is not None and before.key == "bina":  # "Bina No: 5"
+        if before is not None and (door or before.key == "bina"):  # "Bina No", "Dış Kapı No"
             self.used.add(index - 1)
+        if door and earlier is not None and earlier.key == "dis":
+            self.used.add(index - 2)
         number, slash, flat = _digits(value).partition("/")
         if slash and "daire" not in self.fields:
             self.take("bina_no", number, index, index + 1)
@@ -142,10 +151,12 @@ class _Scanner:
             if _POSTAL_CODE.fullmatch(token.text):
                 if "posta_kodu" not in self.fields:
                     self.take("posta_kodu", token.text, index)
+                self.origins["posta_kodu"] = Origin.KEYWORD
             elif "/" in token.text and not {"bina_no", "daire"} & set(self.fields):
                 number, _, flat = token.text.partition("/")
                 self.take("bina_no", number, index)
                 self.take("daire", flat, index)
+                self.origins.update(bina_no=Origin.KEYWORD, daire=Origin.KEYWORD)
 
 
 def extract_numbers(tokens: Sequence[Token]) -> Extraction:
@@ -166,4 +177,4 @@ def extract_numbers(tokens: Sequence[Token]) -> Extraction:
         if index not in scanner.used:
             scanner.labelled(index)
     scanner.bare_values()
-    return Extraction(fields=scanner.fields, used=frozenset(scanner.used))
+    return Extraction(fields=scanner.fields, used=frozenset(scanner.used), origins=scanner.origins)

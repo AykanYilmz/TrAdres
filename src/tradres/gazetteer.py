@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import gzip
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from functools import cache, cached_property
@@ -253,6 +253,43 @@ class Gazetteer:
         pool = {ascii_key(m.ad): m for m in self.mahalleleri(il, ilce)}
         hit = closest(key, pool, config)
         return pool[hit] if hit is not None else None
+
+    # ------------------------------------------------------------------ #
+    # Spelling
+    # ------------------------------------------------------------------ #
+
+    @cached_property
+    def _word_spellings(self) -> dict[str, str]:
+        """ASCII key -> the most common spelling among all place-name words."""
+        counts: dict[str, Counter[str]] = defaultdict(Counter)
+        names = [
+            *(il.ad for il in self.iller),
+            *(i.ad for ilceler in self._ilceler.values() for i in ilceler),
+            *(m.ad for mahalleler in self._mahalleler.values() for m in mahalleler),
+        ]
+        for name in names:
+            for word in name.split():
+                if word.isalpha():
+                    counts[ascii_key(word)][word] += 1
+        return {key: found.most_common(1)[0][0] for key, found in counts.items()}
+
+    def respell(self, name: str) -> str:
+        """Bring back the Turkish letters of words typed in plain ASCII.
+
+        Place names are the best word list we have: "Atatürk", "Kurtuluş" and
+        "Şehit" are in thousands of them. Words that already have Turkish
+        letters are left alone, and so are words we do not know.
+
+        >>> load_gazetteer().respell("19 Mayis")
+        '19 Mayıs'
+        >>> load_gazetteer().respell("Ataturk Bulvarı")
+        'Atatürk Bulvarı'
+        """
+        spellings = self._word_spellings
+        words = name.split()
+        return " ".join(
+            spellings.get(ascii_key(word), word) if word.isascii() else word for word in words
+        )
 
     def __repr__(self) -> str:
         counts = (

@@ -6,13 +6,18 @@ from collections.abc import Collection, Mapping, Sequence
 
 from tradres.extractors.numbers import extract_numbers
 from tradres.extractors.places import extract_places, free_windows
-from tradres.extractors.streets import extract_streets
+from tradres.extractors.streets import DESCRIPTION_ENDS, extract_streets
 from tradres.gazetteer import Gazetteer, load_gazetteer
 from tradres.matching import DEFAULT_CONFIG, MatchConfig
 from tradres.models import Address
+from tradres.normalization import tr_title
+from tradres.scoring import Origin, score_address
 from tradres.tokenizer import Token, street_keyword, tokenize
 
 __all__ = ["parse"]
+
+_NAME_FIELDS = ("bulvar", "cadde", "sokak", "site", "bina_adi")
+_MAX_LOOSE_NAME_WORDS = 2
 
 
 def official_mahalle(
@@ -20,23 +25,33 @@ def official_mahalle(
     fields: Mapping[str, str],
     gazetteer: Gazetteer,
     config: MatchConfig = DEFAULT_CONFIG,
-) -> str:
-    """Official spelling of a mahalle.
+) -> tuple[str, Origin]:
+    """Official spelling of a mahalle, and how far we can trust it.
 
-    Search the same district, the same province, a typo inside the district,
-    and then everywhere. If nothing fits, the name stays as written.
+    Search the same district, the same province, and then everywhere. A name
+    that exists somewhere is a real name, not a typo, so a typo inside the
+    district comes last. If nothing fits, the name stays as written.
     """
     il, ilce = fields.get("il"), fields.get("ilce")
-    for filters in ({"il": il, "ilce": ilce}, {"il": il}):
+    for filters in ({"il": il, "ilce": ilce}, {"il": il}, {}):
         matches = gazetteer.find_mahalle(name, **filters)
         if matches:
-            return matches[0].ad
+            trusted = filters.get("il") is not None or il is None
+            return matches[0].ad, Origin.EXACT if trusted else Origin.UNVERIFIED
     if il is not None and ilce is not None:
         corrected = gazetteer.fuzzy_mahalle(name, il=il, ilce=ilce, config=config)
         if corrected is not None:
-            return corrected.ad
-    matches = gazetteer.find_mahalle(name)
-    return matches[0].ad if matches else name
+            return corrected.ad, Origin.FUZZY
+    return gazetteer.respell(name), Origin.UNVERIFIED
+
+
+def district_of_mahalle(fields: Mapping[str, str], gazetteer: Gazetteer) -> tuple[str, str] | None:
+    """The (il, ilçe) a mahalle fixes, when only one place has that name."""
+    if "mahalle" not in fields or "ilce" in fields:
+        return None
+    matches = gazetteer.find_mahalle(fields["mahalle"], il=fields.get("il"))
+    places = {(match.il, match.ilce) for match in matches}
+    return places.pop() if len(places) == 1 else None
 
 
 def mahalle_without_keyword(
@@ -61,6 +76,27 @@ def mahalle_without_keyword(
     return None
 
 
+def loose_mahalle(tokens: Sequence[Token], used: Collection[int]) -> list[int]:
+    """Words standing alone, which may name an area the gazetteer does not list.
+
+    "Yenimahalle Ankara, Batıkent, 1923. Cadde": il and ilçe are known and
+    "Batıkent" is a separate piece of one or two words. Numbers, keywords and
+    directions ("okul yanı") do not count.
+    """
+    run: list[int] = []
+    for index, token in enumerate([*tokens, None]):
+        if token is not None and index not in used and not token.is_separator:
+            run.append(index)
+            continue
+        words = [tokens[i] for i in run]
+        if 0 < len(run) <= _MAX_LOOSE_NAME_WORDS and not any(
+            word.is_number or word.key in DESCRIPTION_ENDS or street_keyword(word) for word in words
+        ):
+            return run
+        run = []
+    return []
+
+
 def number_after_keyword(tokens: Sequence[Token], used: Collection[int]) -> int | None:
     """A bare number right after a street keyword: "Gazi Cad. 15"."""
     for index in range(1, len(tokens)):
@@ -83,32 +119,59 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
     gazetteer = load_gazetteer()
     tokens = tokenize(text)
     fields: dict[str, str] = {}
+    origins: dict[str, Origin] = {}
     used: set[int] = set()
 
     numbers = extract_numbers(tokens)
     fields.update(numbers.fields)
+    origins.update(dict.fromkeys(numbers.fields, Origin.EXACT), **numbers.origins)
     used |= numbers.used
 
     places = extract_places(tokens, used, gazetteer, config)
     fields.update(places.fields)
+    origins.update(places.origins)
     used |= places.used
 
     streets = extract_streets(tokens, used)
     fields.update(streets.fields)
+    origins.update(streets.origins)
     used |= streets.used
 
+    for field in _NAME_FIELDS:
+        if field in fields:
+            fields[field] = gazetteer.respell(fields[field])
+
     if "mahalle" in fields:
-        fields["mahalle"] = official_mahalle(fields["mahalle"], fields, gazetteer, config)
+        fields["mahalle"], origins["mahalle"] = official_mahalle(
+            fields["mahalle"], fields, gazetteer, config
+        )
     else:
         found = mahalle_without_keyword(tokens, used, fields, gazetteer)
         if found is not None:
             fields["mahalle"] = found[0]
+            origins["mahalle"] = Origin.EXACT
             used.update(found[1])
+        elif "il" in fields and "ilce" in fields:
+            loose = loose_mahalle(tokens, used)
+            if loose:
+                name = tr_title(" ".join(tokens[index].text for index in loose))
+                fields["mahalle"] = gazetteer.respell(name)
+                origins["mahalle"] = Origin.UNVERIFIED
+                used.update(loose)
+
+    place = district_of_mahalle(fields, gazetteer)
+    if place is not None:
+        fields["ilce"] = place[1]
+        origins["ilce"] = Origin.INFERRED
+        if "il" not in fields:
+            fields["il"] = place[0]
+            origins["il"] = Origin.INFERRED
 
     if "bina_no" not in fields:
         index = number_after_keyword(tokens, used)
         if index is not None:
             fields["bina_no"] = tokens[index].text.rstrip(".")
+            origins["bina_no"] = Origin.KEYWORD
             used.add(index)
 
     rest = [
@@ -116,4 +179,11 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
         for index, token in enumerate(tokens)
         if index not in used and not token.is_separator
     ]
-    return Address(**fields, kalan=" ".join(rest) or None)
+    words = sum(not token.is_separator for token in tokens)
+    scores = score_address(origins, total_words=words, leftover_words=len(rest))
+    return Address(
+        **fields,
+        kalan=" ".join(rest) or None,
+        confidence=scores.overall,
+        field_confidence=scores.fields,
+    )
