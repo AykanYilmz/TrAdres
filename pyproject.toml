@@ -46,6 +46,7 @@ packages = ["src/tradres"]
 dev = [
     "hypothesis>=6.168.5",
     "mypy>=2.4.1",
+    "pip>=26.3",
     "pre-commit>=4.6.2",
     "pytest>=9.2.0",
     "pytest-cov>=7.1.0",
