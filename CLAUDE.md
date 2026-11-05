@@ -178,7 +178,7 @@ Her faz sonunda dur ve onayımı bekle.
   - `gazetteer.py`: `load_gazetteer()` (lazy + cache), `find_il/find_ilce/find_mahalle/provinces_of_district`, ilk yükleme ~0.3 s.
   - Wheel 206 KiB. 268 test, kapsam %98.6. `DATA_SOURCES.md` yazıldı.
   - Açık soru: eksik ~%11 mahallenin doğruluğa etkisi Faz 3'te ölçülecek; gerekirse Wikidata'ya katkı / ek dosya.
-- [x] Faz 3 — Değerlendirme seti (2026-11-05, onay bekliyor)
+- [x] Faz 3 — Değerlendirme seti (2026-11-05, onaylandı)
   - `eval/addresses/*.yaml`: elle etiketlenmiş 313 adres, 20 etiket, 69 il. `python -m eval` (`--parser`, `--failures`, `--tag`, `--markdown`, `--check`, `--min-f1`, `--min-exact`).
   - Baseline (`eval/baseline.py`): F1 0.881, tam doğru %47.0. Parser v1 bunu geçmeli. Set beklenenden kolay: katkılarla zorlaştırılmalı.
   - Set gazetteer'dan bağımsız örneklendi: 43 adres `gazetteer_disi` (%13.7), 1 adres `gazetteer_yazim_farki`.
