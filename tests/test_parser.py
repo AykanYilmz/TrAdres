@@ -231,3 +231,9 @@ def test_repeated_place_is_not_left_over(text: str) -> None:
 def test_piece_between_commas_is_a_site(text: str, site: str | None, kalan: str | None) -> None:
     address = parse(text)
     assert (address.site, address.kalan) == (site, kalan)
+
+
+def test_words_before_a_building_number_are_not_a_mahalle() -> None:
+    address = parse("Kordon Boyu No:6 Karşıyaka/İzmir")
+    assert (address.mahalle, address.bina_no) == (None, "6")
+    assert address.kalan == "Kordon Boyu"

@@ -32,6 +32,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
@@ -40,6 +41,7 @@ from tradres.normalization import ascii_key  # noqa: E402  (needs the sys.path l
 
 RAW_DIR = ROOT / "data" / "raw"
 CORRECTIONS = Path(__file__).resolve().parent / "gazetteer_corrections.json"
+ADDITIONS = Path(__file__).resolve().parent / "gazetteer_additions.json"
 OUTPUT = ROOT / "src" / "tradres" / "data" / "gazetteer.json.gz"
 
 ENDPOINT = "https://query.wikidata.org/sparql"
@@ -468,13 +470,44 @@ def to_payload(provinces: Mapping[str, Province], retrieved: str) -> dict[str, o
     }
 
 
+def _district_of(provinces: Mapping[str, Province], entry: Mapping[str, str]) -> District:
+    for province in provinces.values():
+        if province.name == entry["il"]:
+            for district in province.districts.values():
+                if district.name == entry["ilce"]:
+                    return district
+    raise ValueError(f"additions: no district {entry['il']}/{entry['ilce']}")
+
+
+def apply_additions(provinces: Mapping[str, Province], additions: Mapping[str, Any]) -> None:
+    """Apply gazetteer_additions.json. An entry that is no longer needed is an error."""
+    for entry in [*additions.get("renames", []), *additions.get("mahalleler", [])]:
+        if not entry.get("source"):
+            raise ValueError(f"additions: {entry} needs a 'source'")
+    for entry in additions.get("renames", []):
+        district = _district_of(provinces, entry)
+        if entry["from"] not in district.settlements or entry["to"] in district.settlements:
+            raise ValueError(f"additions: stale rename {entry['from']} -> {entry['to']}")
+        district.settlements.remove(entry["from"])
+        district.settlements.add(entry["to"])
+    for entry in additions.get("mahalleler", []):
+        district = _district_of(provinces, entry)
+        if entry["ad"] in district.settlements:
+            raise ValueError(f"additions: {entry['ad']} is already in the data, remove it")
+        district.settlements.add(entry["ad"])
+
+
 def build(
-    raw: Mapping[str, list[Row]], corrections: Corrections, retrieved: str
+    raw: Mapping[str, list[Row]],
+    corrections: Corrections,
+    retrieved: str,
+    additions: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, object], BuildReport]:
     report = BuildReport()
     provinces = build_provinces(raw["provinces"], corrections)
     districts = add_districts(provinces, raw["districts"], corrections, report)
     add_settlements(provinces, districts, raw["mahalleler"] + raw["koyler"], report)
+    apply_additions(provinces, additions or {})
     return to_payload(provinces, retrieved), report
 
 
@@ -524,7 +557,8 @@ def main(argv: Iterable[str] | None = None) -> None:  # pragma: no cover
 
     print("transform")
     corrections = Corrections.from_json(json.loads(CORRECTIONS.read_text(encoding="utf-8")))
-    payload, report = build(raw, corrections, retrieved)
+    additions = json.loads(ADDITIONS.read_text(encoding="utf-8"))
+    payload, report = build(raw, corrections, retrieved, additions)
     print_summary(payload, report)
 
     print("write")

@@ -1,0 +1,25 @@
+{
+  "_comment": [
+    "Reviewed mahalle fixes that Wikidata does not have yet, applied by build_gazetteer.py.",
+    "Add one entry at a time, for a name you met in practice. Every entry needs a",
+    "public 'source' page that shows the name. Do not copy from bulk lists.",
+    "The build fails when an entry is no longer needed, so stale entries get removed."
+  ],
+  "renames": [
+    {
+      "il": "Ağrı",
+      "ilce": "Merkez",
+      "from": "Firat",
+      "to": "Fırat",
+      "source": "https://www.ntv.com.tr/posta-kodu-ogrenme/agri/merkez/firat-mahallesi-posta-kodu-ogrenme"
+    }
+  ],
+  "mahalleler": [
+    {
+      "il": "Kırşehir",
+      "ilce": "Merkez",
+      "ad": "Kuşdilli",
+      "source": "https://www.ntv.com.tr/posta-kodu-ogrenme/kirsehir/merkez/kusdilli-mahallesi-posta-kodu-ogrenme"
+    }
+  ]
+}

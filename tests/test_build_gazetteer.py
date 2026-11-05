@@ -286,3 +286,46 @@ def test_output_is_sorted_and_versioned() -> None:
     )
     assert payload["format"] == bg.FORMAT_VERSION
     assert _districts(payload, "Bolu") == {"Merkez": ["Çay", "Zeytin"]}
+
+
+# --------------------------------------------------------------------------- #
+# Reviewed additions
+# --------------------------------------------------------------------------- #
+
+DISTRICT = {"item": "Q10", "label": "Mengen", "parent": "Q1"}
+SETTLEMENT = {"item": "Q20", "label": "Firat", "parent": "Q10"}
+SOURCE = "https://example.org/page"
+
+
+def _with_additions(additions: dict[str, Any]) -> dict[str, list[str]]:
+    raw = {
+        "provinces": PROVINCES,
+        "districts": [DISTRICT],
+        "mahalleler": [SETTLEMENT],
+        "koyler": [],
+    }
+    payload, _ = bg.build(raw, bg.Corrections(), "2026-01-01", additions)
+    return _districts(payload, "Bolu")
+
+
+RENAME = {"il": "Bolu", "ilce": "Mengen", "from": "Firat", "to": "Fırat", "source": SOURCE}
+ADDED = {"il": "Bolu", "ilce": "Mengen", "ad": "Kuşdilli", "source": SOURCE}
+
+
+def test_additions_are_applied() -> None:
+    districts = _with_additions({"renames": [RENAME], "mahalleler": [ADDED]})
+    assert sorted(districts["Mengen"]) == ["Fırat", "Kuşdilli"]
+
+
+@pytest.mark.parametrize(
+    "additions",
+    [
+        {"renames": [{**RENAME, "from": "Yok"}]},  # the old name is gone: Wikidata was fixed
+        {"mahalleler": [{**ADDED, "ad": "Firat"}]},  # already in the data
+        {"mahalleler": [{**ADDED, "ilce": "Yok"}]},  # unknown district
+        {"mahalleler": [{**ADDED, "source": ""}]},  # no source
+    ],
+)
+def test_bad_additions_stop_the_build(additions: dict[str, Any]) -> None:
+    with pytest.raises(ValueError, match="additions"):
+        _with_additions(additions)

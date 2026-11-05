@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Collection, Mapping, Sequence
 
-from tradres.abbreviations import load_description_words
+from tradres.abbreviations import load_description_words, lookup
 from tradres.extractors.numbers import extract_numbers
 from tradres.extractors.places import extract_places, free_windows
 from tradres.extractors.streets import extract_streets
@@ -116,6 +116,15 @@ def loose_words(
     return []
 
 
+def before_number_word(tokens: Sequence[Token], run: Sequence[int]) -> bool:
+    """True for "Kordon Boyu No:6": a street without a keyword, not an area name."""
+    following = run[-1] + 1
+    if following >= len(tokens):
+        return False
+    found = lookup(tokens[following].text)
+    return found is not None and found.kind == "bina_no"
+
+
 def repeated_places(
     tokens: Sequence[Token],
     used: Collection[int],
@@ -211,7 +220,7 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
             used.update(found[1])
         elif "il" in fields and "ilce" in fields:
             loose = loose_words(tokens, used, max_words=_MAX_LOOSE_MAHALLE_WORDS)
-            if loose:
+            if loose and not before_number_word(tokens, loose):
                 name = tr_title(" ".join(tokens[index].text for index in loose))
                 fields["mahalle"] = gazetteer.respell(name)
                 origins["mahalle"] = Origin.UNVERIFIED

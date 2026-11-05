@@ -94,7 +94,11 @@ request when you update the data.
 
 1. **Best:** fix it on Wikidata (anyone can edit). The next rebuild picks
    it up, and every other Wikidata user benefits too.
-2. **Quick:** add an entry to `scripts/gazetteer_corrections.json` with
+2. **Missing or misspelled mahalle:** add an entry to
+   `scripts/gazetteer_additions.json` with a public source page. One name at a
+   time; do not copy from bulk lists. The build fails when an entry is no
+   longer needed.
+3. **Quick:** add an entry to `scripts/gazetteer_corrections.json` with
    the item's QID and a short reason, rebuild, and open a pull request.
    When Wikidata is fixed, the entry can be removed.
 
