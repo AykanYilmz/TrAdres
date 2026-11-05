@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TrAdres Demo</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f6f4;
+    --panel: #ffffff;
+    --text: #1f2328;
+    --muted: #6a7078;
+    --line: #dcdedf;
+    --accent: #0f6e63;
+    --accent-text: #ffffff;
+    --warn: #8a5a00;
+    --warn-bg: #fff4dc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181b;
+      --panel: #1f2226;
+      --text: #e8e9ea;
+      --muted: #9aa0a6;
+      --line: #34383d;
+      --accent: #4fc1b0;
+      --accent-text: #0d1f1c;
+      --warn: #f1c26b;
+      --warn-bg: #3a2e16;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 16px 48px;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 640px; margin: 0 auto; }
+  h1 { margin: 0; font-size: 26px; }
+  .intro { margin: 4px 0 20px; color: var(--muted); }
+  label { display: block; margin-bottom: 6px; font-weight: 600; }
+  textarea {
+    display: block;
+    width: 100%;
+    min-height: 92px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+    color: var(--text);
+    font: inherit;
+    resize: vertical;
+  }
+  textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .actions { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .primary {
+    padding: 9px 20px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--accent-text);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .hint { color: var(--muted); font-size: 14px; }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .examples button {
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .examples button:hover { color: var(--text); border-color: var(--muted); }
+  #result { margin-top: 28px; }
+  h2 { margin: 0 0 8px; font-size: 18px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; }
+  tr:last-child th, tr:last-child td { border-bottom: 0; }
+  th { width: 34%; color: var(--muted); font-weight: 500; }
+  td { overflow-wrap: anywhere; }
+  .empty-field { color: var(--muted); }
+  .kalan {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--warn-bg);
+    color: var(--warn);
+    overflow-wrap: anywhere;
+  }
+  .error { color: #c0392b; }
+  footer { margin-top: 28px; color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>TrAdres</h1>
+  <p class="intro">Dağınık yazılmış bir Türkçe adresi parçalarına ayırır.</p>
+
+  <form id="form">
+    <label for="adres">Adres</label>
+    <textarea id="adres" maxlength="1000" placeholder="Örnek: ataturk mh 23nisan cd no 5 d 3 bolu merkez" autofocus></textarea>
+    <div class="actions">
+      <button class="primary" type="submit">Ayrıştır</button>
+      <span class="hint">Ctrl + Enter</span>
+    </div>
+  </form>
+
+  <div class="examples" id="examples" aria-label="Örnek adresler"></div>
+
+  <section id="result" aria-live="polite"></section>
+
+  <footer>Bu sayfa sadece bilgisayarında çalışır. Yazdığın adres kaydedilmez ve internete gönderilmez.</footer>
+</main>
+
+<script>
+  const FIELDS = [
+    ["il", "İl"], ["ilce", "İlçe"], ["mahalle", "Mahalle / Köy"], ["bulvar", "Bulvar"],
+    ["cadde", "Cadde"], ["sokak", "Sokak"], ["site", "Site"], ["bina_adi", "Bina adı"],
+    ["blok", "Blok"], ["bina_no", "Bina no"], ["kat", "Kat"], ["daire", "Daire"],
+    ["posta_kodu", "Posta kodu"],
+  ];
+  const EXAMPLES = [
+    "Atatürk Mah. 23 Nisan Cad. No:5/3 Merkez/Bolu",
+    "ataturk mh 23nisan cd no 5 d 3 bolu merkez",
+    "Çankaya Ankara Kızılay Mahallesi Gazi Mustafa Kemal Blv. No: 12 Kat: 4 Daire: 8",
+    "Yenimahalle Ankara, Batıkent, 1923. Cadde, Toki Konutları B-3 Blok, No:7, D:14",
+  ];
+
+  const form = document.getElementById("form");
+  const input = document.getElementById("adres");
+  const result = document.getElementById("result");
+
+  function element(tag, text, className) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;  // textContent: input is never run as HTML
+    if (className) node.className = className;
+    return node;
+  }
+
+  function show(address) {
+    result.replaceChildren(element("h2", "Sonuç"));
+    const table = element("table");
+    const found = FIELDS.filter(([key]) => address[key]);
+    for (const [key, label] of found) {
+      const row = element("tr");
+      row.append(element("th", label), element("td", address[key]));
+      table.append(row);
+    }
+    if (found.length) result.append(table);
+    else result.append(element("p", "Hiçbir alan bulunamadı.", "empty-field"));
+    if (address.kalan) result.append(element("div", "Anlaşılamayan kısım: " + address.kalan, "kalan"));
+  }
+
+  async function send() {
+    const text = input.value.trim();
+    if (!text) { result.replaceChildren(); return; }
+    try {
+      const response = await fetch("/parse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adres: text }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.hata);
+      show(data);
+    } catch (error) {
+      result.replaceChildren(element("p", "Hata: " + error.message, "error"));
+    }
+  }
+
+  form.addEventListener("submit", (event) => { event.preventDefault(); send(); });
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && event.ctrlKey) send();
+  });
+  for (const example of EXAMPLES) {
+    const button = element("button", example.length > 34 ? example.slice(0, 32) + "…" : example);
+    button.type = "button";
+    button.title = example;
+    button.addEventListener("click", () => { input.value = example; send(); });
+    document.getElementById("examples").append(button);
+  }
+</script>
+</body>
+</html>
