@@ -191,7 +191,7 @@ Her faz sonunda dur ve onayımı bekle.
   - Yerel demo: `python -m demo` → http://127.0.0.1:8000. Sadece stdlib, sadece localhost, adres kaydetmez. Pakete dahil değil.
   - Faz 5'e kalanlar: yazım hatası (`yazim_hatasi` %27.3), ASCII cadde/sokak adlarının Türkçeleştirilmesi, mahalleden ilçe çıkarımı, `İst.`/`Ş.Urfa`/`G.Antep` kısa adları, `gmk`.
   - Demoda bulunan hata düzeltildi: tarif sözcükleri (`üzeri`, `yanı`, `lojmanları`...) bina adına karışıyordu. Önce F1 0.977, %88.8 (278/313) → sonra **F1 0.979, %89.5 (280/313)**; `bina_adi` F1 0.815 → 0.963.
-- [x] Faz 5 — İyileştirme (2026-11-05, onay bekliyor)
+- [x] Faz 5 — İyileştirme (2026-11-05, onaylandı)
   - Önce kilitli test seti: `eval/holdout/test.yaml`, 100 adres, 48 il, geliştirme setiyle ortak mahalle yok. `python -m eval --holdout` sadece toplamları gösterir.
   - **Kilitli test seti: F1 0.966 → 0.975, tam doğru %82.0 → %89.0** (baseline F1 0.824, %38.0). Geliştirme seti: F1 0.979 → 0.996, 283/316 → 312/318 (%98.1). İkisi arasındaki fark ezberin ölçüsü: README'de kilitli test sayısı kullanılacak.
   - Adımlar (geliştirme seti, tam doğru): `Daire No` 283/316 → bulanık eşleştirme 297 → Türkçe harf + kısa adlar 303 → çıkarım, hiyerarşi, lojman, kapı no 310/318 → gevşek mahalle 312/318.
@@ -204,7 +204,7 @@ Her faz sonunda dur ve onayımı bekle.
   - **Son ölçüm: test seti 1 %90.0 (100 adres, F1 0.976), yeni test seti 2 %94.0 (50 adres, F1 0.989, baseline %44.0), geliştirme 320/323 (%99.1).** Test seti 2 de aynı kişi tarafından, kurallar bilinerek yazıldı ve küçük; gerçek dünya sayısı değil.
   - Demo kod değişince kendini yeniden başlatıyor (`--no-reload` ile kapanır).
   - Bilinen hatalar: `Sinir` (kelime listesinde yok), `Ankara Kızılay Atatürk Blv.`, anahtarsız `Marina Residence`. 144 mahalle yazım farkı açık kaldı.
-- [ ] Faz 6 — CLI ve API yüzeyi
+- [ ] Faz 6 — CLI ve API yüzeyi (sonunda: Google Maps adresleriyle gerçek deneme, Faz 7'den önce)
 - [ ] Faz 7 — Açık kaynak altyapısı
 - [ ] Faz 8 — README ve v0.1.0
 - [ ] Faz 9 — Tanıtım
@@ -238,6 +238,7 @@ Her faz sonunda dur ve onayımı bekle.
 - **Web demosu Faz 4 sonunda, stdlib ile** (`http.server`): parser olmadan gösterecek şey yoktu; bağımlılık eklememek için FastAPI kullanılmadı. Hugging Face demosu v0.2 planında kalıyor.
 - **Tarif sözcüğü kuralı sadece bina adında:** `Cami Yanı Sokak`, `Kale Arkası Cad.` gerçek sokak adları, bu yüzden cadde/sokakta uygulanmıyor. `... Lojmanları` şimdilik `kalan`'a gidiyor.
 - **Hedef daraltıldı (2026-11-05, Aykan):** TrAdres bir form aracı değil, veri temizleme aracı: dağınık adres içeren CSV ve eski kayıtları temizleyen, CLI odaklı kütüphane. Yeni formlarda ayrı kutular daha iyi. Talep ve rakip araştırması şimdilik yapılmadı; README ve tanıtımda büyük talep iddiası yazılmayacak.
+- **Gerçek adres denemesi Faz 6 sonunda:** Aykan internetten bulduğu adresleri `tradres parse-csv` ile toplu dener. Hatalar kalıp olarak geliştirme setine girer; numaralar ve binalar uydurulur, adresler olduğu gibi depoya girmez.
 - **Faz 6'dan önce yer verisi güçlendirilecek** (Aykan kabul etti); kaynak seçimi Aykan'da.
 - **Fuzzy: rapidfuzz + OSA.** Takas (`Malatay`) 1 düzeltme sayılır. Eşitlikte tahmin edilmez. Kısa kelime düzeltilmez (`Van`/`Yan`). Mahalle için alt sınır daha yüksek: eksik bir `Çınar` `Pınar` olmamalı.
 - **Birebir ad, fuzzy'den önce gelir:** Türkiye'nin herhangi bir yerinde birebir geçen mahalle gerçek ad sayılır (`Ulucami` → `Uluçam` hatası böyle çözüldü).
