@@ -239,6 +239,7 @@ Her faz sonunda dur ve onayımı bekle.
 - **Tarif sözcüğü kuralı sadece bina adında:** `Cami Yanı Sokak`, `Kale Arkası Cad.` gerçek sokak adları, bu yüzden cadde/sokakta uygulanmıyor. `... Lojmanları` şimdilik `kalan`'a gidiyor.
 - **Hedef daraltıldı (2026-11-05, Aykan):** TrAdres bir form aracı değil, veri temizleme aracı: dağınık adres içeren CSV ve eski kayıtları temizleyen, CLI odaklı kütüphane. Yeni formlarda ayrı kutular daha iyi. Talep ve rakip araştırması şimdilik yapılmadı; README ve tanıtımda büyük talep iddiası yazılmayacak.
 - **Gerçek adres denemesi Faz 6 sonunda:** Aykan internetten bulduğu adresleri `tradres parse-csv` ile toplu dener. Hatalar kalıp olarak geliştirme setine girer; numaralar ve binalar uydurulur, adresler olduğu gibi depoya girmez.
+- **Deneme sırası:** önce düzenli adresler (Google Maps) oturtulacak, karmaşık veri ondan sonra ele alınacak (Aykan, 2026-11-05). v0.1 hedefi dağınık CSV temizliği olduğu için karmaşık veri denemesi unutulmamalı.
 - **Faz 6'dan önce yer verisi güçlendirilecek** (Aykan kabul etti); kaynak seçimi Aykan'da.
 - **Fuzzy: rapidfuzz + OSA.** Takas (`Malatay`) 1 düzeltme sayılır. Eşitlikte tahmin edilmez. Kısa kelime düzeltilmez (`Van`/`Yan`). Mahalle için alt sınır daha yüksek: eksik bir `Çınar` `Pınar` olmamalı.
 - **Birebir ad, fuzzy'den önce gelir:** Türkiye'nin herhangi bir yerinde birebir geçen mahalle gerçek ad sayılır (`Ulucami` → `Uluçam` hatası böyle çözüldü).
