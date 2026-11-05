@@ -1,4 +1,14 @@
-"""TrAdres: parse, normalize and validate Turkish addresses."""
+"""TrAdres: parse, normalize and validate Turkish addresses.
+
+>>> from tradres import parse
+>>> address = parse("ataturk mh 23nisan cd no 5 d 3 bolu merkez")
+>>> address.il, address.mahalle, address.cadde
+('Bolu', 'Atatürk', '23 Nisan')
+>>> address.format()
+'Atatürk Mah. 23 Nisan Cad. No:5 D:3 Merkez/Bolu'
+>>> address.confidence > 0.9
+True
+"""
 
 from importlib.metadata import PackageNotFoundError, version
 

@@ -187,7 +187,9 @@ def number_after_keyword(tokens: Sequence[Token], used: Collection[int]) -> int 
 def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
     """Split a Turkish address into its parts.
 
-    ``config`` sets how far a misspelled place name may be from the real one.
+    The result is always an :class:`Address`: text that makes no sense gives
+    empty fields and goes to ``kalan``. It does not raise an error. ``config``
+    sets how far a misspelled place name may be from the real one.
 
     >>> address = parse("Kızılay Mah. Gül Sk. No:5/3 Çankaya/Ankara")
     >>> address.il, address.ilce, address.mahalle, address.sokak
