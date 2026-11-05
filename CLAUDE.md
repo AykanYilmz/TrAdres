@@ -192,7 +192,15 @@ Her faz sonunda dur ve onayımı bekle.
   - Yerel demo: `python -m demo` → http://127.0.0.1:8000. Sadece stdlib, sadece localhost, adres kaydetmez. Pakete dahil değil.
   - Faz 5'e kalanlar: yazım hatası (`yazim_hatasi` %27.3), ASCII cadde/sokak adlarının Türkçeleştirilmesi, mahalleden ilçe çıkarımı, `İst.`/`Ş.Urfa`/`G.Antep` kısa adları, `gmk`.
   - Demoda bulunan hata düzeltildi: tarif sözcükleri (`üzeri`, `yanı`, `lojmanları`...) bina adına karışıyordu. Önce F1 0.977, %88.8 (278/313) → sonra **F1 0.979, %89.5 (280/313)**; `bina_adi` F1 0.815 → 0.963.
-- [ ] Faz 5 — İyileştirme
+- [x] Faz 5 — İyileştirme (2026-11-05, onay bekliyor)
+  - Önce kilitli test seti: `eval/holdout/test.yaml`, 100 adres, 48 il, geliştirme setiyle ortak mahalle yok. `python -m eval --holdout` sadece toplamları gösterir.
+  - **Kilitli test seti: F1 0.966 → 0.975, tam doğru %82.0 → %89.0** (baseline F1 0.824, %38.0). Geliştirme seti: F1 0.979 → 0.996, 283/316 → 312/318 (%98.1). İkisi arasındaki fark ezberin ölçüsü: README'de kilitli test sayısı kullanılacak.
+  - Adımlar (geliştirme seti, tam doğru): `Daire No` 283/316 → bulanık eşleştirme 297 → Türkçe harf + kısa adlar 303 → çıkarım, hiyerarşi, lojman, kapı no 310/318 → gevşek mahalle 312/318.
+  - Yeni: `matching.py` (`MatchConfig`, OSA), `scoring.py` (`Origin`, `score_address`), `Gazetteer.fuzzy_*`/`respell`, `data/name_words.json`. `parse(text, config=...)`, `Address.confidence`, `Address.field_confidence`. Demo güven gösteriyor.
+  - Hız ~222 µs/adres (önce ~174), wheel 228 KiB, rapidfuzz ilk çekirdek bağımlılık. CI eşiği `--min-f1 0.98 --min-exact 0.95`.
+  - Sızıntı: test setinin ilk ölçümünde etiket grupları ekrana geldi, sonra kapatıldı; `İç Kapı No` kuralı test setindeki bir adresten önce biliniyordu ve geliştirme setine de eklendi. Test seti aynı kişi tarafından yazıldı. v0.1 öncesi yeni adreslerle tazelenmeli.
+  - Güven skoru açıklanabilir ama kalibre değil: yanlış adreslerin ortalaması 0.859, doğruların 0.934; geliştirme setinde hata az olduğu için eşik önerilemiyor.
+  - Bilinen hatalar: `Kordon Boyu No:6` mahalle sayılıyor (c089, gevşek mahalle kuralının bedeli), `Sinir`, `Kusdilli` (kelime listesinde yok), `Firat` (Wikidata yazımı), `Ankara Kızılay Atatürk Blv.`, anahtarsız `Marina Residence`. 144 mahalle yazım farkı açık kaldı.
 - [ ] Faz 6 — CLI ve API yüzeyi
 - [ ] Faz 7 — Açık kaynak altyapısı
 - [ ] Faz 8 — README ve v0.1.0
@@ -226,6 +234,11 @@ Her faz sonunda dur ve onayımı bekle.
 - **Çıplak `D` + 3 hane daire sayılmaz** (`D 100` karayolu); `D:100` ve `Daire 100` sayılır.
 - **Web demosu Faz 4 sonunda, stdlib ile** (`http.server`): parser olmadan gösterecek şey yoktu; bağımlılık eklememek için FastAPI kullanılmadı. Hugging Face demosu v0.2 planında kalıyor.
 - **Tarif sözcüğü kuralı sadece bina adında:** `Cami Yanı Sokak`, `Kale Arkası Cad.` gerçek sokak adları, bu yüzden cadde/sokakta uygulanmıyor. `... Lojmanları` şimdilik `kalan`'a gidiyor.
+- **Fuzzy: rapidfuzz + OSA.** Takas (`Malatay`) 1 düzeltme sayılır. Eşitlikte tahmin edilmez. Kısa kelime düzeltilmez (`Van`/`Yan`). Mahalle için alt sınır daha yüksek: eksik bir `Çınar` `Pınar` olmamalı.
+- **Birebir ad, fuzzy'den önce gelir:** Türkiye'nin herhangi bir yerinde birebir geçen mahalle gerçek ad sayılır (`Ulucami` → `Uluçam` hatası böyle çözüldü).
+- **Harf geri getirme sadece tamamen ASCII kelimede:** kelime listesi gazetteer'dan, en sık yazım seçilir. Kullanıcının Türkçe harflerine dokunulmaz.
+- **Güven skoru kural tabanlı:** alanın bulunma biçimi (`Origin`) puanı verir, olasılık değildir.
+- **`pip` dev grubunda:** VS Code Python eklentisi `pip list` çalıştırıyor; uv ortamında pip yok.
 - **Etiket dili önceliği tr → mul → en → …**: Wikidata ortak adları `mul` diline taşıyor; sadece `tr` sorgusu 12 ilçeyi kaçırıyordu.
 
 ---

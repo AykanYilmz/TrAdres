@@ -113,7 +113,7 @@ Measured on 2026-11-04 with `uv build`:
 
 | Artifact | Size |
 |---|---:|
-| Wheel (`.whl`) | 206 KiB |
+| Wheel (`.whl`) | 228 KiB |
 | `gazetteer.json.gz` | 194 KiB (626 KiB unpacked) |
 | Loaded in memory | ~17 MB |
 | First load time (index build) | ~0.3 s, once per process |
