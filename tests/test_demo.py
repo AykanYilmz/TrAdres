@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 import json
+import os
 import threading
 import urllib.error
 import urllib.request
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 
-from demo.__main__ import HOST, MAX_BODY_BYTES, make_server, parse_request
+from demo.__main__ import HOST, MAX_BODY_BYTES, make_server, parse_request, snapshot
 
 
 def test_parse_request() -> None:
@@ -78,3 +80,21 @@ def test_unknown_paths(url: str, path: str) -> None:
     with pytest.raises(urllib.error.HTTPError) as info:
         urllib.request.urlopen(request)
     assert info.value.code == 404
+
+
+def test_snapshot_sees_a_changed_file(tmp_path: Path) -> None:
+    code = tmp_path / "nested" / "code.py"
+    code.parent.mkdir()
+    code.write_text("a = 1", encoding="utf-8")
+    (tmp_path / "notes.txt").write_text("not watched", encoding="utf-8")
+
+    before = snapshot([tmp_path])
+    assert list(before) == [code]
+
+    os.utime(code, ns=(1, 1))
+    assert snapshot([tmp_path]) != before
+
+
+def test_page_is_not_cached(url: str) -> None:
+    with urllib.request.urlopen(url) as response:
+        assert response.headers["Cache-Control"] == "no-store"
