@@ -361,7 +361,7 @@ def test_plus_code_stays_in_kalan() -> None:
 def test_centre_of_a_district_is_not_a_mahalle() -> None:
     address = parse("Van Merkez, Gül Cd. No:5, İpekyolu/Van")
     assert address.mahalle is None
-    assert address.kalan is None
+    assert address.kalan == "Merkez"
 
 
 def test_a_real_mahalle_called_merkez_stays() -> None:
@@ -380,4 +380,4 @@ def test_three_word_mahalle_needs_its_own_piece() -> None:
 def test_centre_after_a_district_name() -> None:
     address = parse("Bodrum Merkez, Gül Cd. No:5, Bodrum/Muğla")
     assert address.mahalle is None
-    assert address.kalan is None
+    assert address.kalan == "Merkez"

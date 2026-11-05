@@ -211,6 +211,7 @@ Her faz sonunda dur ve onayımı bekle.
   - Hız: 10.000 satır CSV 2.6 s (~261 µs/satır, dosya okuma/yazma dahil). Wheel 229 KiB.
   - CI eşiği `--min-tag temiz=0.95 --min-tag google_maps=0.95`: dağınık veri çalışması düzenli adresleri bozarsa build kırılır.
   - Gerçek deneme dosyaları `denemeler/` altında, `.gitignore`'da.
+  - Aykan'ın 50 adreslik ilk denemesi (2026-11-05, etiketsiz, elle okundu): 41/50 hatasız. 8 adreste `X Merkez` sahte mahalle oldu, 1 adreste 3 kelimelik mahalle `kalan`'a düştü; ikisi de düzeltildi. Kalıplar uydurma sokak/numarayla geliştirme setine girdi: `google_maps` 27/32 → 32/32, geliştirme 347/355 → 352/355 (%99.2), test setleri değişmedi (%90.0, %94.0). Bu 50 adres çok düzenliydi: bina adı, site, `Türkiye`, Plus Code yok.
 - [ ] Faz 7 — Açık kaynak altyapısı
 - [ ] Faz 8 — README ve v0.1.0
 - [ ] Faz 9 — Tanıtım
@@ -250,6 +251,7 @@ Her faz sonunda dur ve onayımı bekle.
 - **Ayraç veri sezilerek değil, `--column` adıyla bulunur:** adreslerde virgül bol olduğu için `csv.Sniffer` güvenilmez; doğru ayraç kullanıcının verdiği sütunu bulan ayraçtır.
 - **Fazla hücre son sütuna birleşir:** tırnaksız virgüllü adres satırı metin kaybetmez, özette uyarı çıkar.
 - **Formül koruması:** `=`, `+`, `-`, `@` ile başlayan yeni hücrelerin başına `'` eklenir (CSV injection: Excel hücreyi formül diye çalıştırabilir). Girdi sütunlarına dokunulmaz.
+- **`Van Merkez` mahalle sayılmaz, `kalan`'da kalır:** ilçede gerçek `Merkez` mahallesi varsa (Bağcılar) mahalle olur. İlk sürüm kelimeyi siliyordu; hypothesis (5000 örnek) sessiz kaybı `Çınar Merkez`'de yakaladı.
 - **Ülke adı sadece adresin son kelimesiyse atılır:** `Türkiye Sk.` sokak olarak kalır.
 - **Deneme sırası:** önce düzenli adresler (Google Maps) oturtulacak, karmaşık veri ondan sonra ele alınacak (Aykan, 2026-11-05). v0.1 hedefi dağınık CSV temizliği olduğu için karmaşık veri denemesi unutulmamalı.
 - **Faz 6'dan önce yer verisi güçlendirilecek** (Aykan kabul etti); kaynak seçimi Aykan'da.
