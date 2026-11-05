@@ -25,6 +25,24 @@ FIELDS: tuple[str, ...] = (
     "tarif",
 )
 
+#: Fields written as "<value> <word>", in output order.
+_NAMED_PARTS: tuple[tuple[str, str], ...] = (
+    ("mahalle", "Mah."),
+    ("bulvar", "Blv."),
+    ("cadde", "Cad."),
+    ("sokak", "Sk."),
+    ("site", "Sit."),
+    ("bina_adi", "Apt."),
+    ("blok", "Blok"),
+)
+
+#: Fields written as "<label><value>", in output order.
+_NUMBER_PARTS: tuple[tuple[str, str], ...] = (
+    ("bina_no", "No:"),
+    ("kat", "K:"),
+    ("daire", "D:"),
+)
+
 
 @dataclass(frozen=True)
 class Address:
@@ -57,6 +75,28 @@ class Address:
     kalan: str | None = None
     confidence: float = 0.0
     field_confidence: Mapping[str, float] = field(default_factory=dict, hash=False)
+
+    def format(self) -> str:
+        """One standard spelling of the address.
+
+        The order is always the same: mahalle, street, building, numbers,
+        directions, postal code, ilçe/il. ``kalan`` is left out because it is
+        not a known part of an address; read it from the field.
+
+        >>> Address(il="Bolu", ilce="Merkez", mahalle="Atatürk", bina_no="5", daire="3").format()
+        'Atatürk Mah. No:5 D:3 Merkez/Bolu'
+        """
+        parts = [
+            f"{getattr(self, name)} {word}" for name, word in _NAMED_PARTS if getattr(self, name)
+        ]
+        parts += [
+            f"{label}{getattr(self, name)}" for name, label in _NUMBER_PARTS if getattr(self, name)
+        ]
+        parts += [value for value in (self.tarif, self.posta_kodu) if value]
+        place = "/".join(value for value in (self.ilce, self.il) if value)
+        if place:
+            parts.append(place)
+        return " ".join(parts)
 
     def to_dict(self) -> dict[str, object]:
         """All parts and scores as a plain dictionary, ready for JSON."""

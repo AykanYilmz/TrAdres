@@ -7,6 +7,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 import tradres
+from eval.dataset import load_cases
 from tradres import Address, parse
 from tradres.abbreviations import alias_key, lookup
 from tradres.models import FIELDS
@@ -237,3 +238,99 @@ def test_words_before_a_building_number_are_not_a_mahalle() -> None:
     address = parse("Kordon Boyu No:6 Karşıyaka/İzmir")
     assert (address.mahalle, address.bina_no) == (None, "6")
     assert address.kalan == "Kordon Boyu"
+
+
+def fields_of(address: Address) -> dict[str, str | None]:
+    return {name: getattr(address, name) for name in FIELDS}
+
+
+def test_format_order_and_labels() -> None:
+    address = Address(
+        il="Ankara",
+        ilce="Çankaya",
+        mahalle="Kızılay",
+        bulvar="Atatürk",
+        cadde="Gazi",
+        sokak="Gül",
+        site="Çamlık",
+        bina_adi="Yıldız",
+        blok="B",
+        bina_no="5",
+        kat="2",
+        daire="3",
+        posta_kodu="06420",
+        tarif="okul yanı",
+    )
+    assert address.format() == (
+        "Kızılay Mah. Atatürk Blv. Gazi Cad. Gül Sk. Çamlık Sit. Yıldız Apt. B Blok "
+        "No:5 K:2 D:3 okul yanı 06420 Çankaya/Ankara"
+    )
+
+
+def test_format_of_an_empty_address() -> None:
+    assert Address().format() == ""
+
+
+def test_format_with_only_one_place() -> None:
+    assert Address(il="Bolu").format() == "Bolu"
+    assert Address(ilce="Merkez").format() == "Merkez"
+
+
+def test_format_leaves_out_kalan() -> None:
+    assert Address(il="Bolu", kalan="xqzv").format() == "Bolu"
+
+
+def test_format_round_trips_on_the_development_set() -> None:
+    for case in load_cases():
+        first = parse(case.girdi)
+        again = parse(first.format())
+        assert fields_of(again) == fields_of(first), case.id
+
+
+_NAMES = st.sampled_from(["Gül", "Atatürk", "23 Nisan", "Cumhuriyet", "Şehit Ali", "1923", "Barış"])
+_NUMBERS = st.from_regex(r"[1-9][0-9]{0,2}[A-C]?", fullmatch=True)
+
+
+@given(
+    place=st.sampled_from(
+        [("Bolu", "Merkez"), ("Ankara", "Çankaya"), ("İstanbul", "Şişli"), ("Muğla", "Bodrum")]
+    ),
+    mahalle=st.none() | st.sampled_from(["Atatürk", "Cumhuriyet", "Yeni"]),
+    cadde=st.none() | _NAMES,
+    sokak=st.none() | _NAMES,
+    site=st.none() | st.sampled_from(["Çamlık", "Güneş Evleri"]),
+    bina_adi=st.none() | st.sampled_from(["Yıldız", "Deniz"]),
+    blok=st.none() | st.sampled_from(["A", "B", "C2"]),
+    bina_no=st.none() | _NUMBERS,
+    kat=st.none() | st.integers(1, 30).map(str),
+    daire=st.none() | st.integers(1, 200).map(str),
+    posta_kodu=st.none() | st.sampled_from(["06420", "14100"]),
+)
+def test_format_round_trips_on_any_mix_of_parts(
+    place: tuple[str, str],
+    mahalle: str | None,
+    cadde: str | None,
+    sokak: str | None,
+    site: str | None,
+    bina_adi: str | None,
+    blok: str | None,
+    bina_no: str | None,
+    kat: str | None,
+    daire: str | None,
+    posta_kodu: str | None,
+) -> None:
+    address = Address(
+        il=place[0],
+        ilce=place[1],
+        mahalle=mahalle,
+        cadde=cadde,
+        sokak=sokak,
+        site=site,
+        bina_adi=bina_adi,
+        blok=blok,
+        bina_no=bina_no,
+        kat=kat,
+        daire=daire,
+        posta_kodu=posta_kodu,
+    )
+    assert fields_of(parse(address.format())) == fields_of(address)
