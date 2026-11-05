@@ -204,7 +204,7 @@ Her faz sonunda dur ve onayımı bekle.
   - **Son ölçüm: test seti 1 %90.0 (100 adres, F1 0.976), yeni test seti 2 %94.0 (50 adres, F1 0.989, baseline %44.0), geliştirme 320/323 (%99.1).** Test seti 2 de aynı kişi tarafından, kurallar bilinerek yazıldı ve küçük; gerçek dünya sayısı değil.
   - Demo kod değişince kendini yeniden başlatıyor (`--no-reload` ile kapanır).
   - Bilinen hatalar: `Sinir` (kelime listesinde yok), `Ankara Kızılay Atatürk Blv.`, anahtarsız `Marina Residence`. 144 mahalle yazım farkı açık kaldı.
-- [ ] Faz 6 — CLI ve API yüzeyi (2026-11-05, kod bitti; Google Maps denemesi ve onay bekliyor)
+- [x] Faz 6 — CLI ve API yüzeyi (2026-11-05, onaylandı)
   - `cli.py` (argparse, yeni bağımlılık yok): `tradres parse "adres"` (JSON + `adres` anahtarı), `tradres parse-csv girdi.csv --column adres -o cikti.csv`, `python -m tradres`. Excel uyumu: kodlama (BOM → UTF-8 → cp1254) ve ayraç otomatik, çıktı BOM'lu UTF-8. Sonuç sütunları `tradres_` önekli, `tradres_guven`, `tradres_adres`.
   - `Address.format()`: sabit sıra, `kalan` hariç. Tur testi: geliştirme 323/323, karışık alanlı 30.000 adreste 6 sapma (hepsi ilsiz adreste tarif kelimesi yer sanılıyor), test seti 1'de 99/100 (kilitli set açılmadı), test seti 2'de 50/50. Hypothesis 5000 örnekte temiz.
   - Maps biçimi için yeni `google_maps` grubu (24 adres, uydurma numaralar): **önce 0/24, sonra 24/24.** Sondaki ülke adı site/mahalle oluyordu (`data/country_names.json`), Plus Code mahalle oluyordu. Geliştirme 320/347 → 344/347 (%99.1), test setleri değişmedi (%90.0, %94.0).
@@ -214,7 +214,7 @@ Her faz sonunda dur ve onayımı bekle.
   - Aykan'ın 50 adreslik ilk denemesi (2026-11-05, etiketsiz, elle okundu): 41/50 hatasız. 8 adreste `X Merkez` sahte mahalle oldu, 1 adreste 3 kelimelik mahalle `kalan`'a düştü; ikisi de düzeltildi. Kalıplar uydurma sokak/numarayla geliştirme setine girdi: `google_maps` 27/32 → 32/32, geliştirme 347/355 → 352/355 (%99.2), test setleri değişmedi (%90.0, %94.0). Bu 50 adres çok düzenliydi: bina adı, site, `Türkiye`, Plus Code yok.
   - Aykan'ın 101 adreslik karışık denemesi (2026-11-05): elle okuma 83/101, 18 hata. Düzeltilenler: `14/A`, `72A/5`, `39-C`, küçük `b`, `İç Kapı:`, `Merkez`'in yanındaki ilçeyi ezmesi, `Bölgesi`/`İş Merkezi`, `Etlik 512. Sk.`, kelime blok, `üstü`, `Prof/Dr/Org` noktası, `Can`→`Çan`. Geliştirme 353/374 → 373/376 (%99.2), test seti 1 %90 → %91, test seti 2 %94 → %96.
   - Aykan'ın etiketli JSON'u aynı 101 adres (bağımsız değil, depoya alınmadı): 80/101 ham; 21 farkın 16'sı yazım kuralı (`27/B`-`27B`, `5.`-`5`, OSB semt/site, resmi yazım, bizim ilçe/il çıkarımımız). Gerçek kalanlar: `Mavişehir Caher Dudayev Blv.`, `Hüriyet`, `Nidakule Ataşehir`, `Merkez Küme Evleri`.
-  - Açık karar: `27/B` ve `39-C` tek biçime (`27B`) indirilsin mi? Kapsam bulgusu: 101 adreste 37 mahalle verinin o ilçesinde yok; bir kısmı resmi mahalle değil (semt), bir kısmı veri eksiği. Oran %11'den yüksek görünüyor, Faz 7'den önce ölçülmeli.
+  - **Faz 7'den önce açık işler:** (1) karar: `27/B` ve `39-C` tek biçime (`27B`) indirilsin mi (öneri evet, etiketler de güncellenir); (2) Claude'un görmediği adreslerden bağımsız etiketli set, sadece toplam skor; (3) karmaşık veri denemesi. Kapsam bulgusu: 101 adreste 37 mahalle verinin o ilçesinde yok; bir kısmı resmi mahalle değil (semt), bir kısmı veri eksiği. Oran %11'den yüksek görünüyor, Faz 7'den önce ölçülmeli.
 - [ ] Faz 7 — Açık kaynak altyapısı
 - [ ] Faz 8 — README ve v0.1.0
 - [ ] Faz 9 — Tanıtım
