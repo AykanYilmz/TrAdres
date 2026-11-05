@@ -28,6 +28,8 @@ jobs:
         run: uv run ruff format --check .
       - name: mypy --strict
         run: uv run mypy
+      - name: Evaluation set (fails if accuracy drops)
+        run: uv run python -m eval --min-f1 0.95 --min-exact 0.85
 
   test:
     name: Tests (Python ${{ matrix.python-version }})
