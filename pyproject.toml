@@ -34,6 +34,7 @@ tradres = "tradres.cli:main"
 [project.urls]
 Homepage = "https://github.com/AykanYilmz/TrAdres"
 Issues = "https://github.com/AykanYilmz/TrAdres/issues"
+Changelog = "https://github.com/AykanYilmz/TrAdres/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling"]
@@ -41,6 +42,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tradres"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["CLAUDE.md"]
 
 # --------------------------------------------------------------------------- #
 # Development dependencies (not installed by `pip install tradres`)
