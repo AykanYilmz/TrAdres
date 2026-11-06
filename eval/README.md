@@ -13,6 +13,13 @@ uv run python -m eval --markdown                 # table for the README
 uv run python -m eval --check                    # only validate the labels
 ```
 
+## Messy data
+
+`python -m eval.robustness` damages the same addresses in one known way (no
+Turkish letters, no punctuation, typos, changed order) and scores them again.
+The labels stay the same, so each row shows the price of that mess. Use
+`--failures no_punctuation` to see the failures of one row.
+
 ## Privacy (KVKK)
 
 **Never add a real person's address.** Places are real and public, but
