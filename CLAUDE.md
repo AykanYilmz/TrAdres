@@ -215,7 +215,12 @@ Her faz sonunda dur ve onayımı bekle.
   - Aykan'ın 101 adreslik karışık denemesi (2026-11-05): elle okuma 83/101, 18 hata. Düzeltilenler: `14/A`, `72A/5`, `39-C`, küçük `b`, `İç Kapı:`, `Merkez`'in yanındaki ilçeyi ezmesi, `Bölgesi`/`İş Merkezi`, `Etlik 512. Sk.`, kelime blok, `üstü`, `Prof/Dr/Org` noktası, `Can`→`Çan`. Geliştirme 353/374 → 373/376 (%99.2), test seti 1 %90 → %91, test seti 2 %94 → %96.
   - Aykan'ın etiketli JSON'u aynı 101 adres (bağımsız değil, depoya alınmadı): 80/101 ham; 21 farkın 16'sı yazım kuralı (`27/B`-`27B`, `5.`-`5`, OSB semt/site, resmi yazım, bizim ilçe/il çıkarımımız). Gerçek kalanlar: `Mavişehir Caher Dudayev Blv.`, `Hüriyet`, `Nidakule Ataşehir`, `Merkez Küme Evleri`.
   - **Faz 7'den önce açık işler:** (1) karar: `27/B` ve `39-C` tek biçime (`27B`) indirilsin mi (öneri evet, etiketler de güncellenir); (2) Claude'un görmediği adreslerden bağımsız etiketli set, sadece toplam skor; (3) karmaşık veri denemesi. Kapsam bulgusu: 101 adreste 37 mahalle verinin o ilçesinde yok; bir kısmı resmi mahalle değil (semt), bir kısmı veri eksiği. Oran %11'den yüksek görünüyor, Faz 7'den önce ölçülmeli.
-- [ ] Faz 7 — Açık kaynak altyapısı
+- [ ] Faz 7 — Açık kaynak altyapısı (2026-11-06, dosyalar hazır; TestPyPI denemesi ve onay bekliyor)
+  - Önce Faz 6'dan kalanlar: harfli numara tek biçim (`27/B`, `27-B`, `27b` → `27B`), skorlar aynı (373/376, %91, %96), Aykan'ın etiketleriyle 80/101 → 86/101.
+  - Eksik mahalle nedeni: derleme değil, Wikidata. Şehir merkezlerinde kapsam düşük (Merkez/Kilis 2, Merkez/Kırıkkale 9); denemede 71 mahallenin 33'ü listede yok, bir kısmı semt. `gazetteer_disi` grubu 50/51, doğruluk etkisi küçük. v0.1 için kaynak değişmedi, sınır `DATA_SOURCES.md`'de.
+  - Yeni: `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1), `CHANGELOG.md`, issue formları, PR şablonu, `.github/GOOD_FIRST_ISSUES.md`, `dependabot.yml`, `release.yml`. `CLAUDE.md` sdist dışında.
+  - `tradres` adı PyPI ve TestPyPI'da boş (kontrol: 2026-11-06).
+  - Faz 8'den önce açık: bağımsız etiketli set, karmaşık veri denemesi, `pytest-benchmark`.
 - [ ] Faz 8 — README ve v0.1.0
 - [ ] Faz 9 — Tanıtım
 
@@ -258,6 +263,9 @@ Her faz sonunda dur ve onayımı bekle.
 - **Ülke adı sadece adresin son kelimesiyse atılır:** `Türkiye Sk.` sokak olarak kalır.
 - **Kelime sayısı eşiği reddedildi:** `Çan`/`Can` için en az 3 geçiş kuralı `Gül`'ü de bozuyordu; yerine `data/ascii_names.json` listesi.
 - **Harfli numara tek biçimde (Aykan onayladı):** `27/B`, `27-B`, `27b` → `27B`; `bina_no` ve `daire` için. CSV temizliğinde aynı kapı eşit görünsün diye. Rakamlı `5/3` korunur.
+- **Yayın Trusted Publishing ile (OIDC):** token saklanmaz. `v*` tag'i PyPI + GitHub Release, elle başlatma TestPyPI. Tag ile `pyproject` sürümü uyuşmazsa yayın durur.
+- **İletişim adresi `pyproject.toml`'daki e-posta:** `SECURITY.md` ve `CODE_OF_CONDUCT.md` bunu kullanıyor.
+- **Veri kaynağı v0.1'de değişmedi:** eksik şehir mahalleleri belgelendi; lisansı açık, tam ve toplu bir resmi liste bulunamamıştı (Faz 2).
 - **Deneme sırası:** önce düzenli adresler (Google Maps) oturtulacak, karmaşık veri ondan sonra ele alınacak (Aykan, 2026-11-05). v0.1 hedefi dağınık CSV temizliği olduğu için karmaşık veri denemesi unutulmamalı.
 - **Faz 6'dan önce yer verisi güçlendirilecek** (Aykan kabul etti); kaynak seçimi Aykan'da.
 - **Fuzzy: rapidfuzz + OSA.** Takas (`Malatay`) 1 düzeltme sayılır. Eşitlikte tahmin edilmez. Kısa kelime düzeltilmez (`Van`/`Yan`). Mahalle için alt sınır daha yüksek: eksik bir `Çınar` `Pınar` olmamalı.
