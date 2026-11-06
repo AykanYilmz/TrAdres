@@ -1,0 +1,57 @@
+name: Wrongly parsed address / Yanlış ayrıştırılan adres
+description: TrAdres read an address wrong.
+title: "[Address] "
+labels: ["wrong-parse"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not share a real person's address. Change the street, building and numbers, and keep the pattern that fails.**
+        **Gerçek kişisel adres paylaşmayın. Sokağı, binayı ve numaraları değiştirin, hataya yol açan kalıbı koruyun.**
+  - type: textarea
+    id: input
+    attributes:
+      label: Input / Girdi
+      description: The address you gave to TrAdres, with personal data removed.
+      placeholder: "Lale Mah. Gül Sk. No:5/3 Konak/İzmir"
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected / Beklenen
+      description: The fields you expected.
+      placeholder: |
+        il: İzmir
+        ilce: Konak
+        mahalle: Lale
+        sokak: Gül
+        bina_no: 5
+        daire: 3
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual / Gerçekleşen
+      description: The output of `tradres parse "..."`.
+      render: json
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / Sürüm
+      description: The output of `tradres --version`.
+      placeholder: "tradres 0.1.0"
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy / Gizlilik
+      options:
+        - label: This is not a real person's address. / Bu, gerçek bir kişinin adresi değil.
+          required: true

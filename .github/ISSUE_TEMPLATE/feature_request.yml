@@ -1,0 +1,23 @@
+name: Feature request / Özellik isteği
+description: Suggest a new feature.
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does it solve? / Hangi sorunu çözüyor?
+      description: Describe your real use case.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea / Öneriniz
+      description: How should it work? A small example helps.
+    validations:
+      required: true
+  - type: textarea
+    id: other
+    attributes:
+      label: Other ways you tried / Denediğiniz başka yollar
