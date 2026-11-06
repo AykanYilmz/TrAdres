@@ -39,6 +39,13 @@ __all__ = [
 _DATA_FILE = "gazetteer.json.gz"
 _FORMAT_VERSION = 1
 
+_COMMON_NAME_COUNT = 20  # see Gazetteer.fuzzy_common_mahalle
+
+
+def _plain(word: str) -> bool:
+    """True if the only Turkish letter of the word is "ı"."""
+    return word.replace("ı", "i").isascii()
+
 
 @dataclass(frozen=True)
 class Il:
@@ -255,6 +262,24 @@ class Gazetteer:
         hit = closest(key, pool, config)
         return pool[hit] if hit is not None else None
 
+    @cached_property
+    def _common_mahalle_names(self) -> dict[str, str]:
+        """ASCII key -> spelling of mahalle names used all over the country."""
+        counts = Counter(m.ad for found in self._mahalleler.values() for m in found)
+        return {ascii_key(ad): ad for ad, count in counts.items() if count >= _COMMON_NAME_COUNT}
+
+    def fuzzy_common_mahalle(self, name: str, config: MatchConfig = DEFAULT_CONFIG) -> str | None:
+        """A common mahalle name that ``name`` most likely misspells: "Cumuhriyet".
+
+        Our list misses many city mahalles, so "Cumhuriyet" may be real in a
+        district even when the list does not have it there.
+        """
+        key = ascii_key(name)
+        if len(key) < config.min_mahalle_length:
+            return None
+        hit = closest(key, self._common_mahalle_names, config)
+        return self._common_mahalle_names[hit] if hit is not None else None
+
     # ------------------------------------------------------------------ #
     # Spelling
     # ------------------------------------------------------------------ #
@@ -275,8 +300,12 @@ class Gazetteer:
         keep = load_ascii_names()
         return {key: found.most_common(1)[0][0] for key, found in counts.items() if key not in keep}
 
-    def respell(self, name: str) -> str:
+    def respell(self, name: str, *, capitals: bool = False) -> str:
         """Bring back the Turkish letters of words typed in plain ASCII.
+
+        With ``capitals``, the source was all capitals, so "ı" counts as plain:
+        "CUMHURIYET" cannot show its "i", title case gives "Cumhurıyet", and the
+        word list repairs it. In normal text, "ı" is the writer's choice.
 
         Place names are the best word list we have: "Atatürk", "Kurtuluş" and
         "Şehit" are in thousands of them. Words that already have Turkish
@@ -290,7 +319,10 @@ class Gazetteer:
         spellings = self._word_spellings
         words = name.split()
         return " ".join(
-            spellings.get(ascii_key(word), word) if word.isascii() else word for word in words
+            spellings.get(ascii_key(word), word)
+            if word.isascii() or (capitals and _plain(word))
+            else word
+            for word in words
         )
 
     def __repr__(self) -> str:

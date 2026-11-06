@@ -220,7 +220,10 @@ Her faz sonunda dur ve onayımı bekle.
   - Eksik mahalle nedeni: derleme değil, Wikidata. Şehir merkezlerinde kapsam düşük (Merkez/Kilis 2, Merkez/Kırıkkale 9); denemede 71 mahallenin 33'ü listede yok, bir kısmı semt. `gazetteer_disi` grubu 50/51, doğruluk etkisi küçük. v0.1 için kaynak değişmedi, sınır `DATA_SOURCES.md`'de.
   - Yeni: `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1), `CHANGELOG.md`, issue formları, PR şablonu, `.github/GOOD_FIRST_ISSUES.md`, `dependabot.yml`, `release.yml`. `CLAUDE.md` sdist dışında.
   - `tradres` adı PyPI ve TestPyPI'da boş (kontrol: 2026-11-06).
-  - Faz 8'den önce açık: bağımsız etiketli set, karmaşık veri denemesi, `pytest-benchmark`.
+  - GitHub hesabı ödeme kilidinde, Actions çalışmıyor; destek talebi #4961468 açık. TestPyPI denemesi bunu bekliyor, push çalışıyor.
+  - **Karmaşık veri ölçümü (2026-11-06):** `python -m eval.robustness`, adresleri bilinen biçimde bozup yeniden puanlar. Geliştirme, önce → sonra: Türkçe harfsiz %88.6 → %88.8, noktalamasız %90.7 → %94.7, yazım hatası %89.9 → %91.5, sıra değişik %92.6 → %99.2, hepsi birden %80.6 → %84.3. Kilitli set 1 hepsi birden %85, set 2 %74 (sadece toplam). Büyük/küçük harf ve fazla boşluk kayıpsız.
+  - Yeni kurallar: başta ülke adı, `No`suz `7/C`, iki noktasız `İç Kapı 7`, sokağa yapışık mahalle, büyük harfte `ı` onarımı, yaygın mahalle adında yazım hatası (`fuzzy_common_mahalle`).
+  - Faz 8'den önce açık: bağımsız etiketli set.
 - [ ] Faz 8 — README ve v0.1.0
 - [ ] Faz 9 — Tanıtım
 
@@ -266,6 +269,9 @@ Her faz sonunda dur ve onayımı bekle.
 - **Yayın Trusted Publishing ile (OIDC):** token saklanmaz. `v*` tag'i PyPI + GitHub Release, elle başlatma TestPyPI. Tag ile `pyproject` sürümü uyuşmazsa yayın durur.
 - **İletişim adresi `pyproject.toml`'daki e-posta:** `SECURITY.md` ve `CODE_OF_CONDUCT.md` bunu kullanıyor.
 - **Veri kaynağı v0.1'de değişmedi:** eksik şehir mahalleleri belgelendi; lisansı açık, tam ve toplu bir resmi liste bulunamamıştı (Faz 2).
+- **Tarif yazıldığı gibi kalır:** `yani` → `yanı` denendi, kilitli setlerin temiz skorunu düşürdü (%91 → %89, %96 → %94), çünkü tarif serbest metin ve etiketler de yazıldığı gibi. Kural geri alındı, kilitli etiketlere dokunulmadı.
+- **`ı` onarımı sadece tamamı büyük harfli metinde:** `CUMHURIYET` `ı`'yı gösteremez; normal metinde `ı` yazarın seçimi.
+- **Sokağa yapışık mahalle:** ilk kelimeler o ilçenin mahallesiyse ayrılır; sokak adının tamamı bir yer adıysa (`Fatih Sultan Mehmet`) ayrılmaz.
 - **Deneme sırası:** önce düzenli adresler (Google Maps) oturtulacak, karmaşık veri ondan sonra ele alınacak (Aykan, 2026-11-05). v0.1 hedefi dağınık CSV temizliği olduğu için karmaşık veri denemesi unutulmamalı.
 - **Faz 6'dan önce yer verisi güçlendirilecek** (Aykan kabul etti); kaynak seçimi Aykan'da.
 - **Fuzzy: rapidfuzz + OSA.** Takas (`Malatay`) 1 düzeltme sayılır. Eşitlikte tahmin edilmez. Kısa kelime düzeltilmez (`Van`/`Yan`). Mahalle için alt sınır daha yüksek: eksik bir `Çınar` `Pınar` olmamalı.

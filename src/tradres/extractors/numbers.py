@@ -116,7 +116,12 @@ class _Scanner:
 
     def labelled(self, index: int) -> None:
         token = self.tokens[index]
-        if token.key == "kapi" and token.text.endswith(":"):
+        before = self.at(index - 1)
+        labelled_door = token.text.endswith(":") or (
+            before is not None and before.key in ("ic", "dis")
+        )
+        following = self.at(index + 1)
+        if token.key == "kapi" and labelled_door and (not following or following.is_number):
             self.door(index)
             return
         glued = _GLUED.fullmatch(token.key)
@@ -182,12 +187,12 @@ class _Scanner:
         if steps and value and _POSTAL_CODE.fullmatch(value.text):
             self.take("posta_kodu", value.text, *range(index, index + steps + 1))
 
-    def letter_after_street(self, index: int) -> bool:
-        """ "Lale Cad. 14/A": a number and its letter right after a street keyword."""
-        before, mark, letter = self.at(index - 1), self.at(index + 1), self.at(index + 2)
-        if before is None or mark is None or letter is None or "bina_no" in self.fields:
+    def number_and_letter(self, index: int) -> bool:
+        """ "Lale Cad. 14/A": a number, a slash and one letter, without "No"."""
+        mark, letter = self.at(index + 1), self.at(index + 2)
+        if mark is None or letter is None or "bina_no" in self.fields:
             return False
-        if not street_keyword(before) or mark.text != "/" or len(letter.text) != 1:
+        if mark.text != "/" or len(letter.text) != 1:
             return False
         after = self.at(index + 3)
         if not letter.text.isalpha() or (after is not None and street_keyword(after)):
@@ -201,7 +206,7 @@ class _Scanner:
         """Unlabelled ``12/8`` and postal codes, after the labelled values."""
         for index, token in enumerate(self.tokens):
             following = self.at(index + 1)
-            if index in self.used or not token.is_number or self.letter_after_street(index):
+            if index in self.used or not token.is_number or self.number_and_letter(index):
                 continue
             if following and (street_keyword(following) or following.key == "nolu"):
                 continue  # "1752/3 Sk.", "64023 Sokak": a street number

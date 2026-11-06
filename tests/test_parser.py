@@ -450,3 +450,49 @@ def test_titles_in_street_names_get_their_dot() -> None:
 def test_every_spelling_of_a_lettered_door_gives_one_value(number: str) -> None:
     assert parse(f"Gül Sk. No:{number} Konak İzmir").bina_no == "27B"
     assert parse(f"Gül Sk. {number} Konak İzmir").bina_no == "27B"
+
+
+@pytest.mark.parametrize("text", ["Türkiye, Çankaya/Ankara", "Turkey - Çankaya/Ankara"])
+def test_country_at_the_start(text: str) -> None:
+    address = parse(text)
+    assert (address.il, address.ilce) == ("Ankara", "Çankaya")
+    assert address.site is None
+    assert address.mahalle is None
+
+
+def test_country_word_starts_a_street() -> None:
+    assert parse("Türkiye Sk. No:3 Çankaya/Ankara").sokak == "Türkiye"
+
+
+def test_number_and_letter_without_a_street_keyword() -> None:
+    assert parse("7/C Konak İzmir Lale Cd.").bina_no == "7C"
+
+
+def test_inner_door_without_a_colon() -> None:
+    assert parse("Lale Sk. İç Kapı 7 No:3 Konak/İzmir").daire == "7"
+
+
+def test_mahalle_glued_to_a_street() -> None:
+    address = parse("Kızılay Lale Sk No 5 Çankaya/Ankara")
+    assert (address.mahalle, address.sokak) == ("Kızılay", "Lale")
+
+
+def test_street_named_after_a_place_stays_whole() -> None:
+    address = parse("Fatih Sultan Mehmet Blv. No:7 Nilüfer/Bursa")
+    assert (address.mahalle, address.bulvar) == (None, "Fatih Sultan Mehmet")
+
+
+def test_capital_ascii_street_is_repaired() -> None:
+    assert parse("CUMHURIYET CAD. NO:41 KONAK IZMIR").cadde == "Cumhuriyet"
+
+
+def test_direction_stays_as_written() -> None:
+    assert parse("Gül Sk. okul yani Konak/İzmir").tarif == "okul yani"
+
+
+def test_misspelled_common_mahalle_is_fixed() -> None:
+    assert parse("Cumuhriyet Mah. Gül Sk. Konak/İzmir").mahalle == "Cumhuriyet"
+
+
+def test_rare_unknown_mahalle_is_not_turned_into_a_common_one() -> None:
+    assert parse("Zerzevat Mah. Gül Sk. Konak/İzmir").mahalle == "Zerzevat"

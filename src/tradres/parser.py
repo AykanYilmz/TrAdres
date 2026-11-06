@@ -23,17 +23,25 @@ _MAX_LOOSE_MAHALLE_WORDS = 2
 _MAX_PIECE_MAHALLE_WORDS = 3
 _MAX_LOOSE_SITE_WORDS = 3
 _CENTRE_WORD = "merkez"
+_MIN_GLUED_WORDS = 2
 _COMMAS = frozenset(",;")
 #: Letters of a Google Plus Code: "8Q5V+2H".
 _PLUS_CODE = re.compile(r"[23456789CFGHJMPQRVWX]{2,8}\+[23456789CFGHJMPQRVWX]{2,3}", re.IGNORECASE)
 
 
 def country_word(tokens: Sequence[Token]) -> set[int]:
-    """The country at the very end: "..., Çankaya/Ankara, Türkiye"."""
+    """The country at either end: "Çankaya/Ankara, Türkiye" or "Türkiye, Çankaya/Ankara".
+
+    At the start a separator must follow, because "Türkiye Sokak" is a street.
+    """
+    countries = load_country_names()
     words = [index for index, token in enumerate(tokens) if not token.is_separator]
-    if words and tokens[words[-1]].key in load_country_names():
-        return {words[-1]}
-    return set()
+    found = set()
+    if words and tokens[words[-1]].key in countries:
+        found.add(words[-1])
+    if len(words) > 1 and tokens[words[0]].key in countries and tokens[words[0] + 1].is_separator:
+        found.add(words[0])
+    return found
 
 
 def official_mahalle(
@@ -58,6 +66,9 @@ def official_mahalle(
         corrected = gazetteer.fuzzy_mahalle(name, il=il, ilce=ilce, config=config)
         if corrected is not None:
             return corrected.ad, Origin.FUZZY
+    common = gazetteer.fuzzy_common_mahalle(name, config)
+    if common is not None:
+        return common, Origin.FUZZY
     return gazetteer.respell(name), Origin.UNVERIFIED
 
 
@@ -70,15 +81,26 @@ def district_of_mahalle(fields: Mapping[str, str], gazetteer: Gazetteer) -> tupl
     return places.pop() if len(places) == 1 else None
 
 
-def mahalle_in_street(fields: Mapping[str, str], gazetteer: Gazetteer) -> tuple[str, str] | None:
-    """The mahalle hidden in a numbered street: "Etlik 512. Sokak" gives (sokak, Etlik)."""
+def mahalle_in_street(
+    fields: Mapping[str, str], gazetteer: Gazetteer
+) -> tuple[str, str, str] | None:
+    """A mahalle glued to the street after it: (field, mahalle, street).
+
+    "Etlik 512. Sokak" and "Kızılay Lale Sokak" have no comma or keyword after
+    the mahalle. The first words must be a mahalle of the known district. A
+    street name that is a place name itself stays whole: "Fatih Sultan Mehmet".
+    """
     il, ilce = fields.get("il"), fields.get("ilce")
     if il is None or ilce is None or "mahalle" in fields:
         return None
-    for field in ("cadde", "sokak"):
-        head, _, tail = fields.get(field, "").rpartition(" ")
-        if head and tail.isdigit() and gazetteer.find_mahalle(head, il=il, ilce=ilce):
-            return field, head
+    for field in ("bulvar", "cadde", "sokak"):
+        words = fields.get(field, "").split()
+        if len(words) < _MIN_GLUED_WORDS or gazetteer.find_mahalle(" ".join(words)):
+            continue
+        for size in range(len(words) - 1, 0, -1):
+            head = " ".join(words[:size])
+            if gazetteer.find_mahalle(head, il=il, ilce=ilce):
+                return field, head, " ".join(words[size:])
     return None
 
 
@@ -260,13 +282,13 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
 
     for field in _NAME_FIELDS:
         if field in fields:
-            fields[field] = gazetteer.respell(fields[field])
+            fields[field] = gazetteer.respell(fields[field], capitals=text.isupper())
 
     hidden = mahalle_in_street(fields, gazetteer)
     if hidden is not None:
-        street, name = hidden
+        street, name, street_name = hidden
         fields["mahalle"] = name
-        fields[street] = fields[street].rpartition(" ")[2]
+        fields[street] = street_name
         origins["mahalle"] = Origin.KEYWORD
 
     if "mahalle" in fields:
