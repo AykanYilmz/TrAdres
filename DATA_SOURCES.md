@@ -85,6 +85,16 @@ request when you update the data.
   Wikidata or are not linked to a district there. Rural districts with
   many villages (for example Viranşehir and Akçakale in Şanlıurfa) have
   the largest gaps.
+- The gap is larger in city centres than this average shows. Wikidata has
+  good coverage of villages, but few mahalles for many central districts: the
+  package has 2 for Merkez/Kilis and 9 for Merkez/Kırıkkale. In one hand trial
+  of 101 made-up addresses, 33 of the 71 mahalle names were not in the list for
+  their ilçe. Some of these were areas and not official mahalles, and we had no
+  official list to separate them.
+- A missing mahalle is still read when a keyword marks it (`Lale Mah.`). It is
+  kept as written, with a lower confidence. Typo fixing and Turkish letter
+  recovery do not work for it. On the evaluation set, addresses with a mahalle
+  outside the list score 50/51 exact, so accuracy suffers little.
 - Some names may be out of date (mahalle merges and renames happen every
   year).
 - Neighbourhood *areas* that are not official mahalles (for example
