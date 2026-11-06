@@ -44,7 +44,7 @@ address.mahalle     # "Atatürk"
 address.format()    # "Atatürk Mah. 23 Nisan Cad. No:5 D:3 Merkez/Bolu"
 ```
 
-TrAdres works offline. The place list comes with the package, and the wheel is about 232 KiB.
+TrAdres works offline. The place list comes with the package, and the wheel is about 236 KiB.
 
 ## Who is it for?
 

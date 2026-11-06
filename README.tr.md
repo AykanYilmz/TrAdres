@@ -44,7 +44,7 @@ address.mahalle     # "Atatürk"
 address.format()    # "Atatürk Mah. 23 Nisan Cad. No:5 D:3 Merkez/Bolu"
 ```
 
-TrAdres internetsiz çalışır. Yer listesi paketle gelir, wheel boyutu yaklaşık 232 KiB'dir.
+TrAdres internetsiz çalışır. Yer listesi paketle gelir, wheel boyutu yaklaşık 236 KiB'dir.
 
 ## Kimin için?
 

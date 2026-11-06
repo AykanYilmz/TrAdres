@@ -223,7 +223,7 @@ Her faz sonunda dur ve onayımı bekle.
   - GitHub hesabı ödeme kilidinde, Actions çalışmıyor; destek talebi #4961468 açık. TestPyPI denemesi bunu bekliyor, push çalışıyor.
   - **Karmaşık veri ölçümü (2026-11-06):** `python -m eval.robustness`, adresleri bilinen biçimde bozup yeniden puanlar. Geliştirme, önce → sonra: Türkçe harfsiz %88.6 → %88.8, noktalamasız %90.7 → %94.7, yazım hatası %89.9 → %91.5, sıra değişik %92.6 → %99.2, hepsi birden %80.6 → %84.3. Kilitli set 1 hepsi birden %85, set 2 %74 (sadece toplam). Büyük/küçük harf ve fazla boşluk kayıpsız.
   - Yeni kurallar: başta ülke adı, `No`suz `7/C`, iki noktasız `İç Kapı 7`, sokağa yapışık mahalle, büyük harfte `ı` onarımı, yaygın mahalle adında yazım hatası (`fuzzy_common_mahalle`).
-  - `benchmarks/test_speed.py` (`pytest-benchmark`, sadece dev, normal testlerin dışında): tek adres ~230 µs, yazım hatalı ~700 µs, 10.000 adres 2.4 s, 10.000 CSV satırı 2.8 s, ilk yükleme 0.2 s. Wheel 232 KiB. Hedef önerisi: adres başına 1 ms'nin altı (Aykan henüz onaylamadı).
+  - `benchmarks/test_speed.py` (`pytest-benchmark`, sadece dev, normal testlerin dışında): tek adres ~230 µs, yazım hatalı ~700 µs, 10.000 adres 2.4 s, 10.000 CSV satırı 2.8 s, ilk yükleme 0.2 s. Wheel 236 KiB. Hedef önerisi: adres başına 1 ms'nin altı (Aykan henüz onaylamadı).
   - `README.md` + `README.tr.md` taslağı yazıldı; `tests/test_readme.py` örnekleri doğruluyor. Kurulum şimdilik GitHub'dan, PyPI satırı ve rozeti yayında eklenecek. GIF ve senaryo Faz 8'de.
   - Faz 8'den önce açık: bağımsız etiketli set, PyPI kararı (Aykan henüz seçmedi).
 - [ ] Faz 8 — README ve v0.1.0
