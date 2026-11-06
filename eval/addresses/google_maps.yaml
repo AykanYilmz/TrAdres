@@ -12,7 +12,7 @@
   etiketler: [google_maps, temiz, posta_kodu]
 - id: "m003"
   girdi: "Caferağa, Nergis Sk. No:21/A, 34710 Kadıköy/İstanbul, Türkiye"
-  beklenen: {il: İstanbul, ilce: Kadıköy, mahalle: Caferağa, sokak: Nergis, bina_no: 21/A, posta_kodu: "34710"}
+  beklenen: {il: İstanbul, ilce: Kadıköy, mahalle: Caferağa, sokak: Nergis, bina_no: 21A, posta_kodu: "34710"}
   etiketler: [google_maps, posta_kodu]
 - id: "m004"
   girdi: "Fenerbahçe, Papatya Cd. No:88, 34726 Kadıköy/İstanbul, Türkiye"

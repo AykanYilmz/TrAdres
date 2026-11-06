@@ -183,7 +183,7 @@
   etiketler: [kisaltma]
 - id: "d037"
   girdi: "Eskiköy Mah. Gürgentepe Ordu No:7/A"
-  beklenen: {il: Ordu, ilce: Gürgentepe, mahalle: Eskiköy, bina_no: 7/A}
+  beklenen: {il: Ordu, ilce: Gürgentepe, mahalle: Eskiköy, bina_no: 7A}
   etiketler: [kisaltma, tuzak]
   not: "7/A bina numarası; A daire değil."
 - id: "d038"

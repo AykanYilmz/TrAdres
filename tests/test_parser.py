@@ -196,8 +196,8 @@ def test_street_named_after_a_direction_is_not_a_direction() -> None:
 @pytest.mark.parametrize(
     ("text", "daire", "blok"),
     [
-        ("Gül Sk. D:6/B Kadıköy", "6/B", None),
-        ("Gül Sk. Daire:6/b Kadıköy", "6/B", None),
+        ("Gül Sk. D:6/B Kadıköy", "6B", None),
+        ("Gül Sk. Daire:6/b Kadıköy", "6B", None),
         ("Gül Sk. D:6/A Blok Kadıköy", "6", "A"),
         ("Gül Sk. D:6 / Kadıköy", "6", None),
     ],
@@ -386,11 +386,11 @@ def test_centre_after_a_district_name() -> None:
 @pytest.mark.parametrize(
     ("text", "bina_no", "daire"),
     [
-        ("Konak İzmir Lale Cad. 14/A", "14/A", None),
-        ("Konak İzmir Lale Cad. 14/a", "14/A", None),
+        ("Konak İzmir Lale Cad. 14/A", "14A", None),
+        ("Konak İzmir Lale Cad. 14/a", "14A", None),
         ("Konak İzmir Lale Cad. 72A/5", "72A", "5"),
-        ("Konak İzmir Lale Cad. No:39-C", "39-C", None),
-        ("Konak İzmir Lale Cad. No:9/b", "9/B", None),
+        ("Konak İzmir Lale Cad. No:39-C", "39C", None),
+        ("Konak İzmir Lale Cad. No:9/b", "9B", None),
         ("Konak İzmir Lale Cad. No:9 İç Kapı: 4", "9", "4"),
         ("Konak İzmir Lale Cad. Dış Kapı: 9 İç Kapı: 4", "9", "4"),
     ],
@@ -444,3 +444,9 @@ def test_a_rare_place_word_does_not_respell_a_name() -> None:
 
 def test_titles_in_street_names_get_their_dot() -> None:
     assert parse("Prof Dr Ali Demir Cd. Konak İzmir").cadde == "Prof. Dr. Ali Demir"
+
+
+@pytest.mark.parametrize("number", ["27/B", "27-B", "27B", "27b", "27/b"])
+def test_every_spelling_of_a_lettered_door_gives_one_value(number: str) -> None:
+    assert parse(f"Gül Sk. No:{number} Konak İzmir").bina_no == "27B"
+    assert parse(f"Gül Sk. {number} Konak İzmir").bina_no == "27B"

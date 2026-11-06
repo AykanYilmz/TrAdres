@@ -23,7 +23,7 @@ from tradres.tokenizer import tokenize
         ("no5", {"bina_no": "5"}),
         ("Numara 12A", {"bina_no": "12A"}),
         ("No:5/3", {"bina_no": "5", "daire": "3"}),
-        ("No:7/A", {"bina_no": "7/A"}),
+        ("No:7/A", {"bina_no": "7A"}),
         ("D:3", {"daire": "3"}),
         ("d 3", {"daire": "3"}),
         ("d4", {"daire": "4"}),

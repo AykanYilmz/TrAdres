@@ -257,6 +257,7 @@ Her faz sonunda dur ve onayımı bekle.
 - **`Van Merkez` mahalle sayılmaz, `kalan`'da kalır:** ilçede gerçek `Merkez` mahallesi varsa (Bağcılar) mahalle olur. İlk sürüm kelimeyi siliyordu; hypothesis (5000 örnek) sessiz kaybı `Çınar Merkez`'de yakaladı.
 - **Ülke adı sadece adresin son kelimesiyse atılır:** `Türkiye Sk.` sokak olarak kalır.
 - **Kelime sayısı eşiği reddedildi:** `Çan`/`Can` için en az 3 geçiş kuralı `Gül`'ü de bozuyordu; yerine `data/ascii_names.json` listesi.
+- **Harfli numara tek biçimde (Aykan onayladı):** `27/B`, `27-B`, `27b` → `27B`; `bina_no` ve `daire` için. CSV temizliğinde aynı kapı eşit görünsün diye. Rakamlı `5/3` korunur.
 - **Deneme sırası:** önce düzenli adresler (Google Maps) oturtulacak, karmaşık veri ondan sonra ele alınacak (Aykan, 2026-11-05). v0.1 hedefi dağınık CSV temizliği olduğu için karmaşık veri denemesi unutulmamalı.
 - **Faz 6'dan önce yer verisi güçlendirilecek** (Aykan kabul etti); kaynak seçimi Aykan'da.
 - **Fuzzy: rapidfuzz + OSA.** Takas (`Malatay`) 1 düzeltme sayılır. Eşitlikte tahmin edilmez. Kısa kelime düzeltilmez (`Van`/`Yan`). Mahalle için alt sınır daha yüksek: eksik bir `Çınar` `Pınar` olmamalı.

@@ -3,15 +3,15 @@
 
 - id: "k001"
   girdi: "Konak İzmir Lale Cad. 14/A Daire:3"
-  beklenen: {il: İzmir, ilce: Konak, cadde: Lale, bina_no: 14/A, daire: "3"}
+  beklenen: {il: İzmir, ilce: Konak, cadde: Lale, bina_no: 14A, daire: "3"}
   etiketler: [no_bolu, sira, mahalle_eksik]
 - id: "k002"
   girdi: "Seyhan Adana Papatya Cd. 7/C"
-  beklenen: {il: Adana, ilce: Seyhan, cadde: Papatya, bina_no: 7/C}
+  beklenen: {il: Adana, ilce: Seyhan, cadde: Papatya, bina_no: 7C}
   etiketler: [no_bolu, sira, mahalle_eksik]
 - id: "k003"
   girdi: "konya meram yeni mh lale cd 18/b d 5"
-  beklenen: {il: Konya, ilce: Meram, mahalle: Yeni, cadde: Lale, bina_no: 18/B, daire: "5"}
+  beklenen: {il: Konya, ilce: Meram, mahalle: Yeni, cadde: Lale, bina_no: 18B, daire: "5"}
   etiketler: [ascii, kisaltma, no_bolu, sira]
 - id: "k004"
   girdi: "Efeler Aydın Zambak Cad. 52A/6"
@@ -23,11 +23,11 @@
   etiketler: [no_bolu, il_eksik, posta_kodu]
 - id: "k006"
   girdi: "Tepebaşı/Eskişehir Lale Cad. No:12-B Daire 3"
-  beklenen: {il: Eskişehir, ilce: Tepebaşı, cadde: Lale, bina_no: 12-B, daire: "3"}
+  beklenen: {il: Eskişehir, ilce: Tepebaşı, cadde: Lale, bina_no: 12B, daire: "3"}
   etiketler: [sira, mahalle_eksik]
 - id: "k007"
   girdi: "Melikgazi/KAYSERİ Sümbül Cd. No:40-A"
-  beklenen: {il: Kayseri, ilce: Melikgazi, cadde: Sümbül, bina_no: 40-A}
+  beklenen: {il: Kayseri, ilce: Melikgazi, cadde: Sümbül, bina_no: 40A}
   etiketler: [sira, mahalle_eksik, buyuk_harf]
 - id: "k008"
   girdi: "Merkez Mah. Lale Sk. İç Kapı: 7 No:3 Ortahisar/Trabzon"
@@ -35,7 +35,7 @@
   etiketler: [tuzak]
 - id: "k009"
   girdi: "Kemerkaya Mahallesi Dr. Ali Can Sokağı No: 9/A İç Kapı: 2 Ortahisar/Trabzon"
-  beklenen: {il: Trabzon, ilce: Ortahisar, mahalle: Kemerkaya, sokak: Dr. Ali Can, bina_no: 9/A, daire: "2"}
+  beklenen: {il: Trabzon, ilce: Ortahisar, mahalle: Kemerkaya, sokak: Dr. Ali Can, bina_no: 9A, daire: "2"}
   etiketler: [temiz]
 - id: "k010"
   girdi: "Çaykışla Köyü Merkez Küme Evleri No:5 Yığılca/Düzce"

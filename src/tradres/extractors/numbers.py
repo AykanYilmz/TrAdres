@@ -11,13 +11,24 @@ from tradres.normalization import tr_title, tr_upper
 from tradres.scoring import Origin
 from tradres.tokenizer import Token, TokenKind, street_keyword
 
-__all__ = ["extract_numbers"]
+__all__ = ["compact_number", "extract_numbers"]
 
 _GLUED = re.compile(r"([dk])(\d{1,3})")  # "d4", "k2": flat and floor without a space
 _POSTAL_CODE = re.compile(r"(0[1-9]|[1-7]\d|8[01])\d{3}")  # first two digits: plate code 01-81
 _FLOOR_WORDS = frozenset({"zemin", "giris", "bodrum", "asma", "cati"})
 _BASEMENT_FLOOR = re.compile(r"[bB]\d")
 _MIN_ROAD_DIGITS = 3  # "D 100" is a road; "D 12" is flat 12
+_NUMBER_AND_LETTER = re.compile(r"(\d+)[/-]?([^\W\d_])")
+
+
+def compact_number(value: str) -> str:
+    """One spelling for a number with a letter, so the same door compares equal.
+
+    >>> [compact_number(value) for value in ("27/B", "27-b", "27B", "5/3")]
+    ['27B', '27B', '27B', '5/3']
+    """
+    found = _NUMBER_AND_LETTER.fullmatch(value)
+    return f"{found[1]}{tr_upper(found[2])}" if found else value
 
 
 def _digits(token: Token) -> str:
@@ -223,4 +234,8 @@ def extract_numbers(tokens: Sequence[Token]) -> Extraction:
         if index not in scanner.used:
             scanner.labelled(index)
     scanner.bare_values()
-    return Extraction(fields=scanner.fields, used=frozenset(scanner.used), origins=scanner.origins)
+    fields = {
+        name: compact_number(value) if name in ("bina_no", "daire") else value
+        for name, value in scanner.fields.items()
+    }
+    return Extraction(fields=fields, used=frozenset(scanner.used), origins=scanner.origins)

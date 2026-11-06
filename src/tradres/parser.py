@@ -6,7 +6,7 @@ import re
 from collections.abc import Collection, Mapping, Sequence
 
 from tradres.abbreviations import load_country_names, load_description_words, lookup
-from tradres.extractors.numbers import extract_numbers
+from tradres.extractors.numbers import compact_number, extract_numbers
 from tradres.extractors.places import extract_places, free_windows
 from tradres.extractors.streets import extract_streets
 from tradres.gazetteer import Gazetteer, load_gazetteer
@@ -301,7 +301,7 @@ def parse(text: str, *, config: MatchConfig = DEFAULT_CONFIG) -> Address:
     if "bina_no" not in fields:
         index = number_after_keyword(tokens, used)
         if index is not None:
-            fields["bina_no"] = tokens[index].text.rstrip(".")
+            fields["bina_no"] = compact_number(tokens[index].text.rstrip("."))
             origins["bina_no"] = Origin.KEYWORD
             used.add(index)
 

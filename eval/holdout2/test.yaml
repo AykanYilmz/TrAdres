@@ -36,7 +36,7 @@
   etiketler: [site, tuzak]
 - id: "t009"
   girdi: "Akçeşme Mh. 3041 Sk. No:6 D:2/A Merkezefendi Denizli"
-  beklenen: {il: Denizli, ilce: Merkezefendi, mahalle: Akçeşme, sokak: "3041", bina_no: "6", daire: 2/A}
+  beklenen: {il: Denizli, ilce: Merkezefendi, mahalle: Akçeşme, sokak: "3041", bina_no: "6", daire: 2A}
   etiketler: [kisaltma, no_bolu]
 - id: "t010"
   girdi: "Bismil Diyarbakir Alibey mh Istasyon cd no:3"
@@ -200,5 +200,5 @@
   etiketler: [temiz]
 - id: "t050"
   girdi: "Taşliman Mah. Sahil Cad. Çınarcık-Yalova No:30/B"
-  beklenen: {il: Yalova, ilce: Çınarcık, mahalle: Taşliman, cadde: Sahil, bina_no: 30/B}
+  beklenen: {il: Yalova, ilce: Çınarcık, mahalle: Taşliman, cadde: Sahil, bina_no: 30B}
   etiketler: [noktalama, kisaltma]
