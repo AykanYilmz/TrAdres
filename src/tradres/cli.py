@@ -212,12 +212,18 @@ def convert_csv(
     output_encoding: str = "utf-8-sig",
     progress: bool = False,
 ) -> Summary:
-    """Parse one column of a CSV file and write the file with result columns."""
+    """Parse one column of a CSV file and write the file with result columns.
+
+    The rows go to a temporary file next to ``target``, which takes its place
+    only at the end. A failed or stopped run leaves no half-written file, and an
+    older ``target`` stays as it was.
+    """
     if not source.is_file():
         raise CliError(f"file not found: {source}")
     if target.exists() and target.samefile(source):
         raise CliError("the output file must not be the input file")
 
+    partial = target.with_name(f"{target.name}.part")
     try:
         with source.open("rb") as binary:
             text = io.TextIOWrapper(binary, encoding or detect_encoding(source), newline="")
@@ -232,17 +238,20 @@ def convert_csv(
             size = source.stat().st_size
             bar = Progress(size, enabled=progress, stream=sys.stderr)
             rows = csv.reader(text, delimiter=delimiter)
-            with target.open("w", encoding=output_encoding, newline="") as output:
+            with partial.open("w", encoding=output_encoding, newline="") as output:
                 writer = csv.writer(output, delimiter=delimiter)
                 writer.writerow([*header, *_RESULT_COLUMNS])
                 for row in parse_rows(rows, index, len(header), delimiter, summary):
                     writer.writerow(row)
                     bar.update(binary.tell(), summary.rows)
             bar.close(size, summary.rows)
+        partial.replace(target)
     except (csv.Error, UnicodeError, LookupError) as error:
         raise CliError(f"could not convert {source}: {error}; try --encoding") from error
     except OSError as error:
         raise CliError(str(error)) from error
+    finally:
+        partial.unlink(missing_ok=True)
     return summary
 
 
@@ -321,6 +330,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"tradres: error: {error}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:
-        print("\ntradres: stopped; the output file is not complete", file=sys.stderr)
+        print("\ntradres: stopped; no output file was written", file=sys.stderr)
         return _INTERRUPTED
     return code

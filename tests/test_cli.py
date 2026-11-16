@@ -363,7 +363,7 @@ def test_ctrl_c_says_the_output_is_not_complete(
 
     monkeypatch.setattr(cli, "convert_csv", stop)
     assert main(["parse-csv", "a", "--column", "b", "-o", "c"]) == 130
-    assert "not complete" in capsys.readouterr().err
+    assert "no output file was written" in capsys.readouterr().err
 
 
 def test_csv_gives_the_same_result_as_parse(tmp_path: Path) -> None:
@@ -385,3 +385,28 @@ def test_csv_of_one_column_with_commas_gives_no_warning(tmp_path: Path) -> None:
     summary = convert_csv(source, target, column="adres")
     assert summary.uneven == 0
     assert read_rows(target)[0]["adres"] == "Gül Sk. No:5, Merkez/Bolu"
+
+
+def test_failed_run_keeps_the_old_output(tmp_path: Path) -> None:
+    source = tmp_path / "in.csv"
+    target = tmp_path / "out.csv"
+    target.write_text("old result\n", encoding="utf-8")
+    source.write_bytes(b"adres\nBolu\n\xff\xfe\n")
+    with pytest.raises(CliError):
+        convert_csv(source, target, column="adres", encoding="utf-8")
+    assert target.read_text(encoding="utf-8") == "old result\n"
+    assert set(tmp_path.iterdir()) == {source, target}
+
+
+def test_stopped_run_writes_nothing(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    source = tmp_path / "in.csv"
+    target = tmp_path / "out.csv"
+    source.write_text("adres\nBolu\n", encoding="utf-8")
+
+    def stop(_text: str) -> None:
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(cli, "parse", stop)
+    with pytest.raises(KeyboardInterrupt):
+        convert_csv(source, target, column="adres")
+    assert set(tmp_path.iterdir()) == {source}
