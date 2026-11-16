@@ -32,3 +32,6 @@ data/raw/
 
 # Real address trials: these files must never enter the repository
 denemeler/
+
+# Local working notes (kept on this computer, not on GitHub)
+CLAUDE.md
