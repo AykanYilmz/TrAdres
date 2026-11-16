@@ -12,7 +12,7 @@ requires-python = ">=3.10"
 dependencies = [
     "rapidfuzz>=3.14.5",
 ]
-keywords = ["turkish", "address", "parser", "geocoding", "nlp", "adres", "türkçe"]
+keywords = ["turkish", "address", "parser", "data-cleaning", "nlp", "adres", "türkçe"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
